@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="content" class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <!--        <h1 class="h1 mt-3 mb-0 text-gray-800">Caméléon</h1>-->
+    </div>
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Scanner adhérent</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="select">
+            <!--            <div class="row">-->
+            <form action="/member/scan" method="GET">
+                <p class="font-italic mt-2">Appuyez sur le bouton scanner puis poser votre carte sur le lecteur</p>
+                <button type="submit" class="form-control btn btn-secondary">Scanner</button>
+                {% if status %}
+                {% if member %}
+                <h3 class="font-weight-bold mt-2"></h3>
+                {%else%}
+                <p class="font-weight-bold mt-2">{{ status }}</p>
+                {% endif %}
+                {% endif %}
+
+            </form>
+            <!--            </div>-->
+        </div>
+    </div>
+
+    {% if new %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Adhérent inconnu</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="inconnu">
+            <div class="row">
+                <div class="col m-2">
+                    <p class="font-italic mt-2">Remplissez les informations ci dessous</p>
+                    <form action="/member/new_link" method="POST">
+                        <div class="form-group">
+                            <label for="lastname">Nom</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Nom"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstname">Prénom</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Prénom"
+                                   required>
+                        </div>
+                        <button type="submit" class="form-control btn btn-secondary">Rechercher</button>
+                    </form>
+                </div>
+                <div class="col m-2">
+                    {% if unknow %}
+                    <h4 class="font-weight-bold text-danger mt-2">Non trouvé</h4>
+                    <p class="mt-2"> Oups ! {{ lastname }} {{ firstname }} n'est pas un adhérent d'EirLab
+                        Community, vérifiez les informations et le cas échant rendez vous sur <a
+                                href="https://www.helloasso.com/associations/eirlab-community/adhesions/adherer-a-eirlab-le-fablab-associatif-de-bordeaux-inp/">
+                            adherer.eirlab.net</a> pour faire partie de l'association</p>
+                    <p class="font-italic small mt-2">Si vous êtes sûr que c'est bien un adhérent d'EirLab Community,
+                        n'hésitez pas à demander à un administrateur</p>
+                    {% endif %}
+                    {% if to_link %}
+                    <h4 class="font-weight-bold text-warning mt-2">Adhérent trouvé et non lié</h4>
+                    <p class="mt-2">{{ lastname }} {{ firstname }} est un adhérent d'EirLab Community </p>
+                    <p class="mt-2 text-danger">Un administrateur d'EirLab Community est nécessaire pour confirmer
+                        l'opération</p>
+
+                    <p class="mt-2"> Appuyez sur le bouton confirmer et posez la carte d'un administrateur d'EirLab
+                        Community</p>
+
+                    <form action="/member/confirm_link" method="GET">
+                        <button type="submit" class="form-control btn btn-secondary">Confirmer</button>
+                    </form>
+                    {% endif %}
+                    {% if already_link %}
+                    <h4 class="font-weight-bold text-success mt-2">Adhérent trouvé et lié</h4>
+                    <p class="mt-2">La carte de {{ lastname }} {{ firstname }} est déjà liée</p>
+                    <p class="font-italic small mt-2">Si vous devez changer votre carte, demandez à un
+                        administrateur</p>
+                    {% endif %}
+                    {% if success %}
+                    <h4 class="font-weight-bold text-success mt-2">Adhérent lié</h4>
+                    <p class="mt-2">{{ lastname }} {{ firstname }} est maintenant lié à votre carte</p>
+                    {% endif %}
+                    {% if error %}
+                    <h4 class="font-weight-bold text-danger mt-2">Erreur</h4>
+                    <p class="mt-2"> Oups ! L'administrateur n'a pas été reconnu </p>
+                    {% endif %}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if member %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Fiche adhérent</h6>
+            {% if member.expired %}
+            <h2 class="font-weight-bold text-danger mt-2">Adhésion Expirée</h2>
+            {% endif %}
+        </a>
+        <div class="collapse show card-body mb-4" id="fiche">
+            <div class="row">
+                <div class="col m-2">
+                    <ul class="list-group">
+                        <h3 class="font-weight-bold mt-2">{{ member.firstname }} {{ member.lastname }}</h3>
+                        <p class="mt-2"><a href="mailto:{{ member.email }}"> {{ member.email }}</a></p>
+                        <p class="mt-2">Validité de l'adhésion : {{ member.datec }} - {{ member.datem }}</p>
+                        <p class="mt-2">{{ member.type }}</p>
+                    </ul>
+                </div>
+
+                <div class="col m-2">
+                    <h4 class="font-weight-bold mt-2"> Formations </h4>
+                    {% if member.impression_3d %}
+                    <img src="{{ url_for('static', filename='img/imprimante.jpg') }}"
+                         class="img-fluid rounded-circle mt-2"
+                         alt="Imprimante">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/imprimante_black.jpg') }}"
+                         class="img-fluid rounded-circle mt-2" alt="Imprimante">
+                    {% endif %}
+                    {% if member.laser %}
+                    <img src="{{ url_for('static', filename='img/laser.png') }}" class="img-fluid rounded-circle mt-2"
+                         alt="Laser">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/laser_black.png') }}"
+                         class="img-fluid rounded-circle mt-2" alt="Laser">
+                    {% endif %}
+
+                    {% if member.cnc %}
+                    <img src="{{ url_for('static', filename='img/cnc.jpg') }}" class="img-fluid rounded-circle mt-2"
+                         alt="CNC">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/cnc_black.jpg') }}"
+                         class="img-fluid rounded-circle" alt="CNC">
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
