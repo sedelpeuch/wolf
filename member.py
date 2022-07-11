@@ -53,10 +53,12 @@ class Member:
             member["expired"] = True
         member["datem"] = timestamp.strftime('%d/%m/%Y')
         try:
-            formations = list(member["array_options"]["options_impression3d"].split(','))
-            member["impression_3d"] = True if '1' in formations else False
-            member["laser"] = True if '2' in formations else False
-            member["cnc"] = True if '3' in formations else False
+            formations = member["array_options"]["options_impression3d"]
+            if formations is not None:
+                list(formations.split(','))
+                member["impression_3d"] = True if '1' in formations else False
+                member["laser"] = True if '2' in formations else False
+                member["cnc"] = True if '3' in formations else False
         except TypeError:
             member["array_options"] = {}
             member["array_options"]["options_nserie"] = None
@@ -129,7 +131,7 @@ class Member:
                     break
         for user in users:
             if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                if user["lasname"] != "Schmitz":
+                if user["lastname"] != "Schmitz":
                     lock = False
                 break
         # put modifications
@@ -147,9 +149,10 @@ class Member:
                 }
             }
             print(content)
-            # r = requests.put(url, json=content, headers=config.headers)
+            r = requests.put(url, json=content, headers=config.headers)
             return render_template(template_name_or_list='index.html', status='Adhérent lié', new=True,
-                                   member=self.actual_member, success=True)
+                                   member=self.actual_member, success=True, lastname=member["lastname"],
+                                   firstname=member["firstname"])
         else:
             return render_template(template_name_or_list='index.html', status='Adhérent non lié', new=True,
                                    member=self.actual_member, error=True, lastname=member["lastname"],
