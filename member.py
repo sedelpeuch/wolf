@@ -2,20 +2,18 @@ import datetime
 import json
 
 import requests
-import serial
 import unidecode as unidecode
 from flask import Blueprint, render_template, request
 
 import config
+import rfid
 
 
 class Member:
     def __init__(self):
         self.bp = Blueprint('member', __name__, url_prefix='/member')
 
-        self.port_USB = "/dev/ttyUSB"
-        self.ser = None
-        self.baudrate = 9600
+        self.rfid = rfid.Serial()
 
         self.bp.route('/scan')(self.scan_member)
         self.bp.route('/new_link', methods=['POST'])(self.new_link)
@@ -23,27 +21,6 @@ class Member:
         self.data = None
         self.actual_n_serie = None
         self.actual_member = None
-
-    def initialize(self):
-        for i in range(0, 10):
-            try:
-                self.ser = serial.Serial(self.port_USB + str(i), self.baudrate)
-                return True
-            except serial.serialutil.SerialException:
-                pass
-        if self.ser is None:
-            return False
-
-    def read_serie(self):
-        try:
-            line = self.ser.readline().strip().decode('utf-8')
-            self.ser.close()
-        except serial.serialutil.SerialException:
-            self.ser.close()
-            self.initialize()
-            line = self.ser.readline().strip().decode('utf-8')
-            self.ser.close()
-        return line
 
     def process_member(self, member):
         timestamp = datetime.datetime.fromtimestamp(member["datec"])
@@ -65,10 +42,10 @@ class Member:
         return member
 
     def scan_member(self):
-        status = self.initialize()
+        status = self.rfid.initialize()
         if status is False:
             return render_template(template_name_or_list='index.html', status='Connectez le lecteur RFID et reeassayez')
-        n_serie = self.read_serie()
+        n_serie = self.rfid.read_serie()
         self.actual_n_serie = n_serie
         try:
             r = requests.get(config.url + config.url_member, headers=config.headers)
@@ -114,8 +91,8 @@ class Member:
     def confirm_link(self):
         # confirm adminitrator card
 
-        self.initialize()
-        n_serie = self.read_serie()
+        self.rfid.initialize()
+        n_serie = self.rfid.read_serie()
 
         users = requests.get(config.url + config.url_user, headers=config.headers).text
         users = json.loads(users)
@@ -145,7 +122,7 @@ class Member:
         if not lock:
             try:
                 formations = self.actual_member["array_options"]["options_impression3d"]
-            except TypeError:
+            except (TypeError, KeyError):
                 formations = ""
             id = self.actual_member["id"]
             url = "https://gestion.eirlab.net/api/index.php/members/" + str(id)
