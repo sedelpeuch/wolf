@@ -1,4 +1,5 @@
 import json
+import time
 
 import requests
 import unidecode as unidecode
@@ -21,15 +22,16 @@ class Member:
         self.data = None
         self.actual_n_serie = None
         self.actual_member = None
+        self.rfid.initialize()
+
 
     def scan_member(self):
         status = self.rfid.initialize()
         if status is False:
             return render_template(template_name_or_list='index.html', status='Connectez le lecteur RFID et reeassayez')
-        self.rfid.activation()
+
         n_serie = self.rfid.read_serie()
         self.actual_n_serie = n_serie
-        self.rfid.desactivation()
         try:
             r = requests.get(config.url + config.url_member, headers=config.headers)
         except requests.ConnectionError:
@@ -75,9 +77,7 @@ class Member:
         # confirm adminitrator card
 
         self.rfid.initialize()
-        self.rfid.activation()
         n_serie = self.rfid.read_serie()
-        self.rfid.desactivation()
 
         users = requests.get(config.url + config.url_user, headers=config.headers).text
         users = json.loads(users)
@@ -118,7 +118,7 @@ class Member:
                 }
             }
             print(content)
-            r = requests.put(url, json=content, headers=config.headers)
+            # r = requests.put(url, json=content, headers=config.headers)
             return render_template(template_name_or_list='index.html', status='Adhérent lié', new=True,
                                    member=self.actual_member, success=True, lastname=self.actual_member["lastname"],
                                    firstname=self.actual_member["firstname"])

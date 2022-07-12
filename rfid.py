@@ -29,24 +29,3 @@ class Serial:
             line = self.ser.readline().strip().decode('utf-8')
             self.ser.close()
         return line
-
-    def activation(self):
-        try:
-            self.ser.write(b'1')
-            time.sleep(0.5)
-        except serial.serialutil.SerialException:
-            self.ser.close()
-            self.initialize()
-            self.ser.write(b'1')
-            time.sleep(0.5)
-
-
-    def desactivation(self):
-        try:
-            self.ser.write(b'0')
-        except serial.serialutil.SerialException:
-            self.ser.close()
-            self.initialize()
-            self.ser.write(b'0')
-            time.sleep(0.5)
-
