@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="content" class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <!--        <h1 class="h1 mt-3 mb-0 text-gray-800">Caméléon</h1>-->
+    </div>
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Session de formation</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="scan">
+            <!--            <div class="row">-->
+            <form action="/formations/start" method="GET">
+                <p class="mt-2 text-danger">Un <a
+                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                    d'EirLab Community est nécessaire pour débuter
+                    l'opération</p>
+
+                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                    d'EirLab
+                    Community</p>
+
+                <button type="submit" class="form-control btn btn-secondary">Scanner</button>
+                {% if error %}
+                <h4 class="font-weight-bold mt-2 text-danger">{{ error }}</h4>
+                {% endif %}
+            </form>
+            <!--            </div>-->
+        </div>
+    </div>
+    {% if member %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Choix de la formation</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="choix">
+            <h4 class="mt-2">Fabmanager : {{ member.firstname }} {{ member.lastname }} - {{ job }}</h4>
+            <!--            <div class="row">-->
+            <form action="/formations/confirm" method="POST">
+
+                {% if member.impression_3d %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations" id="impression3d"
+                           value="impression_3d">
+                    <label class="form-check-label" for="impression3d"> <img
+                            src="{{ url_for('static', filename='img/imprimante.jpg') }}"
+                            class="img-fluid rounded-circle mt-2"
+                            alt="Imprimante">
+                    </label>
+                </div>
+                {% else %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations" id="impression3d"
+                           value="False" disabled>
+                    <label class="form-check-label" for="impression3d"> <img
+                            src="{{ url_for('static', filename='img/imprimante_black.jpg') }}"
+                            class="img-fluid rounded-circle mt-2" alt="Imprimante">
+                    </label>
+                </div>
+                {% endif %}
+                {% if member.laser %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations" id="laser"
+                           value="laser">
+                    <label class="form-check-label" for="laser"> <img
+                            src="{{ url_for('static', filename='img/laser.png') }}"
+                            class="img-fluid rounded-circle mt-2"
+                            alt="Laser"></label>
+                </div>
+                {% else %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations" id="laser"
+                           value="False" disabled>
+                    <label class="form-check-label" for="laser"> <img
+                            src="{{ url_for('static', filename='img/laser_black.png') }}"
+                            class="img-fluid rounded-circle mt-2" alt="Laser"></label>
+                </div>
+                {% endif %}
+
+                {% if member.cnc %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations" id="cnc"
+                           value="cnc">
+                    <label class="form-check-label" for="cnc"> <img
+                            src="{{ url_for('static', filename='img/cnc.jpg') }}"
+                            class="img-fluid rounded-circle mt-2"
+                            alt="CNC"></label>
+                </div>
+                {% else %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations" id="cnc"
+                           value="False" disabled>
+                    <label class="form-check-label" for="cnc"> <img
+                            src="{{ url_for('static', filename='img/cnc_black.jpg') }}"
+                            class="img-fluid rounded-circle" alt="CNC"></label>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="form-control btn btn-secondary mt-2">Confirmer</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if formation %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Personnes formées</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="add">
+            <h4 class="m-0 font-weight-bold text-secondary">Fabmanager : {{ fabmanager.firstname }} {{
+                fabmanager.lastname }} - {{ job }}</h4>
+            <h4 class="m-0 font-weight-bold text-secondary">Formation : {{ formation }}</h4>
+            <div class="row">
+                <div class="col m-2">
+                    <form action="/formations/add" method="GET">
+
+                        <p class="mt-2"> Appuyez sur le bouton scanner et posez votre carte sur le lecteur</p>
+                        <button type="submit" class="form-control btn btn-secondary mt-2">Scanner</button>
+                    </form>
+
+                    {% if list_add %}
+                    <h5 class="mt-2">Personnes formées pendant la session</h5>
+                    <ul class="list-group">
+                        {% for member in list_add %}
+                        <li class="list-group-item">{{ member.firstname }} {{ member.lastname }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="col m-2">
+                    {% if success %}
+                    <h4 class="mt-2 text-success"> Formation acquise </h4>
+                    <p class="mt-2"> La formation {{ formation }} a été acquise pour {{ student.firstname }} {{
+                        student.lastname }}</p>
+                    {% endif %}
+                    {% if error %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+

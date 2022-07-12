@@ -1,10 +1,10 @@
-import datetime
 import json
 
 import requests
 import unidecode as unidecode
 from flask import Blueprint, render_template, request
 
+import common
 import config
 import rfid
 
@@ -22,31 +22,14 @@ class Member:
         self.actual_n_serie = None
         self.actual_member = None
 
-    def process_member(self, member):
-        timestamp = datetime.datetime.fromtimestamp(member["datec"])
-        member["datec"] = timestamp.strftime('%d/%m/%Y')
-        timestamp = timestamp + datetime.timedelta(days=365)
-        if timestamp < timestamp.today():
-            member["expired"] = True
-        member["datem"] = timestamp.strftime('%d/%m/%Y')
-        try:
-            formations = member["array_options"]["options_impression3d"]
-            if formations is not None:
-                list(formations.split(','))
-                member["impression_3d"] = True if '1' in formations else False
-                member["laser"] = True if '2' in formations else False
-                member["cnc"] = True if '3' in formations else False
-        except TypeError:
-            member["array_options"] = {}
-            member["array_options"]["options_nserie"] = None
-        return member
-
     def scan_member(self):
         status = self.rfid.initialize()
         if status is False:
             return render_template(template_name_or_list='index.html', status='Connectez le lecteur RFID et reeassayez')
+        self.rfid.activation()
         n_serie = self.rfid.read_serie()
         self.actual_n_serie = n_serie
+        self.rfid.desactivation()
         try:
             r = requests.get(config.url + config.url_member, headers=config.headers)
         except requests.ConnectionError:
@@ -55,7 +38,7 @@ class Member:
         for member in self.data:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == n_serie:
-                    member = self.process_member(member)
+                    member = common.process_member(member)
                     return render_template(template_name_or_list='index.html', status="Member found", member=member)
         return render_template(template_name_or_list='index.html', status='Adhérent inconnu', new=True)
 
@@ -73,7 +56,7 @@ class Member:
         for member in self.data:
             if unidecode.unidecode(member["firstname"]).lower() == firstname.lower() and unidecode.unidecode(
                     member["lastname"]).lower() == lastname.lower():
-                found = self.process_member(member)
+                found = common.process_member(member)
                 break
         if found is None:
             return render_template(template_name_or_list='index.html', status='Non adhérent', new=True, unknow=True,
@@ -92,7 +75,9 @@ class Member:
         # confirm adminitrator card
 
         self.rfid.initialize()
+        self.rfid.activation()
         n_serie = self.rfid.read_serie()
+        self.rfid.desactivation()
 
         users = requests.get(config.url + config.url_user, headers=config.headers).text
         users = json.loads(users)
@@ -104,7 +89,7 @@ class Member:
         for member in member:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == n_serie:
-                    member = self.process_member(member)
+                    member = common.process_member(member)
                     break
         for user in users:
             if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
@@ -133,7 +118,7 @@ class Member:
                 }
             }
             print(content)
-            # r = requests.put(url, json=content, headers=config.headers)
+            r = requests.put(url, json=content, headers=config.headers)
             return render_template(template_name_or_list='index.html', status='Adhérent lié', new=True,
                                    member=self.actual_member, success=True, lastname=self.actual_member["lastname"],
                                    firstname=self.actual_member["firstname"])

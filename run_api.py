@@ -65,6 +65,9 @@ class RunAPI:
         import member
         self.app.register_blueprint(member.Member().bp)
 
+        import formation
+        self.app.register_blueprint(formation.Formations().bp)
+
         CORS(self.app)
 
 
