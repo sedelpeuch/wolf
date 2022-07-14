@@ -34,6 +34,7 @@ class Formations:
         id = member["id"]
         if self.formation_dictionnary[self.formation] not in formations:
             formations = formations + ',' + self.formation_dictionnary[self.formation]
+            member["array_options"]["options_impression3d"] = formations
         url = "https://gestion.eirlab.net/api/index.php/members/" + str(id)
         content = {
             "array_options": {
@@ -41,8 +42,8 @@ class Formations:
                 "options_nserie": self.actual_n_serie
             }
         }
-        print(content)
         r = requests.put(url, json=content, headers=config.headers)
+        return member
 
     def start(self):
         self.rfid.initialize()
@@ -108,8 +109,9 @@ class Formations:
                     break
         if member is not None:
             if member not in self.list_add:
-                self.add_formation(member)
                 self.list_add.append(member)
+                member = self.add_formation(member)
+                member = common.process_formations(member)
             # add member to group
             return render_template('formations.html', list_add=self.list_add, job=self.job, student=member,
                                    success=True, fabmanager=self.fabmanager, formation=self.formation)
@@ -178,8 +180,9 @@ class Formations:
                 break
         # put modifications
         if not lock:
-            self.add_formation(self.actual_member)
             self.list_add.append(self.actual_member)
+            self.actual_member = self.add_formation(self.actual_member)
+            self.actual_member = common.process_formations(self.actual_member)
             return render_template(template_name_or_list='formations.html', status='Adhérent lié', new=True,
                                    success=True, student=self.actual_member, job=self.job,
                                    fabmanager=self.fabmanager, formation=self.formation, linked=True,

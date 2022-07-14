@@ -1,5 +1,4 @@
 import json
-import time
 
 import requests
 import unidecode as unidecode
@@ -11,21 +10,39 @@ import rfid
 
 
 class Member:
+    """
+    La classe membre permet de :
+
+    - lire la fiche d'un adhérent à partir de sa carte RFID
+    - lier une carte RFID à un adhérent
+    - confirmer la liaison d'une carte RFID à un adhérent à l'aide d'un membre du conseil d'administration
+    """
+
     def __init__(self):
         self.bp = Blueprint('member', __name__, url_prefix='/member')
 
-        self.rfid = rfid.Serial()
+        self.rfid = rfid.Serial()  # Initialisation du lecteur RFID
 
         self.bp.route('/scan')(self.scan_member)
         self.bp.route('/new_link', methods=['POST'])(self.new_link)
         self.bp.route('/confirm_link')(self.confirm_link)
-        self.data = None
-        self.actual_n_serie = None
-        self.actual_member = None
+
+        self.data = None  # Données provenant des requêtes dolibarr sur les adhérents
+        self.actual_n_serie = None  # Numéro de série de la dernière carte RFID lue
+        self.actual_member = None  # Adhérent lié à la dernière carte RFID lue
         self.rfid.initialize()
 
-
     def scan_member(self):
+        """
+        Permet de lire la carte RFID et de demander la correspondance à la base de données sur dolibarr
+        :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données
+        n'est pas établie
+        :return: index.html avec le message d'erreur "Connectez le lecteur RFID et reeassayez" si la lecture de la carte
+        n'est pas possible
+        :return: index.html avec le message d'erreur "Adhérent inconnu" si l'adhérent n'est pas trouvé,
+        l'onglet "Adhérent inconnu" avec le formulaire nom prénom apparait
+        :return: index.html avec la fiche de l'adhérent si l'adhérent est trouvé
+        """
         status = self.rfid.initialize()
         if status is False:
             return render_template(template_name_or_list='index.html', status='Connectez le lecteur RFID et reeassayez')
@@ -41,7 +58,7 @@ class Member:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == n_serie:
                     member = common.process_member(member)
-                    return render_template(template_name_or_list='index.html', status="Member found", member=member)
+                    return render_template(template_name_or_list='index.html', status="Adhérent trouvé", member=member)
         return render_template(template_name_or_list='index.html', status='Adhérent inconnu', new=True)
 
     def new_link(self):

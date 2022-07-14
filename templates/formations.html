@@ -194,6 +194,59 @@
     </div>
     {% endif %}
 
+    {% if student %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Fiche adhérent</h6>
+            {% if student.expired %}
+            <h2 class="font-weight-bold text-danger mt-2">Adhésion Expirée</h2>
+            {% endif %}
+        </a>
+        <div class="collapse show card-body mb-4" id="fiche">
+            <div class="row">
+                <div class="col m-2">
+                    <ul class="list-group">
+                        <h3 class="font-weight-bold mt-2">{{ student.lastname }} {{ student.firstname }}</h3>
+                        <p class="mt-2"><a href="mailto:{{ student.email }}"> {{ student.email }}</a></p>
+                        <p class="mt-2">Validité de l'adhésion : {{ student.datec }} - {{ student.datem }}</p>
+                        <p class="mt-2">{{ student.type }}</p>
+                    </ul>
+                </div>
+
+                <div class="col m-2">
+                    <h4 class="font-weight-bold mt-2"> Formations </h4>
+                    {% if student.impression_3d %}
+                    <img src="{{ url_for('static', filename='img/imprimante.jpg') }}"
+                         class="img-fluid rounded-circle mt-2"
+                         alt="Imprimante">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/imprimante_black.jpg') }}"
+                         class="img-fluid rounded-circle mt-2" alt="Imprimante">
+                    {% endif %}
+                    {% if student.laser %}
+                    <img src="{{ url_for('static', filename='img/laser.png') }}" class="img-fluid rounded-circle mt-2"
+                         alt="Laser">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/laser_black.png') }}"
+                         class="img-fluid rounded-circle mt-2" alt="Laser">
+                    {% endif %}
+
+                    {% if student.cnc %}
+                    <img src="{{ url_for('static', filename='img/cnc.jpg') }}" class="img-fluid rounded-circle mt-2"
+                         alt="CNC">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/cnc_black.jpg') }}"
+                         class="img-fluid rounded-circle" alt="CNC">
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 

@@ -15,17 +15,20 @@ def process_member(member):
         member["expired"] = True
     member["datem"] = timestamp.strftime('%d/%m/%Y')
     try:
-        formations = member["array_options"]["options_impression3d"]
-        if formations is not None:
-            list(formations.split(','))
-            member["impression_3d"] = True if '2' in formations else False
-            member["laser"] = True if '1' in formations else False
-            member["cnc"] = True if '3' in formations else False
+        member = process_formations(member)
     except TypeError:
         member["array_options"] = {}
         member["array_options"]["options_nserie"] = None
     return member
 
+def process_formations(member):
+    formations = member["array_options"]["options_impression3d"]
+    if formations is not None:
+        list(formations.split(','))
+        member["impression_3d"] = True if '2' in formations else False
+        member["laser"] = True if '1' in formations else False
+        member["cnc"] = True if '3' in formations else False
+    return member
 
 class Common:
     def __init__(self):
