@@ -26,25 +26,6 @@ class Formations:
         self.actual_n_serie = ""
         self.formation_dictionnary = {"laser": '1', "impression_3d": '2', "cnc": '3'}
 
-    def add_formation(self, member):
-        try:
-            formations = member["array_options"]["options_impression3d"]
-        except (TypeError, KeyError):
-            formations = ""
-        id = member["id"]
-        if self.formation_dictionnary[self.formation] not in formations:
-            formations = formations + ',' + self.formation_dictionnary[self.formation]
-            member["array_options"]["options_impression3d"] = formations
-        url = "https://gestion.eirlab.net/api/index.php/members/" + str(id)
-        content = {
-            "array_options": {
-                "options_impression3d": formations,
-                "options_nserie": self.actual_n_serie
-            }
-        }
-        r = requests.put(url, json=content, headers=config.headers)
-        return member
-
     def start(self):
         self.rfid.initialize()
         self.formation = None
@@ -110,9 +91,8 @@ class Formations:
         if member is not None:
             if member not in self.list_add:
                 self.list_add.append(member)
-                member = self.add_formation(member)
+                member = common.update_member(member, self.formation, self.actual_n_serie)
                 member = common.process_formations(member)
-            # add member to group
             return render_template('formations.html', list_add=self.list_add, job=self.job, student=member,
                                    success=True, fabmanager=self.fabmanager, formation=self.formation)
         if member is None:
@@ -181,7 +161,7 @@ class Formations:
         # put modifications
         if not lock:
             self.list_add.append(self.actual_member)
-            self.actual_member = self.add_formation(self.actual_member)
+            self.actual_member = common.update_member(self.actual_member, self.formation, self.actual_n_serie)
             self.actual_member = common.process_formations(self.actual_member)
             return render_template(template_name_or_list='formations.html', status='Adhérent lié', new=True,
                                    success=True, student=self.actual_member, job=self.job,

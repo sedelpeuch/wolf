@@ -37,7 +37,7 @@ class Member:
         Permet de lire la carte RFID et de demander la correspondance à la base de données sur dolibarr
         :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données
         n'est pas établie
-        :return: index.html avec le message d'erreur "Connectez le lecteur RFID et reeassayez" si la lecture de la carte
+        :return: index.html avec le message d'erreur "Connectez le lecteur RFID et réessayez" si la lecture de la carte
         n'est pas possible
         :return: index.html avec le message d'erreur "Adhérent inconnu" si l'adhérent n'est pas trouvé,
         l'onglet "Adhérent inconnu" avec le formulaire nom prénom apparait
@@ -45,7 +45,7 @@ class Member:
         """
         status = self.rfid.initialize()
         if status is False:
-            return render_template(template_name_or_list='index.html', status='Connectez le lecteur RFID et reeassayez')
+            return render_template(template_name_or_list='index.html', status='Connectez le lecteur RFID et réessayez')
 
         n_serie = self.rfid.read_serie()
         self.actual_n_serie = n_serie
@@ -62,6 +62,18 @@ class Member:
         return render_template(template_name_or_list='index.html', status='Adhérent inconnu', new=True)
 
     def new_link(self):
+        """
+        Permet de lier une carte RFID à un adhérent à partir de son nom et prénom, l'onglet "Adhérent inconnu" est
+        accessible uniquement après avoir scanné une carte (fonction scan_member)
+        :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données
+        n'est pas établie
+        :return: index.html avec le message "Non adhérent" si l'adhérent n'est pas trouvé
+        :return: index.html avec le message d'erreur "Adhérent déjà lié" si la carte RFID est déjà liée à un
+        adhérent, la fiche de
+        l'adhérent apparait
+        :return: index.html avec le message d'erreur "Adhérent non lié" si la carte RFID n'est pas liée, la fiche de
+        l'adhérent apparait
+        """
         lastname = request.form['lastname']
         lastname = unidecode.unidecode(lastname)
         firstname = request.form['firstname']
@@ -91,7 +103,13 @@ class Member:
                                    lastname=lastname, firstname=firstname, member=found)
 
     def confirm_link(self):
-        # confirm adminitrator card
+        """
+        Permet de confirmer la liaison d'une carte RFID à un adhérent à partir de son nom et prénom, le bouton de
+        confirmation n'est accessible que si l'adhérent a été trouvé par la fonction new_link mais qu'il n'est pas
+        lié à une carte RFID. Un membre du conseil d'administration est nécessaire pour confirmer la liaison.
+        :return: index.html avec le message d'erreur "Adhérent non lié" si l'administrateur n'est pas trouvé
+        :return: index.html avec "Adhérent lié" si la liaison a été effectuée
+        """
 
         self.rfid.initialize()
         n_serie = self.rfid.read_serie()
@@ -120,22 +138,9 @@ class Member:
                         lock = False
                         break
                 break
-        # put modifications
+
         if not lock:
-            try:
-                formations = self.actual_member["array_options"]["options_impression3d"]
-            except (TypeError, KeyError):
-                formations = ""
-            id = self.actual_member["id"]
-            url = "https://gestion.eirlab.net/api/index.php/members/" + str(id)
-            content = {
-                "array_options": {
-                    "options_impression3d": formations,
-                    "options_nserie": self.actual_n_serie
-                }
-            }
-            print(content)
-            r = requests.put(url, json=content, headers=config.headers)
+            self.actual_member = common.update_member(self.actual_member, None, self.actual_n_serie)
             return render_template(template_name_or_list='index.html', status='Adhérent lié', new=True,
                                    member=self.actual_member, success=True, lastname=self.actual_member["lastname"],
                                    firstname=self.actual_member["firstname"])
