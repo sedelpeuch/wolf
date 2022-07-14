@@ -118,7 +118,7 @@ class Member:
                 }
             }
             print(content)
-            # r = requests.put(url, json=content, headers=config.headers)
+            r = requests.put(url, json=content, headers=config.headers)
             return render_template(template_name_or_list='index.html', status='Adhérent lié', new=True,
                                    member=self.actual_member, success=True, lastname=self.actual_member["lastname"],
                                    firstname=self.actual_member["firstname"])

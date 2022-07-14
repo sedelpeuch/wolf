@@ -114,11 +114,11 @@
             <h6 class="m-0 font-weight-bold text-secondary">Personnes formées</h6>
         </a>
         <div class="collapse show card-body mb-4" id="add">
-            <h4 class="m-0 font-weight-bold text-secondary">Fabmanager : {{ fabmanager.firstname }} {{
-                fabmanager.lastname }} - {{ job }}</h4>
-            <h4 class="m-0 font-weight-bold text-secondary">Formation : {{ formation }}</h4>
             <div class="row">
                 <div class="col m-2">
+                    <h4 class="m-0 font-weight-bold text-secondary">Fabmanager : {{ fabmanager.firstname }} {{
+                        fabmanager.lastname }} - {{ job }}</h4>
+                    <h4 class="m-0 font-weight-bold text-secondary">Formation : {{ formation }}</h4>
                     <form action="/formations/add" method="GET">
 
                         <p class="mt-2"> Appuyez sur le bouton scanner et posez votre carte sur le lecteur</p>
@@ -135,12 +135,58 @@
                     {% endif %}
                 </div>
                 <div class="col m-2">
+                    {% if linked %}
+                    <h4 class="font-weight-bold text-success mt-2">Adhérent lié</h4>
+                    <p class="mt-2">{{ student.lastname }} {{ student.firstname }} est maintenant lié à votre carte</p>
+                    {% endif %}
+                    {% if not_linked %}
+                    <h4 class="font-weight-bold text-danger mt-2">Erreur</h4>
+                    <p class="mt-2"> Oups ! L'administrateur n'a pas été reconnu </p>
+                    {% endif %}
                     {% if success %}
-                    <h4 class="mt-2 text-success"> Formation acquise </h4>
-                    <p class="mt-2"> La formation {{ formation }} a été acquise pour {{ student.firstname }} {{
-                        student.lastname }}</p>
+                    <h4 class="mt-2 font-weight-bold text-success"> Formation acquise </h4>
+                    <p class="mt-2"> La formation {{ formation }} a été acquise pour {{ student.lastname }} {{
+                        student.firstname }}</p>
                     {% endif %}
                     {% if error %}
+                    <h4 class="mt-2 font-weight-bold text-secondary">Adhérent inconnu</h4>
+                    <p class="font-italic mt-2">Remplissez les informations ci dessous</p>
+                    <form action="/formations/new_link" method="POST">
+                        <div class="form-group">
+                            <label for="lastname">Nom</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Nom"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstname">Prénom</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Prénom"
+                                   required>
+                        </div>
+                        <button type="submit" class="form-control btn btn-secondary">Rechercher</button>
+                    </form>
+                    {% endif %}
+
+                    {% if unknow %}
+                    <h4 class="font-weight-bold text-danger mt-2">Non trouvé</h4>
+                    <p class="mt-2"> Oups ! {{ lastname }} {{ firstname }} n'est pas un adhérent d'EirLab
+                        Community, vérifiez les informations et le cas échant rendez vous sur <a
+                                href="https://www.helloasso.com/associations/eirlab-community/adhesions/adherer-a-eirlab-le-fablab-associatif-de-bordeaux-inp/">
+                            adherer.eirlab.net</a> pour faire partie de l'association</p>
+                    <p class="font-italic small mt-2">Si vous êtes sûr que c'est bien un adhérent d'EirLab Community,
+                        n'hésitez pas à demander à un administrateur</p>
+                    {% endif %}
+                    {% if to_link %}
+                    <h4 class="font-weight-bold text-warning mt-2">Adhérent trouvé et non lié</h4>
+                    <p class="mt-2">{{ lastname }} {{ firstname }} est un adhérent d'EirLab Community </p>
+                    <p class="mt-2 text-danger">Un administrateur d'EirLab Community est nécessaire pour confirmer
+                        l'opération</p>
+
+                    <p class="mt-2"> Appuyez sur le bouton confirmer et posez la carte d'un administrateur d'EirLab
+                        Community</p>
+
+                    <form action="/formations/confirm_link" method="GET">
+                        <button type="submit" class="form-control btn btn-secondary">Confirmer</button>
+                    </form>
                     {% endif %}
                 </div>
             </div>
