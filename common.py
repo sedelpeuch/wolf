@@ -57,7 +57,7 @@ def process_member(member):
 
 def process_formations(member):
     formations = member["array_options"]["options_impression3d"]
-    with open('formations.json') as json_file:
+    with open('/opt/wolf/formations.json') as json_file:
         json_formations = json.load(json_file)
         member['formations'] = {}
         member['no_formations'] = {}
