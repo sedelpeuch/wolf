@@ -16,6 +16,8 @@ def update_member(member, formation, actual_n_serie):
         formations = member["array_options"]["options_impression3d"]
     except (TypeError, KeyError):
         formations = ""
+    if formations is None:
+        formations = ""
     id = member["id"]
     if formation is not None:
         if formation_dictionnary[formation] not in formations:
