@@ -24,7 +24,6 @@ class Formations:
         self.job = ""
         self.list_add = []
         self.actual_n_serie = ""
-        self.formation_dictionnary = {"laser": '1', "impression_3d": '2', "cnc": '3'}
 
     def start(self):
         self.rfid.initialize()
@@ -125,7 +124,8 @@ class Formations:
             return render_template(template_name_or_list='formations.html', status='Adhérent non lié', job=self.job,
                                    fabmanager=self.fabmanager, formation=self.formation, to_link=True,
                                    lastname=self.actual_member["lastname"],
-                                   firstname=self.actual_member["firstname"], list_add=self.list_add)
+                                   firstname=self.actual_member["firstname"], list_add=self.list_add,
+                                   student=self.actual_member)
 
         return render_template('formations.html', error=True, job=self.job,
                                fabmanager=self.fabmanager, formation=self.formation, list_add=self.list_add)

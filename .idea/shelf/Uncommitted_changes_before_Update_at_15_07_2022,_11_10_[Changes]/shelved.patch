@@ -1,0 +1,295 @@
+Index: templates/formations.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"base.html\" %}\n\n{% block content %}\n<div id=\"content\" class=\"container-fluid\">\n    <!-- Page Heading -->\n    <div class=\"d-sm-flex align-items-center justify-content-between mb-4\">\n        <!--        <h1 class=\"h1 mt-3 mb-0 text-gray-800\">Caméléon</h1>-->\n    </div>\n    <div class=\"card shadow mb-4\">\n        <a href=\"#select\" class=\"d-block card-header py-3\" data-toggle=\"collapse\"\n           role=\"button\" aria-expanded=\"true\" aria-controls=\"select\">\n            <h6 class=\"m-0 font-weight-bold text-secondary\">Session de formation</h6>\n        </a>\n        <div class=\"collapse show card-body mb-4\" id=\"scan\">\n            <!--            <div class=\"row\">-->\n            <form action=\"/formations/start\" method=\"GET\">\n                <p class=\"mt-2 text-danger\">Un <a\n                        href=\"https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png\">fabmanager</a>\n                    d'EirLab Community est nécessaire pour débuter\n                    l'opération</p>\n\n                <p class=\"mt-2\"> Appuyez sur le bouton scanner et posez la carte d'un <a\n                        href=\"https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png\">fabmanager</a>\n                    d'EirLab\n                    Community</p>\n\n                <button type=\"submit\" class=\"form-control btn btn-secondary\">Scanner</button>\n                {% if error %}\n                <h4 class=\"font-weight-bold mt-2 text-danger\">{{ error }}</h4>\n                {% endif %}\n            </form>\n            <!--            </div>-->\n        </div>\n    </div>\n    {% if member %}\n    <div class=\"card shadow mb-4\">\n        <a href=\"#select\" class=\"d-block card-header py-3\" data-toggle=\"collapse\"\n           role=\"button\" aria-expanded=\"true\" aria-controls=\"select\">\n            <h6 class=\"m-0 font-weight-bold text-secondary\">Choix de la formation</h6>\n        </a>\n        <div class=\"collapse show card-body mb-4\" id=\"choix\">\n            <h4 class=\"mt-2\">Fabmanager : {{ member.firstname }} {{ member.lastname }} - {{ job }}</h4>\n            <!--            <div class=\"row\">-->\n            <form action=\"/formations/confirm\" method=\"POST\">\n\n                {% if member.impression_3d %}\n                <div class=\"form-check form-check-inline\">\n                    <input class=\"form-check-input\" type=\"radio\" name=\"formations\" id=\"impression3d\"\n                           value=\"impression_3d\">\n                    <label class=\"form-check-label\" for=\"impression3d\"> <img\n                            src=\"{{ url_for('static', filename='img/imprimante.jpg') }}\"\n                            class=\"img-fluid rounded-circle mt-2\"\n                            alt=\"Imprimante\">\n                    </label>\n                </div>\n                {% else %}\n                <div class=\"form-check form-check-inline\">\n                    <input class=\"form-check-input\" type=\"radio\" name=\"formations\" id=\"impression3d\"\n                           value=\"False\" disabled>\n                    <label class=\"form-check-label\" for=\"impression3d\"> <img\n                            src=\"{{ url_for('static', filename='img/imprimante_black.jpg') }}\"\n                            class=\"img-fluid rounded-circle mt-2\" alt=\"Imprimante\">\n                    </label>\n                </div>\n                {% endif %}\n                {% if member.laser %}\n                <div class=\"form-check form-check-inline\">\n                    <input class=\"form-check-input\" type=\"radio\" name=\"formations\" id=\"laser\"\n                           value=\"laser\">\n                    <label class=\"form-check-label\" for=\"laser\"> <img\n                            src=\"{{ url_for('static', filename='img/laser.png') }}\"\n                            class=\"img-fluid rounded-circle mt-2\"\n                            alt=\"Laser\"></label>\n                </div>\n                {% else %}\n                <div class=\"form-check form-check-inline\">\n                    <input class=\"form-check-input\" type=\"radio\" name=\"formations\" id=\"laser\"\n                           value=\"False\" disabled>\n                    <label class=\"form-check-label\" for=\"laser\"> <img\n                            src=\"{{ url_for('static', filename='img/laser_black.png') }}\"\n                            class=\"img-fluid rounded-circle mt-2\" alt=\"Laser\"></label>\n                </div>\n                {% endif %}\n\n                {% if member.cnc %}\n                <div class=\"form-check form-check-inline\">\n                    <input class=\"form-check-input\" type=\"radio\" name=\"formations\" id=\"cnc\"\n                           value=\"cnc\">\n                    <label class=\"form-check-label\" for=\"cnc\"> <img\n                            src=\"{{ url_for('static', filename='img/cnc.jpg') }}\"\n                            class=\"img-fluid rounded-circle mt-2\"\n                            alt=\"CNC\"></label>\n                </div>\n                {% else %}\n                <div class=\"form-check form-check-inline\">\n                    <input class=\"form-check-input\" type=\"radio\" name=\"formations\" id=\"cnc\"\n                           value=\"False\" disabled>\n                    <label class=\"form-check-label\" for=\"cnc\"> <img\n                            src=\"{{ url_for('static', filename='img/cnc_black.jpg') }}\"\n                            class=\"img-fluid rounded-circle\" alt=\"CNC\"></label>\n                </div>\n                {% endif %}\n\n                <button type=\"submit\" class=\"form-control btn btn-secondary mt-2\">Confirmer</button>\n            </form>\n        </div>\n    </div>\n    {% endif %}\n\n    {% if formation %}\n    <div class=\"card shadow mb-4\">\n        <a href=\"#select\" class=\"d-block card-header py-3\" data-toggle=\"collapse\"\n           role=\"button\" aria-expanded=\"true\" aria-controls=\"select\">\n            <h6 class=\"m-0 font-weight-bold text-secondary\">Personnes formées</h6>\n        </a>\n        <div class=\"collapse show card-body mb-4\" id=\"add\">\n            <div class=\"row\">\n                <div class=\"col m-2\">\n                    <h4 class=\"m-0 font-weight-bold text-secondary\">Fabmanager : {{ fabmanager.firstname }} {{\n                        fabmanager.lastname }} - {{ job }}</h4>\n                    <h4 class=\"m-0 font-weight-bold text-secondary\">Formation : {{ formation }}</h4>\n                    <form action=\"/formations/add\" method=\"GET\">\n\n                        <p class=\"mt-2\"> Appuyez sur le bouton scanner et posez votre carte sur le lecteur</p>\n                        <button type=\"submit\" class=\"form-control btn btn-secondary mt-2\">Scanner</button>\n                    </form>\n\n                    {% if list_add %}\n                    <h5 class=\"mt-2\">Personnes formées pendant la session</h5>\n                    <ul class=\"list-group\">\n                        {% for member in list_add %}\n                        <li class=\"list-group-item\">{{ member.firstname }} {{ member.lastname }}</li>\n                        {% endfor %}\n                    </ul>\n                    {% endif %}\n                </div>\n                <div class=\"col m-2\">\n                    {% if linked %}\n                    <h4 class=\"font-weight-bold text-success mt-2\">Adhérent lié</h4>\n                    <p class=\"mt-2\">{{ student.lastname }} {{ student.firstname }} est maintenant lié à votre carte</p>\n                    {% endif %}\n                    {% if not_linked %}\n                    <h4 class=\"font-weight-bold text-danger mt-2\">Erreur</h4>\n                    <p class=\"mt-2\"> Oups ! L'administrateur n'a pas été reconnu </p>\n                    {% endif %}\n                    {% if success %}\n                    <h4 class=\"mt-2 font-weight-bold text-success\"> Formation acquise </h4>\n                    <p class=\"mt-2\"> La formation {{ formation }} a été acquise pour {{ student.lastname }} {{\n                        student.firstname }}</p>\n                    {% endif %}\n                    {% if error %}\n                    <h4 class=\"mt-2 font-weight-bold text-secondary\">Adhérent inconnu</h4>\n                    <p class=\"font-italic mt-2\">Remplissez les informations ci dessous</p>\n                    <form action=\"/formations/new_link\" method=\"POST\">\n                        <div class=\"form-group\">\n                            <label for=\"lastname\">Nom</label>\n                            <input type=\"text\" class=\"form-control\" id=\"lastname\" name=\"lastname\" placeholder=\"Nom\"\n                                   required>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"firstname\">Prénom</label>\n                            <input type=\"text\" class=\"form-control\" id=\"firstname\" name=\"firstname\" placeholder=\"Prénom\"\n                                   required>\n                        </div>\n                        <button type=\"submit\" class=\"form-control btn btn-secondary\">Rechercher</button>\n                    </form>\n                    {% endif %}\n\n                    {% if unknow %}\n                    <h4 class=\"font-weight-bold text-danger mt-2\">Non trouvé</h4>\n                    <p class=\"mt-2\"> Oups ! {{ lastname }} {{ firstname }} n'est pas un adhérent d'EirLab\n                        Community, vérifiez les informations et le cas échant rendez vous sur <a\n                                href=\"https://www.helloasso.com/associations/eirlab-community/adhesions/adherer-a-eirlab-le-fablab-associatif-de-bordeaux-inp/\">\n                            adherer.eirlab.net</a> pour faire partie de l'association</p>\n                    <p class=\"font-italic small mt-2\">Si vous êtes sûr que c'est bien un adhérent d'EirLab Community,\n                        n'hésitez pas à demander à un administrateur</p>\n                    {% endif %}\n                    {% if to_link %}\n                    <h4 class=\"font-weight-bold text-warning mt-2\">Adhérent trouvé et non lié</h4>\n                    <p class=\"mt-2\">{{ lastname }} {{ firstname }} est un adhérent d'EirLab Community </p>\n                    <p class=\"mt-2 text-danger\">Un administrateur d'EirLab Community est nécessaire pour confirmer\n                        l'opération</p>\n\n                    <p class=\"mt-2\"> Appuyez sur le bouton confirmer et posez la carte d'un administrateur d'EirLab\n                        Community</p>\n\n                    <form action=\"/formations/confirm_link\" method=\"GET\">\n                        <button type=\"submit\" class=\"form-control btn btn-secondary\">Confirmer</button>\n                    </form>\n                    {% endif %}\n                </div>\n            </div>\n        </div>\n    </div>\n    {% endif %}\n\n    {% if student %}\n    <div class=\"card shadow mb-4\">\n        <a href=\"#select\" class=\"d-block card-header py-3\" data-toggle=\"collapse\"\n           role=\"button\" aria-expanded=\"true\" aria-controls=\"select\">\n            <h6 class=\"m-0 font-weight-bold text-secondary\">Fiche adhérent</h6>\n            {% if student.expired %}\n            <h2 class=\"font-weight-bold text-danger mt-2\">Adhésion Expirée</h2>\n            {% endif %}\n        </a>\n        <div class=\"collapse show card-body mb-4\" id=\"fiche\">\n            <div class=\"row\">\n                <div class=\"col m-2\">\n                    <ul class=\"list-group\">\n                        <h3 class=\"font-weight-bold mt-2\">{{ student.lastname }} {{ student.firstname }}</h3>\n                        <p class=\"mt-2\"><a href=\"mailto:{{ student.email }}\"> {{ student.email }}</a></p>\n                        <p class=\"mt-2\">Validité de l'adhésion : {{ student.datec }} - {{ student.datem }}</p>\n                        <p class=\"mt-2\">{{ student.type }}</p>\n                    </ul>\n                </div>\n\n                <div class=\"col m-2\">\n                    <h4 class=\"font-weight-bold mt-2\"> Formations </h4>\n                    {% if student.impression_3d %}\n                    <img src=\"{{ url_for('static', filename='img/imprimante.jpg') }}\"\n                         class=\"img-fluid rounded-circle mt-2\"\n                         alt=\"Imprimante\">\n                    {% else %}\n                    <img src=\"{{ url_for('static', filename='img/imprimante_black.jpg') }}\"\n                         class=\"img-fluid rounded-circle mt-2\" alt=\"Imprimante\">\n                    {% endif %}\n                    {% if student.laser %}\n                    <img src=\"{{ url_for('static', filename='img/laser.png') }}\" class=\"img-fluid rounded-circle mt-2\"\n                         alt=\"Laser\">\n                    {% else %}\n                    <img src=\"{{ url_for('static', filename='img/laser_black.png') }}\"\n                         class=\"img-fluid rounded-circle mt-2\" alt=\"Laser\">\n                    {% endif %}\n\n                    {% if student.cnc %}\n                    <img src=\"{{ url_for('static', filename='img/cnc.jpg') }}\" class=\"img-fluid rounded-circle mt-2\"\n                         alt=\"CNC\">\n                    {% else %}\n                    <img src=\"{{ url_for('static', filename='img/cnc_black.jpg') }}\"\n                         class=\"img-fluid rounded-circle\" alt=\"CNC\">\n                    {% endif %}\n\n                </div>\n\n            </div>\n        </div>\n    </div>\n    {% endif %}\n\n</div>\n{% endblock %}\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/formations.html b/templates/formations.html
+--- a/templates/formations.html	(revision 4dd5de99c334b25e937418db4426369e9b907e5c)
++++ b/templates/formations.html	(date 1657876162283)
+@@ -24,6 +24,26 @@
+                     d'EirLab
+                     Community</p>
+ 
++                <button type="submit" class="form-control btn btn-secondary">Scanner</button>
++                {% if error %}
++                <h4 class="font-weight-bold mt-2 text-danger">{{ error }}</h4>
++                {% endif %}
++            </form>
++            <!--            </div>-->
++        </div>
++        <div class="collapse show card-body mb-4" id="scan">
++            <!--            <div class="row">-->
++            <form action="/formations/start" method="GET">
++                <p class="mt-2 text-danger">Un <a
++                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
++                    d'EirLab Community est nécessaire pour débuter
++                    l'opération</p>
++
++                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
++                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
++                    d'EirLab
++                    Community</p>
++
+                 <button type="submit" class="form-control btn btn-secondary">Scanner</button>
+                 {% if error %}
+                 <h4 class="font-weight-bold mt-2 text-danger">{{ error }}</h4>
+Index: config.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>token = \"\"\nurl = \"https://gestion.eirlab.net/api/index.php/\"\nheaders = {\n    \"Accept\": \"application/json\",\n    \"DOLAPIKEY\": token}\nurl_member = \"members?sortfield=t.rowid&sortorder=ASC&limit=600\"\nurl_user = \"users?sortfield=t.rowid&sortorder=ASC&limit=100\"\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config.py b/config.py
+--- a/config.py	(revision 4dd5de99c334b25e937418db4426369e9b907e5c)
++++ b/config.py	(date 1657812603201)
+@@ -1,4 +1,4 @@
+-token = ""
++token = "sPfJjheCExeL"
+ url = "https://gestion.eirlab.net/api/index.php/"
+ headers = {
+     "Accept": "application/json",
+Index: .idea/wolf.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<module type=\"PYTHON_MODULE\" version=\"4\">\n  <component name=\"NewModuleRootManager\">\n    <content url=\"file://$MODULE_DIR$\">\n      <excludeFolder url=\"file://$MODULE_DIR$/venv\" />\n    </content>\n    <orderEntry type=\"jdk\" jdkName=\"Python 3.10 (wolf)\" jdkType=\"Python SDK\" />\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n  </component>\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/wolf.iml b/.idea/wolf.iml
+--- a/.idea/wolf.iml	(revision 4dd5de99c334b25e937418db4426369e9b907e5c)
++++ b/.idea/wolf.iml	(date 1657812603209)
+@@ -3,8 +3,15 @@
+   <component name="NewModuleRootManager">
+     <content url="file://$MODULE_DIR$">
+       <excludeFolder url="file://$MODULE_DIR$/venv" />
++      <excludeFolder url="file://$MODULE_DIR$/instance" />
+     </content>
+     <orderEntry type="jdk" jdkName="Python 3.10 (wolf)" jdkType="Python SDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
++  <component name="PackageRequirementsSettings">
++    <option name="requirementsPath" value="" />
++  </component>
++  <component name="PyDocumentationSettings">
++    <option name="renderExternalDocumentation" value="true" />
++  </component>
+ </module>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"69d42743-a013-463c-9425-a9bc88be5343\" name=\"Changes\" comment=\"\" />\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"FlaskConsoleOptions\" custom-start-script=\"import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\\nApp: %s [%s]\\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))\">\n    <envs>\n      <env key=\"FLASK_APP\" value=\"app\" />\n    </envs>\n    <option name=\"myCustomStartScript\" value=\"import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\\nApp: %s [%s]\\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))\" />\n    <option name=\"myEnvs\">\n      <map>\n        <entry key=\"FLASK_APP\" value=\"app\" />\n      </map>\n    </option>\n  </component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProjectId\" id=\"2Bi9AAIfdpB7rQBWYBurtIsShSx\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showExcludedFiles\" value=\"false\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,\n    &quot;last_opened_file_path&quot;: &quot;/home/sedelpeuch/eirlab/wolf/templates&quot;,\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\n    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;\n  }\n}</component>\n  <component name=\"RecentsManager\">\n    <key name=\"CopyFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$/templates\" />\n    </key>\n  </component>\n  <component name=\"RunManager\" selected=\"Python.run_api\">\n    <configuration name=\"main\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"wolf\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <EXTENSION ID=\"PythonCoverageRunConfigurationExtension\" runner=\"coverage.py\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/main.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"run_api\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"wolf\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <EXTENSION ID=\"PythonCoverageRunConfigurationExtension\" runner=\"coverage.py\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/run_api.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Python.run_api\" />\n        <item itemvalue=\"Python.main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"69d42743-a013-463c-9425-a9bc88be5343\" name=\"Changes\" comment=\"\" />\n      <created>1657377896133</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1657377896133</updated>\n      <workItem from=\"1657377902585\" duration=\"78000\" />\n      <workItem from=\"1657380766042\" duration=\"4943000\" />\n      <workItem from=\"1657386403832\" duration=\"82000\" />\n      <workItem from=\"1657455526308\" duration=\"5714000\" />\n      <workItem from=\"1657461262969\" duration=\"18205000\" />\n    </task>\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"com.intellij.coverage.CoverageDataManagerImpl\">\n    <SUITE FILE_PATH=\"coverage/wolf$main.coverage\" NAME=\"main Coverage Results\" MODIFIED=\"1657460230445\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"true\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$\" />\n    <SUITE FILE_PATH=\"coverage/wolf$run_api.coverage\" NAME=\"run_api Coverage Results\" MODIFIED=\"1657480141015\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"true\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 4dd5de99c334b25e937418db4426369e9b907e5c)
++++ b/.idea/workspace.xml	(date 1657876195727)
+@@ -1,7 +1,13 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ChangeListManager">
+-    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="" />
++    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="🐛 fix(common): fix import when put">
++      <change beforePath="$PROJECT_DIR$/.idea/wolf.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wolf.iml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/templates/formations.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/formations.html" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -25,6 +31,9 @@
+       </map>
+     </option>
+   </component>
++  <component name="Git.Settings">
++    <option name="UPDATE_TYPE" value="REBASE" />
++  </component>
+   <component name="MarkdownSettingsMigration">
+     <option name="stateVersion" value="1" />
+   </component>
+@@ -40,14 +49,16 @@
+     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;/home/sedelpeuch/eirlab/wolf/templates&quot;,
++    &quot;last_opened_file_path&quot;: &quot;/home/sedelpeuch/eirlab/wolf&quot;,
+     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable&quot;
+   }
+ }</component>
+   <component name="RecentsManager">
+     <key name="CopyFile.RECENT_KEYS">
++      <recent name="$PROJECT_DIR$" />
+       <recent name="$PROJECT_DIR$/templates" />
+     </key>
+   </component>
+@@ -115,8 +126,133 @@
+       <workItem from="1657380766042" duration="4943000" />
+       <workItem from="1657386403832" duration="82000" />
+       <workItem from="1657455526308" duration="5714000" />
+-      <workItem from="1657461262969" duration="18205000" />
++      <workItem from="1657461262969" duration="18281000" />
++      <workItem from="1657556966789" duration="2500000" />
++      <workItem from="1657560245215" duration="9967000" />
++      <workItem from="1657643034984" duration="7752000" />
++      <workItem from="1657726693153" duration="3368000" />
++      <workItem from="1657790063589" duration="11894000" />
++    </task>
++    <task id="LOCAL-00001" summary="✨ feat(adherent): reverse name and firstname">
++      <created>1657559197694</created>
++      <option name="number" value="00001" />
++      <option name="presentableId" value="LOCAL-00001" />
++      <option name="project" value="LOCAL" />
++      <updated>1657559197694</updated>
++    </task>
++    <task id="LOCAL-00002" summary="✨ feat(adherent): reverse name and firstname">
++      <created>1657559528769</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1657559528769</updated>
++    </task>
++    <task id="LOCAL-00003" summary="✨ feat(adherent): reverse name and firstname">
++      <created>1657559971703</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1657559971704</updated>
++    </task>
++    <task id="LOCAL-00004" summary="✨ feat(adherent): best administrator check">
++      <created>1657561101763</created>
++      <option name="number" value="00004" />
++      <option name="presentableId" value="LOCAL-00004" />
++      <option name="project" value="LOCAL" />
++      <updated>1657561101763</updated>
++    </task>
++    <task id="LOCAL-00005" summary="🐛 fix(adherent): fix bug when adhrent has no formation">
++      <created>1657561757969</created>
++      <option name="number" value="00005" />
++      <option name="presentableId" value="LOCAL-00005" />
++      <option name="project" value="LOCAL" />
++      <updated>1657561757969</updated>
++    </task>
++    <task id="LOCAL-00006" summary="✨ feat(rfid): create classe with rfid managment">
++      <created>1657561799145</created>
++      <option name="number" value="00006" />
++      <option name="presentableId" value="LOCAL-00006" />
++      <option name="project" value="LOCAL" />
++      <updated>1657561799145</updated>
++    </task>
++    <task id="LOCAL-00007" summary="✨ feat(member): update with new rfid protocol">
++      <created>1657650022531</created>
++      <option name="number" value="00007" />
++      <option name="presentableId" value="LOCAL-00007" />
++      <option name="project" value="LOCAL" />
++      <updated>1657650022531</updated>
++    </task>
++    <task id="LOCAL-00008" summary="✨ feat(member): update with new rfid protocol">
++      <created>1657655520251</created>
++      <option name="number" value="00008" />
++      <option name="presentableId" value="LOCAL-00008" />
++      <option name="project" value="LOCAL" />
++      <updated>1657655520251</updated>
++    </task>
++    <task id="LOCAL-00009" summary="✨ feat(formation): create formation management">
++      <created>1657805377514</created>
++      <option name="number" value="00009" />
++      <option name="presentableId" value="LOCAL-00009" />
++      <option name="project" value="LOCAL" />
++      <updated>1657805377515</updated>
++    </task>
++    <task id="LOCAL-00010" summary="✨ feat(formation): display adhrent fiche">
++      <created>1657806887461</created>
++      <option name="number" value="00010" />
++      <option name="presentableId" value="LOCAL-00010" />
++      <option name="project" value="LOCAL" />
++      <updated>1657806887461</updated>
++    </task>
++    <task id="LOCAL-00011" summary="✨ feat(formation): factorize member update">
++      <created>1657808130200</created>
++      <option name="number" value="00011" />
++      <option name="presentableId" value="LOCAL-00011" />
++      <option name="project" value="LOCAL" />
++      <updated>1657808130200</updated>
++    </task>
++    <task id="LOCAL-00012" summary="✨ feat(formation): factorize member update">
++      <created>1657808764894</created>
++      <option name="number" value="00012" />
++      <option name="presentableId" value="LOCAL-00012" />
++      <option name="project" value="LOCAL" />
++      <updated>1657808764894</updated>
++    </task>
++    <task id="LOCAL-00013" summary="✨ feat(formation): factorize member update">
++      <created>1657808888205</created>
++      <option name="number" value="00013" />
++      <option name="presentableId" value="LOCAL-00013" />
++      <option name="project" value="LOCAL" />
++      <updated>1657808888206</updated>
++    </task>
++    <task id="LOCAL-00014" summary="✨ feat(formation): add bug button">
++      <created>1657812591097</created>
++      <option name="number" value="00014" />
++      <option name="presentableId" value="LOCAL-00014" />
++      <option name="project" value="LOCAL" />
++      <updated>1657812591097</updated>
+     </task>
++    <task id="LOCAL-00015" summary="✨ feat(formation): add bug button">
++      <created>1657874613279</created>
++      <option name="number" value="00015" />
++      <option name="presentableId" value="LOCAL-00015" />
++      <option name="project" value="LOCAL" />
++      <updated>1657874613279</updated>
++    </task>
++    <task id="LOCAL-00016" summary="✨ feat(service): add wolf.service">
++      <created>1657874629761</created>
++      <option name="number" value="00016" />
++      <option name="presentableId" value="LOCAL-00016" />
++      <option name="project" value="LOCAL" />
++      <updated>1657874629761</updated>
++    </task>
++    <task id="LOCAL-00017" summary="🐛 fix(common): fix import when put">
++      <created>1657876024423</created>
++      <option name="number" value="00017" />
++      <option name="presentableId" value="LOCAL-00017" />
++      <option name="project" value="LOCAL" />
++      <updated>1657876024423</updated>
++    </task>
++    <option name="localTasksCounter" value="18" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -133,8 +269,23 @@
+       </map>
+     </option>
+   </component>
++  <component name="VcsManagerConfiguration">
++    <MESSAGE value="✨ feat(adherent): reverse name and firstname" />
++    <MESSAGE value="✨ feat(adherent): best administrator check" />
++    <MESSAGE value=" fix(adherent): fix bug when adhrent has no formation" />
++    <MESSAGE value="✨ feat(rfid): create classe with rfid managment" />
++    <MESSAGE value="✨ feat(member): update with new rfid protocol" />
++    <MESSAGE value="✨ feat(formation): create formation management" />
++    <MESSAGE value="✨ feat(formation): display adhrent fiche" />
++    <MESSAGE value="✨ feat(formation): factorize member update" />
++    <MESSAGE value="✨ feat(formation): add bug button" />
++    <MESSAGE value="✨ feat(" />
++    <MESSAGE value="✨ feat(service): add wolf.service" />
++    <MESSAGE value=" fix(common): fix import when put" />
++    <option name="LAST_COMMIT_MESSAGE" value=" fix(common): fix import when put" />
++  </component>
+   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+     <SUITE FILE_PATH="coverage/wolf$main.coverage" NAME="main Coverage Results" MODIFIED="1657460230445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+-    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1657480141015" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
++    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1657876186573" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+   </component>
+ </project>
+\ No newline at end of file

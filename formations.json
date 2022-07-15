@@ -1,0 +1,30 @@
+{
+  "laser": {
+    "name": "Découpeuse Laser",
+    "image": "/static/img/laser.png",
+    "image_black": "/static/img/laser_black.png",
+    "id": "1",
+    "ref": "laser"
+  },
+  "imprimante_3d": {
+    "name": "Impression 3D",
+    "image": "/static/img/imprimante_3d.jpg",
+    "image_black": "/static/img/imprimante_black.jpg",
+    "id": "2",
+    "ref": "imprimante_3d"
+  },
+  "cnc": {
+    "name": "CNC",
+    "image": "/static/img/cnc.jpg",
+    "image_black": "/static/img/cnc_black.jpg",
+    "id": "3",
+    "ref": "cnc"
+  },
+  "sla": {
+    "name": "Impression 3D SLA",
+    "image": "/static/img/sla.jpg",
+    "image_black": "/static/img/sla_black.jpg",
+    "id": "4",
+    "ref": "sla"
+  }
+}

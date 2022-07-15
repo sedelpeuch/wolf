@@ -1,12 +1,11 @@
 import datetime
-import threading
-import time
+import json
 
-import config
 import requests
 from flask import Blueprint, render_template
 
-formation_dictionnary = {"laser": '1', "impression_3d": '2', "cnc": '3'}
+import config
+
 PUB = True
 
 
@@ -20,9 +19,11 @@ def update_member(member, formation, actual_n_serie):
         formations = ""
     id = member["id"]
     if formation is not None:
-        if formation_dictionnary[formation] not in formations:
-            formations = formations + ',' + formation_dictionnary[formation]
-            member["array_options"]["options_impression3d"] = formations
+        with open('formations.json') as json_file:
+            json_formations = json.load(json_file)
+            if json_formations[formation]['id'] not in formations:
+                formations = formations + ',' + json_formations[formation]['id']
+                member["array_options"]["options_impression3d"] = formations
     url = "https://gestion.eirlab.net/api/index.php/members/" + str(id)
     content = {
         "array_options": {
@@ -37,7 +38,6 @@ def update_member(member, formation, actual_n_serie):
 
 
 def process_member(member):
-    print(member)
     timestamp_begin = datetime.datetime.fromtimestamp(member["datec"])
     member["datec"] = timestamp_begin.strftime('%d/%m/%Y')
     try:
@@ -57,11 +57,15 @@ def process_member(member):
 
 def process_formations(member):
     formations = member["array_options"]["options_impression3d"]
-    if formations is not None:
-        list(formations.split(','))
-        member["impression_3d"] = True if '2' in formations else False
-        member["laser"] = True if '1' in formations else False
-        member["cnc"] = True if '3' in formations else False
+    with open('formations.json') as json_file:
+        json_formations = json.load(json_file)
+        member['formations'] = {}
+        member['no_formations'] = {}
+        for formation in json_formations:
+            if json_formations[formation]["id"] in formations:
+                member["formations"][formation] = json_formations[formation]
+            else:
+                member["no_formations"][formation] = json_formations[formation]
     return member
 
 
@@ -79,7 +83,6 @@ class Common:
 
     def index(self):
         return render_template(template_name_or_list='index.html')
-
 
     def error_404(self, e=None):
         return render_template(template_name_or_list='404.html'), 404

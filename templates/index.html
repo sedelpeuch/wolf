@@ -149,32 +149,17 @@
 
                 <div class="col m-2">
                     <h4 class="font-weight-bold mt-2"> Formations </h4>
-                    {% if member.impression_3d %}
-                    <img src="{{ url_for('static', filename='img/imprimante.jpg') }}"
+                    {% for formation in member.formations %}
+                    <img src="{{ member.formations[formation].image }}"
                          class="img-fluid rounded-circle mt-2"
                          alt="Imprimante">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/imprimante_black.jpg') }}"
-                         class="img-fluid rounded-circle mt-2" alt="Imprimante">
-                    {% endif %}
-                    {% if member.laser %}
-                    <img src="{{ url_for('static', filename='img/laser.png') }}" class="img-fluid rounded-circle mt-2"
-                         alt="Laser">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/laser_black.png') }}"
-                         class="img-fluid rounded-circle mt-2" alt="Laser">
-                    {% endif %}
-
-                    {% if member.cnc %}
-                    <img src="{{ url_for('static', filename='img/cnc.jpg') }}" class="img-fluid rounded-circle mt-2"
-                         alt="CNC">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/cnc_black.jpg') }}"
-                         class="img-fluid rounded-circle" alt="CNC">
-                    {% endif %}
-
+                    {% endfor %}
+                    {% for formation in member.no_formations %}
+                    <img src="{{ member.no_formations[formation].image_black }}"
+                         class="img-fluid rounded-circle mt-2"
+                         alt="Imprimante">
+                    {% endfor %}
                 </div>
-
             </div>
         </div>
     </div>

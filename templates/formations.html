@@ -47,67 +47,31 @@
             <h4 class="mt-2">Fabmanager : {{ member.firstname }} {{ member.lastname }} - {{ job }}</h4>
             <!--            <div class="row">-->
             <form action="/formations/confirm" method="POST">
+                {% for f in member.formations %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="formations"
+                           id="{{ member.formations[f].ref }}"
+                           value="{{ member.formations[f].ref }}">
+                    <label class="form-check-label" for="{{ member.formations[f].ref }}"> <img
+                            src="{{ member.formations[f].image }}"
+                            class="img-fluid rounded-circle mt-2"
+                            alt="Imprimante"> </label>
+                </div>
 
-                {% if member.impression_3d %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="formations" id="impression3d"
-                           value="impression_3d">
-                    <label class="form-check-label" for="impression3d"> <img
-                            src="{{ url_for('static', filename='img/imprimante.jpg') }}"
-                            class="img-fluid rounded-circle mt-2"
-                            alt="Imprimante">
-                    </label>
-                </div>
-                {% else %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="formations" id="impression3d"
-                           value="False" disabled>
-                    <label class="form-check-label" for="impression3d"> <img
-                            src="{{ url_for('static', filename='img/imprimante_black.jpg') }}"
-                            class="img-fluid rounded-circle mt-2" alt="Imprimante">
-                    </label>
-                </div>
-                {% endif %}
-                {% if member.laser %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="formations" id="laser"
-                           value="laser">
-                    <label class="form-check-label" for="laser"> <img
-                            src="{{ url_for('static', filename='img/laser.png') }}"
-                            class="img-fluid rounded-circle mt-2"
-                            alt="Laser"></label>
-                </div>
-                {% else %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="formations" id="laser"
-                           value="False" disabled>
-                    <label class="form-check-label" for="laser"> <img
-                            src="{{ url_for('static', filename='img/laser_black.png') }}"
-                            class="img-fluid rounded-circle mt-2" alt="Laser"></label>
-                </div>
-                {% endif %}
-
-                {% if member.cnc %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="formations" id="cnc"
-                           value="cnc">
-                    <label class="form-check-label" for="cnc"> <img
-                            src="{{ url_for('static', filename='img/cnc.jpg') }}"
-                            class="img-fluid rounded-circle mt-2"
-                            alt="CNC"></label>
-                </div>
-                {% else %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="formations" id="cnc"
-                           value="False" disabled>
-                    <label class="form-check-label" for="cnc"> <img
-                            src="{{ url_for('static', filename='img/cnc_black.jpg') }}"
-                            class="img-fluid rounded-circle" alt="CNC"></label>
-                </div>
-                {% endif %}
+                {% endfor %}
+                {% for f in member.no_formations %}
+                <input class="form-check-input" type="radio" name="formations"
+                       id="{{ member.no_formations[f].ref }}"
+                       value="{{ member.no_formations[f].ref }}" disabled>
+                <label class="form-check-label" for="{{ member.no_formations[f].ref }}"> <img
+                        src="{{ member.no_formations[f].image_black }}"
+                        class="img-fluid rounded-circle mt-2"
+                        alt="Imprimante"> </label>
+                {% endfor %}
 
                 <button type="submit" class="form-control btn btn-secondary mt-2"
-                        onclick="alert('Fabmanager, pensez à cliquer sur le bouton quitter à la fin')">Confirmer
+                        onclick="alert('{{ member.firstname }}, penses à cliquer sur le bouton quitter à la fin')">
+                    Confirmer
                 </button>
             </form>
         </div>
@@ -223,32 +187,17 @@
 
                 <div class="col m-2">
                     <h4 class="font-weight-bold mt-2"> Formations </h4>
-                    {% if student.impression_3d %}
-                    <img src="{{ url_for('static', filename='img/imprimante.jpg') }}"
+                    {% for formation in student.formations %}
+                    <img src="{{ student.formations[formation].image }}"
                          class="img-fluid rounded-circle mt-2"
                          alt="Imprimante">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/imprimante_black.jpg') }}"
-                         class="img-fluid rounded-circle mt-2" alt="Imprimante">
-                    {% endif %}
-                    {% if student.laser %}
-                    <img src="{{ url_for('static', filename='img/laser.png') }}" class="img-fluid rounded-circle mt-2"
-                         alt="Laser">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/laser_black.png') }}"
-                         class="img-fluid rounded-circle mt-2" alt="Laser">
-                    {% endif %}
-
-                    {% if student.cnc %}
-                    <img src="{{ url_for('static', filename='img/cnc.jpg') }}" class="img-fluid rounded-circle mt-2"
-                         alt="CNC">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/cnc_black.jpg') }}"
-                         class="img-fluid rounded-circle" alt="CNC">
-                    {% endif %}
-
+                    {% endfor %}
+                    {% for formation in student.no_formations %}
+                    <img src="{{ student.no_formations[formation].image_black }}"
+                         class="img-fluid rounded-circle mt-2"
+                         alt="Imprimante">
+                    {% endfor %}
                 </div>
-
             </div>
         </div>
     </div>
