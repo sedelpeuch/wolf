@@ -29,6 +29,11 @@
                 <h4 class="font-weight-bold mt-2 text-danger">{{ error }}</h4>
                 {% endif %}
             </form>
+            {% if fabmanager or member %}
+            <form action="/formations" method="GET">
+                <button type="submit" class="form-control btn btn-danger mt-2">Quitter</button>
+            </form>
+            {% endif %}
             <!--            </div>-->
         </div>
     </div>
@@ -101,7 +106,9 @@
                 </div>
                 {% endif %}
 
-                <button type="submit" class="form-control btn btn-secondary mt-2">Confirmer</button>
+                <button type="submit" class="form-control btn btn-secondary mt-2"
+                        onclick="alert('Fabmanager, pensez à cliquer sur le bouton quitter à la fin')">Confirmer
+                </button>
             </form>
         </div>
     </div>

@@ -3,9 +3,39 @@
 {% block content %}
 <div id="content" class="container-fluid">
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <!--        <h1 class="h1 mt-3 mb-0 text-gray-800">Caméléon</h1>-->
+    {% if not new %}
+    {% if not member %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h4 class="m-0 font-weight-bold text-secondary">Wolf - EirLab Community </h4>
+        </a>
+        <div class="collapse show card-body mb-4" id="welcome">
+            <!--            <div class="row">-->
+            <p class="mt-2">Cette application permet de : </p>
+            <ul class="list-group list-group-flush">
+                <a href="/" class="list-group-item list-group-item-action">Obtenir les informations d'un adhérent à
+                    partir de sa carte étudiante /
+                    professionnelle
+                </a>
+                <a href="/" class="list-group-item list-group-item-action">Relier un adhérent à sa carte étudiante /
+                    professionnelle</a>
+                <a href="/formations" class="list-group-item list-group-item-action">Ajouter de nouvelles formations
+                    à un adhérent</a>
+                <!--                    <li class="list-group-item disabled">Gérer les emprunts de matériel</li>-->
+                <!--                    <li class="list-group-item disabled">Gérer les arrivages de matériel</li>-->
+            </ul>
+            <!--            </div>-->
+            <p class="text-warning mt-2">Cette application est développée par les Fabmanager d'EirLab Community
+                depuis le
+                12
+                juillet 2022. Merci de remonter les différents bugs repérés et de ne pas exploiter les potentielles
+                failles. </p>
+        </div>
     </div>
+    {% endif %}
+    {% endif %}
+
     <div class="card shadow mb-4">
         <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
            role="button" aria-expanded="true" aria-controls="select">
@@ -16,15 +46,14 @@
             <form action="/member/scan" method="GET">
                 <p class="font-italic mt-2">Appuyez sur le bouton scanner puis poser votre carte sur le lecteur</p>
                 <button type="submit" class="form-control btn btn-secondary">Scanner</button>
-                {% if status %}
-                {% if member %}
-                <h3 class="font-weight-bold mt-2"></h3>
-                {%else%}
-                <p class="font-weight-bold mt-2">{{ status }}</p>
-                {% endif %}
-                {% endif %}
-
             </form>
+            {% if status %}
+            <form action="/" method="GET">
+                <button type="submit" class="form-control btn btn-danger mt-2">Quitter</button>
+            </form>
+            <p class="font-weight-bold mt-2">{{ status }}</p>
+            {% endif %}
+
             <!--            </div>-->
         </div>
     </div>

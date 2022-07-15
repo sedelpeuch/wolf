@@ -1,10 +1,13 @@
 import datetime
+import threading
+import time
+
 import config
 import requests
 from flask import Blueprint, render_template
 
 formation_dictionnary = {"laser": '1', "impression_3d": '2', "cnc": '3'}
-PUB = False
+PUB = True
 
 
 def update_member(member, formation, actual_n_serie):
@@ -74,6 +77,7 @@ class Common:
 
     def index(self):
         return render_template(template_name_or_list='index.html')
+
 
     def error_404(self, e=None):
         return render_template(template_name_or_list='404.html'), 404
