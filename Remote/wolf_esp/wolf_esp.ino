@@ -153,7 +153,9 @@ void readRFID(String *uid) { /* function readRFID */
     for(int j=1; j<20; j++){
       String j_str = (String) j;
       My_LCD.clear();
-      My_LCD.print("Recherche en cours ...");
+      My_LCD.print("Recherche");
+      My_LCD.setCursor(0,1);
+      My_LCD.print("en cours ...");
       http.begin("https://gestion.eirlab.net/api/index.php/members/?sortfield=t.rowid&sortorder=ASC&limit=20&page="+j_str); //Specify the URL
       http.addHeader("Accept", "application/json");
       http.addHeader("DOLAPIKEY", token);
@@ -167,6 +169,17 @@ void readRFID(String *uid) { /* function readRFID */
         if (error) {
           Serial.print("deserializeJson() failed: ");
           Serial.println(error.c_str());
+          
+            My_LCD.clear();
+            My_LCD.print("Failed:");
+            My_LCD.setCursor(0,1);
+            My_LCD.print(error.c_str());
+            delay(5000);
+
+            My_LCD.clear();
+            digitalWrite(RED_PIN, LOW);
+            digitalWrite(GREEN_PIN, LOW);
+            digitalWrite(BLUE_PIN, HIGH);
           return;
         }
 
@@ -182,6 +195,8 @@ void readRFID(String *uid) { /* function readRFID */
             My_LCD.clear();
             My_LCD.print(lastname);
             Serial.println(lastname);
+            My_LCD.setCursor(0,1);
+            My_LCD.print(firstname);
             Serial.println(firstname);
             delay(5000);
 
