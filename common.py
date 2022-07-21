@@ -19,7 +19,7 @@ def update_member(member, formation, actual_n_serie):
         formations = ""
     id = member["id"]
     if formation is not None:
-        with open('formations.json') as json_file:
+        with open('/opt/wolf/formations.json') as json_file:
             json_formations = json.load(json_file)
             if json_formations[formation]['id'] not in formations:
                 formations = formations + ',' + json_formations[formation]['id']
