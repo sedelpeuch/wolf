@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="🐛 fix(common): add stock url">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="🐛 fix(common): update gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fournisseurs.py" beforeDir="false" afterPath="$PROJECT_DIR$/fournisseurs.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +138,7 @@
       <workItem from="1658325303686" duration="148000" />
       <workItem from="1658411193230" duration="5405000" />
       <workItem from="1658424274256" duration="2509000" />
-      <workItem from="1658428315349" duration="61000" />
+      <workItem from="1658428315349" duration="156000" />
     </task>
     <task id="LOCAL-00001" summary="🐛 fix(common): add stock url">
       <created>1658427632509</created>
@@ -146,7 +147,14 @@
       <option name="project" value="LOCAL" />
       <updated>1658427632509</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="🐛 fix(common): update gitignore">
+      <created>1658428420628</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1658428420628</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,7 +174,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="✨feat(esp32): add serializer json" />
     <MESSAGE value=" fix(common): add stock url" />
-    <option name="LAST_COMMIT_MESSAGE" value=" fix(common): add stock url" />
+    <MESSAGE value=" fix(common): update gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value=" fix(common): update gitignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
