@@ -1,6 +1,6 @@
 {
   "rs": {
-    "name": "Radio Spare",
+    "name": "RS",
     "image": "/static/img/rs.jpg",
     "id": "1"
   },
@@ -8,5 +8,10 @@
     "name": "Otelo",
     "image": "/static/img/otelo.png",
     "id": "2"
+  },
+  "makershop": {
+    "name": "Makershop",
+    "image": "/static/img/makershop.jpg",
+    "id": "3"
   }
 }

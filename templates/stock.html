@@ -34,12 +34,11 @@
                     </div>
                     {% endif %}
                 </div>
-                {% if not recherche %}
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Ajouter</h4>
 
                     <form action="/stock/start" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Débuter un arrivage
+                        <button type="submit" class="form-control btn btn-secondary" disabled>Débuter un arrivage
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -58,7 +57,7 @@
                     <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
 
                     <form action="/stock/start" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Débuter un inventaire
+                        <button type="submit" class="form-control btn btn-secondary" disabled>Débuter un inventaire
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -72,8 +71,6 @@
                             Community</p>
                     </form>
                 </div>
-                {% endif %}
-
             </div>
         </div>
     </div>
@@ -92,12 +89,15 @@
                 <div class="col m-2">
                     <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant[composant].title }}</h5>
                     <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant[composant].ref }}</h5>
+                    <h5 class="font-weight-bold text-secondary mt-2"><a
+                            href="{{ recherche_composant[composant].links_ref }}" target="_blank">Lien {{
+                        recherche_composant[composant].fournisseur.name }}</a></h5>
                     <div class="text-center">
                         <img src="{{ recherche_composant[composant].fournisseur.image }}"
                              class="img-fluid mt-2"
                              alt="Imprimante" width="100px">
                     </div>
-                    <p class="text-secondary mt-2">{{ recherche_composant[composant].price }}</p>
+                    <p class="text-secondary font-weight-bold mt-2">{{ recherche_composant[composant].price }}</p>
                     <a class="mt-2" href="{{ recherche_composant[composant].links }}">{{
                         recherche_composant[composant].links }}</a>
                     <!--                    display recherche_composant[composant].attributes with key and value -->
