@@ -92,3 +92,6 @@ class Common:
 
     def formations(self):
         return render_template(template_name_or_list='formations.html')
+
+    def stock(self):
+        return render_template(template_name_or_list='stock.html')
