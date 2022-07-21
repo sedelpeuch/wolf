@@ -68,7 +68,7 @@ class Fournisseurs:
                     'tbody').find_all('tr'):
                 dict_attributes[row.find('td', attrs={'data-testid': 'specification-attributes-key'}).text] = \
                     row.find('td', attrs={'data-testid': 'specification-attributes-value'}).text
-            with open('fournisseurs.json', 'r') as f:
+            with open('/opt/wolf/fournisseurs.json', 'r') as f:
                 data = json.load(f)
                 product['rs'] = {"fournisseur": data['rs'], "title": title, "price": price, "links": links,
                                  "attributes": dict_attributes, "ref": ref, "image": image,
@@ -97,7 +97,7 @@ class Fournisseurs:
                 if len(tr.find_all('td')) == 2:
                     dict_attributes[tr.find_all('td')[0].text] = tr.find_all('td')[1].text
 
-            with open('fournisseurs.json', 'r') as f:
+            with open('/opt/wolf/fournisseurs.json', 'r') as f:
                 data = json.load(f)
                 product['otelo'] = {"fournisseur": data['otelo'], "title": title, "price": price, "links": links,
                                     "attributes": dict_attributes, "ref": ref, "image": image,
@@ -134,7 +134,7 @@ class Fournisseurs:
             # src="https://cdn-3.makershop.fr/9469-large_default/polylite-pla-orange-polymaker.jpg" alt="PolyLite PLA
             # Orange " title="PolyLite PLA Orange " itemprop="image"> </a>
             image = parsed_html.body.find('a', attrs={'class': 'fancybox shown'}).get('href')
-            with open('fournisseurs.json', 'r') as f:
+            with open('/opt/wolf/fournisseurs.json', 'r') as f:
                 data = json.load(f)
                 product['makershop'] = {"fournisseur": data['makershop'], "title": title, "price": price, "links": links,
                                         "attributes": dict_attributes, "ref": ref, "image": image,
