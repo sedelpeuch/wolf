@@ -1,0 +1,12 @@
+{
+  "rs": {
+    "name": "Radio Spare",
+    "image": "/static/img/rs.jpg",
+    "id": "1"
+  },
+  "otelo": {
+    "name": "Otelo",
+    "image": "/static/img/otelo.png",
+    "id": "2"
+  }
+}

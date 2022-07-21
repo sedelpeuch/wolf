@@ -80,6 +80,7 @@ class Common:
         self.bp.route('/404')(self.error_404)
         self.bp.route('/500')(self.error_500)
         self.bp.route('/formations')(self.formations)
+        self.bp.route('/stock')(self.stock)
 
     def index(self):
         return render_template(template_name_or_list='index.html')
@@ -92,3 +93,6 @@ class Common:
 
     def formations(self):
         return render_template(template_name_or_list='formations.html')
+
+    def stock(self):
+        return render_template(template_name_or_list='stock.html')
