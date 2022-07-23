@@ -28,6 +28,9 @@
                                    disabled>
                         </div>
                     </form>
+                    <form action="/stock/recherche" method="GET">
+                        <button type="submit" class="form-control btn btn-secondary">Scanner un code barre</button>
+                    </form>
                     {% if unknow_composant %}
                     <div class="alert alert-danger" role="alert">
                         <p class="text-center">Aucun résultat trouvé</p>
@@ -37,8 +40,8 @@
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Ajouter</h4>
 
-                    <form action="/stock/start" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary" disabled>Débuter un arrivage
+                    <form action="/stock/arrivage" method="GET">
+                        <button type="submit" class="form-control btn btn-secondary">Débuter un arrivage
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -46,17 +49,20 @@
                             d'EirLab Community est nécessaire pour débuter
                             l'opération</p>
 
-                        <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                        <p class="mt-2"> Appuyez sur le bouton débuter un arrivage et posez la carte d'un <a
                                 href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
                             d'EirLab
                             Community</p>
                     </form>
+                    {% if arrivage_error %}
+                    <h4 class="font-weight-bold mt-2 text-danger">{{ arrivage_error }}</h4>
+                    {% endif %}
                 </div>
 
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
 
-                    <form action="/stock/start" method="GET">
+                    <form action="/stock/arrivage" method="GET">
                         <button type="submit" class="form-control btn btn-secondary" disabled>Débuter un inventaire
                         </button>
 
@@ -65,7 +71,7 @@
                             d'EirLab Community est nécessaire pour débuter
                             l'opération</p>
 
-                        <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                        <p class="mt-2"> Appuyez sur le bouton débuter un inventaire et posez la carte d'un <a
                                 href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
                             d'EirLab
                             Community</p>
@@ -137,7 +143,159 @@
     </div>
     {% endfor %}
     {% endif %}
-</div>
 
-{% endblock %}
+    {% if arrivage %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Choix du fournisseur</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="choix">
+            <form action="/stock/arrivage/fournisseur" method="POST">
+                {% for d in fournisseurs %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="fournisseur"
+                           id="{{ fournisseurs[d].name }}"
+                           value="{{ fournisseurs[d].ref  }}" required>
+                    <label class="form-check-label" for="{{ fournisseurs[d].name }}"> <img
+                            src="{{ fournisseurs[d].image }}"
+                            class="img-fluid mt-2"
+                            alt="{{ fournisseurs[d].ref }}"> </label>
+                </div>
+                {% endfor %}
+                <button type="submit" class="form-control btn btn-secondary mt-2">
+                    Confirmer
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if fournisseur %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Prise des références - {{ fournisseur.name }}</h6>
+        </a>
+        <script type="application/javascript">
+
+        </script>
+        <div class="collapse show card-body mb-4" id="prise">
+            <div class="row">
+                {% if arrivage_recherche %}
+                <div class="col m-2">
+                    <form action="/stock/arrivage/add" method="POST">
+                        <div class="form-group">
+                            <label for="arrivage_ref" class="mt-2">Référence</label>
+                            <input type="text" class="form-control" id="arrivage_ref" name="arrivage_ref"
+                                   placeholder="Référence"
+                                   required autofocus>
+                            <label for="arrivage_ref" class="mt-2">Quantité</label>
+                            <input type="number" class="form-control" id="arrivage_qte" name="arrivage_qte"
+                                   placeholder="Quantité (défaut : 1, négatif pour enlever)">
+                        </div>
+                        <button type="submit" class="form-control btn btn-secondary">Ajouter</button>
+                    </form>
+                </div>
+                {% endif %}
+                {% if arrivage_composants %}
+                <div class="col m-2">
+                    <h4 class="font-weight-bold text-secondary mt-2">Liste d'ajout</h4>
+                    {% for composant in arrivage_composants %}
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="font-weight-bold text-secondary">{{
+                                        arrivage_composants[composant].ref}} - {{
+                                        arrivage_composants[composant].quantite }}</h5>
+                                </div>
+                                <div class="col-md-4">
+                                    <form action="/stock/arrivage/remove" method="POST">
+                                        <input type="hidden" name="composant" id="{{ composant }}"
+                                               value="{{ composant }}">
+                                        <button type="submit" class="form-control btn btn-danger">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    {% endfor %}
+                    <form action="/stock/arrivage/confirm" method="GET">
+                        <button type="submit" class="form-control btn btn-secondary">Confirmer</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if arrivage_confirm %}
+    <div class="card shadow mb-4">
+        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="select">
+            <h6 class="m-0 font-weight-bold text-secondary">Confirmation de l'arrivage</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="add">
+            <h4 class="font-weight-bold text-secondary mt-2">Liste d'ajout</h4>
+        </div>
+        <div class="collapse show card-body mb-4" id="list add">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Référence</th>
+                    <th scope="col">Quantité</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prix</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Lien</th>
+                    <th scope="col">Datasheet</th>
+                </tr>
+                </thead>
+                {% for composant in products_add %}
+
+                <tbody>
+                <tr>
+                    <td><i class="fas fa-check text-success"></i></td>
+                    <td>Succès</td>
+                    <td>{{ products_add[composant].ref }}</td>
+                    <td>{{ products_add[composant].quantite }}</td>
+                    <td>{{ products_add[composant].product.title }}</td>
+                    <td>{{ products_add[composant].product.price }}</td>
+                    <td><img src="{{ products_add[composant].product.image }}"
+                             class="img-fluid mt-2"
+                             alt="Imprimante" width="50px"></td>
+                    <td><a href="{{ products_add[composant].product.links_ref }}">Lien fournisseur</a></td>
+                    <td><a href="{{ products_add[composant].product.links }}">Datasheet</a></td>
+
+                </tr>
+                </tbody>
+                {% endfor %}
+                {% for composant in products_error %}
+                <tbody>
+                <tr>
+                    <td><i class="fas fa-times text-danger"></i></td>
+                    <td>{{ products_error[composant].status }}</td>
+                    <td>{{ products_error[composant].ref }}</td>
+                    <td>{{ products_error[composant].quantite }}</td>
+                    <td>{{ products_error[composant].product.title }}</td>
+                    <td>{{ products_error[composant].product.price }}</td>
+                    <td><img src="{{ products_error[composant].product.image }}"
+                             class="img-fluid mt-2"
+                             alt="Imprimante" width="50px"></td>
+                    <td><a href="{{ products_error[composant].product.links_ref }}">Lien fournisseur</a></td>
+                    <td><a href="{{ products_error[composant].product.links }}">Datasheet</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+
+    {% endblock %}
 

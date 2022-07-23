@@ -68,8 +68,8 @@ class RunAPI:
         import formation
         self.app.register_blueprint(formation.Formations().bp)
 
-        import fournisseurs
-        self.app.register_blueprint(fournisseurs.Fournisseurs().bp)
+        import stock
+        self.app.register_blueprint(stock.Stock().bp)
 
         CORS(self.app)
 

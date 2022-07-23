@@ -2,16 +2,19 @@
   "rs": {
     "name": "RS",
     "image": "/static/img/rs.jpg",
-    "id": "1"
+    "id": "1",
+    "ref": "rs"
   },
   "otelo": {
     "name": "Otelo",
     "image": "/static/img/otelo.png",
-    "id": "2"
+    "id": "2",
+    "ref": "otelo"
   },
   "makershop": {
     "name": "Makershop",
     "image": "/static/img/makershop.jpg",
-    "id": "3"
+    "id": "3",
+    "ref": "makershop"
   }
 }

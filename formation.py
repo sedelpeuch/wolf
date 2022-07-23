@@ -26,6 +26,11 @@ class Formations:
         self.actual_n_serie = ""
 
     def start(self):
+        """
+        Start the formation process by unlock the RFID reader with Fabmanager's card, return the list possible
+        formations
+        :return:
+        """
         self.rfid.initialize()
         self.formation = None
         self.fabmanager = None
@@ -66,6 +71,10 @@ class Formations:
             return render_template('formations.html', error="Vous n'êtes pas autorisé à accéder à cette page")
 
     def confirm(self):
+        """
+        Confirm the formation by choosing the formation and the Fabmanager
+        :return:
+        """
         try:
             self.formation = request.form['formations']
         except KeyError:
@@ -74,6 +83,10 @@ class Formations:
         return render_template('formations.html', formation=self.formation, fabmanager=self.fabmanager, job=self.job)
 
     def add(self):
+        """
+        Add the member to the list of members to add to the formation by scanning the RFID
+        :return:
+        """
         self.rfid.initialize()
         self.actual_n_serie = self.rfid.read_serie()
         try:
@@ -100,6 +113,10 @@ class Formations:
                                    fabmanager=self.fabmanager, formation=self.formation)
 
     def new_link(self):
+        """
+        Link the RFID to the member by scanning the RFID and update the member in the database
+        :return:
+        """
         lastname = request.form['lastname']
         lastname = unidecode.unidecode(lastname)
         firstname = request.form['firstname']
@@ -131,6 +148,10 @@ class Formations:
                                fabmanager=self.fabmanager, formation=self.formation, list_add=self.list_add)
 
     def confirm_link(self):
+        """
+        Confirm the link of the RFID to the member by a adminitrator
+        :return:
+        """
         self.rfid.initialize()
         n_serie = self.rfid.read_serie()
 
