@@ -15,7 +15,8 @@
             <div class="row">
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Rechercher</h4>
-                    <form action="/stock/recherche" method="POST">
+                    <form action="/stock/recherche" method="POST" onsubmit="document.getElementById('container-svg-loading')
+                    .style.visibility = 'visible';return true;">
                         <button type="submit" class="form-control btn btn-secondary">Débuter une recherche</button>
                         <div class="form-group">
                             <label for="ref" class="mt-2">Référence</label>
@@ -28,7 +29,8 @@
                                    disabled>
                         </div>
                     </form>
-                    <form action="/stock/recherche" method="GET">
+                    <form action="/stock/recherche" method="GET" onsubmit="document.getElementById('container-svg-scanning')
+                    .style.visibility = 'visible';return true;">
                         <button type="submit" class="form-control btn btn-secondary">Scanner un code barre</button>
                     </form>
                     {% if unknow_composant %}
@@ -295,7 +297,51 @@
         {% endfor %}
         {% endif %}
     </div>
+    <div class="container-animation-scanning">
+		<div id="container-svg-loading" class="container-svg">
+			<div class="popup-svg">
+                <svg class="loading-circle" viewBox="0 0 226.12 226.12" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
 
-
+					<style type="text/css">
+						.svg-loading-circle-fill{fill:#39aedc;transform-origin: 50% 50%;animation: loading-circle 2s infinite;}
+					</style>
+					<!-- <rect x=".0099945" y=".0099933" width="226.11" height="226.11"/> -->
+					<path class="svg-loading-circle-fill"d="m113.06 226.12c-62.34 0-113.06-50.72-113.06-113.06s50.72-113.06 113.06-113.06c19.45 0 38.64 5.03 55.5 14.55 3.61 2.04 4.88 6.61 2.84 10.22s-6.61 4.88-10.22 2.84c-14.61-8.25-31.26-12.61-48.13-12.61-54.07 0-98.06 43.99-98.06 98.06s43.99 98.06 98.06 98.06c4.14 0 7.5 3.36 7.5 7.5s-3.34 7.5-7.49 7.5z"/>
+				</svg>
+            </div>
+		</div>
+        <div id="container-svg-scanning" class="container-svg">
+			<div class="popup-svg">
+                <svg class="scanner" viewBox="0 0 447.85 297.17" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+					<style type="text/css">
+						.corner{fill:none;stroke:#6c757d;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+						.code{fill:#6c757d}
+						.red{fill:#e2007a;animation: scanner-movement 3s ease-in-out infinite alternate-reverse;}
+					</style>
+					<polyline class="corner" transform="translate(-60.93,-216.41)" points="115.93 219.41 63.93 219.41 63.93 271.41"/>
+					<polyline class="corner" transform="translate(-60.93,-216.41)" points="453.78 219.41 505.78 219.41 505.78 271.41"/>
+					<polyline class="corner" transform="translate(-60.93,-216.41)" points="115.93 510.58 63.93 510.58 63.93 458.58"/>
+					<polyline class="corner" transform="translate(-60.93,-216.41)" points="453.78 510.58 505.78 510.58 505.78 458.58"/>
+					<g transform="translate(-60.93,-216.41)">
+						<rect class="code" x="103.22" y="251.76" width="20.93" height="226.94"/>
+						<rect class="code" x="139.32" y="251.76" width="10.46" height="226.94"/>
+						<rect class="code" x="162.36" y="251.76" width="14.4" height="226.94"/>
+						<rect class="code" x="190.01" y="251.76" width="19.39" height="226.94"/>
+						<rect class="code" x="220.73" y="251.76" width="9.7" height="226.94"/>
+						<rect class="code" x="238.39" y="251.76" width="11.71" height="226.94"/>
+						<rect class="code" x="263.74" y="251.76" width="18.24" height="226.94"/>
+						<rect class="code" x="297.64" y="251.76" width="9.12" height="226.94"/>
+						<rect class="code" x="323.37" y="251.76" width="12.37" height="226.94"/>
+						<rect class="code" x="347.94" y="251.76" width="7.76" height="226.94"/>
+						<rect class="code" x="367.81" y="251.76" width="19.62" height="226.94"/>
+						<rect class="code" x="402.23" y="251.76" width="14.87" height="226.94"/>
+						<rect class="code" x="428.87" y="251.76" width="11.41" height="226.94"/>
+						<rect class="code" x="453.78" y="251.76" width="17.75" height="226.94"/>
+					</g>
+					<rect class="red" x="6.77" y="138.65" width="433.54" height="20.26"/>
+				</svg>
+            </div>
+		</div>
+	</div>
     {% endblock %}
-
+</div>
