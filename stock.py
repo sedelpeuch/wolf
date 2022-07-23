@@ -23,6 +23,7 @@ class Stock:
         self.bp.route('/arrivage/add', methods=['POST', 'GET'])(self.arrivage_add)
         self.bp.route('/arrivage/remove', methods=['POST', 'GET'])(self.arrivage_remove)
         self.bp.route('/arrivage/confirm', methods=['GET'])(self.arrivage_confirm)
+        self.bp.route('/arrivage/end', methods=['GET'])(self.arrivage_end)
 
         self.url_rs = "http://fr.rs-online.com/web/search/searchBrowseAction.html?method=searchProducts&searchTerm="
         self.url_otelo = "https://www.otelo.fr/is-bin/INTERSHOP.enfinity/WFS/Otelo-France-Site/fr_FR/-/EUR/Navigation" \
@@ -319,3 +320,7 @@ class Stock:
         print("products_error", products_error)
         return render_template('stock.html', arrivage_confirm=True,
                                products_add=products_add, products_error=products_error)
+
+    def arrivage_end(self):
+        barcode.running_virtual_keyboard = False
+        return render_template('stock.html')

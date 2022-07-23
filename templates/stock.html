@@ -1,35 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="content" class="container-fluid">
+<div class="container-fluid" id="content">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <!--        <h1 class="h1 mt-3 mb-0 text-gray-800">Caméléon</h1>-->
     </div>
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Stocks</h6>
         </a>
         <div class="collapse show card-body mb-4" id="scan">
             <div class="row">
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Rechercher</h4>
-                    <form action="/stock/recherche" method="POST">
-                        <button type="submit" class="form-control btn btn-secondary">Débuter une recherche</button>
+                    <form action="/stock/recherche" method="POST" onsubmit="document.getElementById('container-svg-loading')
+                    .style.visibility = 'visible';return true;">
+                        <button class="form-control btn btn-secondary" type="submit">Débuter une recherche</button>
                         <div class="form-group">
-                            <label for="ref" class="mt-2">Référence</label>
-                            <input type="text" class="form-control" id="ref" name="ref" placeholder="Référence"
-                                   required>
+                            <label class="mt-2" for="ref">Référence</label>
+                            <input class="form-control" id="ref" name="ref" placeholder="Référence" required
+                                   type="text">
                         </div>
                         <div class="form-group">
                             <label for="name">Nom</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Nom"
-                                   disabled>
+                            <input class="form-control" disabled id="name" name="name" placeholder="Nom"
+                                   type="text">
                         </div>
                     </form>
-                    <form action="/stock/recherche" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Scanner un code barre</button>
+                    <form action="/stock/recherche" method="GET" onsubmit="document.getElementById('container-svg-scanning')
+                    .style.visibility = 'visible';return true;">
+                        <button class="form-control btn btn-secondary" type="submit">Scanner un code barre</button>
                     </form>
                     {% if unknow_composant %}
                     <div class="alert alert-danger" role="alert">
@@ -40,8 +42,9 @@
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Ajouter</h4>
 
-                    <form action="/stock/arrivage" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Débuter un arrivage
+                    <form action="/stock/arrivage" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
+            .style.visibility = 'visible';return true;">
+                        <button class="form-control btn btn-secondary" type="submit">Débuter un arrivage
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -54,6 +57,11 @@
                             d'EirLab
                             Community</p>
                     </form>
+                    {% if fournisseur %}
+                    <form action="/stock/arrivage/end" method="GET">
+                        <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
+                    </form>
+                    {% endif %}
                     {% if arrivage_error %}
                     <h4 class="font-weight-bold mt-2 text-danger">{{ arrivage_error }}</h4>
                     {% endif %}
@@ -63,7 +71,7 @@
                     <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
 
                     <form action="/stock/arrivage" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary" disabled>Débuter un inventaire
+                        <button class="form-control btn btn-secondary" disabled type="submit">Débuter un inventaire
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -85,8 +93,8 @@
     {% if recherche_composant %}
     {% for composant in recherche_composant %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche {{
                 recherche_composant[composant].fournisseur.name }}</h6>
         </a>
@@ -99,9 +107,9 @@
                             href="{{ recherche_composant[composant].links_ref }}" target="_blank">Lien {{
                         recherche_composant[composant].fournisseur.name }}</a></h5>
                     <div class="text-center">
-                        <img src="{{ recherche_composant[composant].fournisseur.image }}"
+                        <img alt="Imprimante"
                              class="img-fluid mt-2"
-                             alt="Imprimante" width="100px">
+                             src="{{ recherche_composant[composant].fournisseur.image }}" width="100px">
                     </div>
                     <p class="text-secondary font-weight-bold mt-2">{{ recherche_composant[composant].price }}</p>
                     <a class="mt-2" href="{{ recherche_composant[composant].links }}">{{
@@ -117,9 +125,9 @@
                         EirLab Community</h4>
                     {% endif %}
                     <div class="text-center">
-                        <img src="{{ recherche_composant[composant].image }}"
+                        <img alt="{{ recherche_composant[composant].title}}"
                              class="img-fluid mt-2"
-                             alt="{{ recherche_composant[composant].title}}" width="200px">
+                             src="{{ recherche_composant[composant].image }}" width="200px">
                     </div>
                 </div>
             </div>
@@ -146,24 +154,24 @@
 
     {% if arrivage %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Choix du fournisseur</h6>
         </a>
         <div class="collapse show card-body mb-4" id="choix">
             <form action="/stock/arrivage/fournisseur" method="POST">
                 {% for d in fournisseurs %}
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="fournisseur"
-                           id="{{ fournisseurs[d].name }}"
-                           value="{{ fournisseurs[d].ref  }}" required>
+                    <input class="form-check-input" id="{{ fournisseurs[d].name }}" name="fournisseur"
+                           required
+                           type="radio" value="{{ fournisseurs[d].ref  }}">
                     <label class="form-check-label" for="{{ fournisseurs[d].name }}"> <img
-                            src="{{ fournisseurs[d].image }}"
+                            alt="{{ fournisseurs[d].ref }}"
                             class="img-fluid mt-2"
-                            alt="{{ fournisseurs[d].ref }}"> </label>
+                            src="{{ fournisseurs[d].image }}"> </label>
                 </div>
                 {% endfor %}
-                <button type="submit" class="form-control btn btn-secondary mt-2">
+                <button class="form-control btn btn-secondary mt-2" type="submit">
                     Confirmer
                 </button>
             </form>
@@ -173,8 +181,8 @@
 
     {% if fournisseur %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Prise des références - {{ fournisseur.name }}</h6>
         </a>
         <script type="application/javascript">
@@ -186,15 +194,16 @@
                 <div class="col m-2">
                     <form action="/stock/arrivage/add" method="POST">
                         <div class="form-group">
-                            <label for="arrivage_ref" class="mt-2">Référence</label>
-                            <input type="text" class="form-control" id="arrivage_ref" name="arrivage_ref"
+                            <label class="mt-2" for="arrivage_ref">Référence</label>
+                            <input autofocus class="form-control" id="arrivage_ref" name="arrivage_ref"
                                    placeholder="Référence"
-                                   required autofocus>
-                            <label for="arrivage_ref" class="mt-2">Quantité</label>
-                            <input type="number" class="form-control" id="arrivage_qte" name="arrivage_qte"
-                                   placeholder="Quantité (défaut : 1, négatif pour enlever)">
+                                   required type="text">
+                            <label class="mt-2" for="arrivage_ref">Quantité</label>
+                            <input class="form-control" id="arrivage_qte" name="arrivage_qte"
+                                   placeholder="Quantité (défaut : 1, négatif pour enlever)"
+                                   type="number">
                         </div>
-                        <button type="submit" class="form-control btn btn-secondary">Ajouter</button>
+                        <button class="form-control btn btn-secondary" type="submit">Ajouter</button>
                     </form>
                 </div>
                 {% endif %}
@@ -212,9 +221,9 @@
                                 </div>
                                 <div class="col-md-4">
                                     <form action="/stock/arrivage/remove" method="POST">
-                                        <input type="hidden" name="composant" id="{{ composant }}"
+                                        <input id="{{ composant }}" name="composant" type="hidden"
                                                value="{{ composant }}">
-                                        <button type="submit" class="form-control btn btn-danger">Supprimer</button>
+                                        <button class="form-control btn btn-danger" type="submit">Supprimer</button>
                                     </form>
                                 </div>
                             </div>
@@ -222,7 +231,7 @@
                     </ul>
                     {% endfor %}
                     <form action="/stock/arrivage/confirm" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Confirmer</button>
+                        <button class="form-control btn btn-secondary" type="submit">Confirmer</button>
                     </form>
                 </div>
                 {% endif %}
@@ -233,8 +242,8 @@
 
     {% if arrivage_confirm %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Confirmation de l'arrivage</h6>
         </a>
         <div class="collapse show card-body mb-4" id="add">
@@ -265,9 +274,9 @@
                     <td>{{ products_add[composant].quantite }}</td>
                     <td>{{ products_add[composant].product.title }}</td>
                     <td>{{ products_add[composant].product.price }}</td>
-                    <td><img src="{{ products_add[composant].product.image }}"
+                    <td><img alt="Imprimante"
                              class="img-fluid mt-2"
-                             alt="Imprimante" width="50px"></td>
+                             src="{{ products_add[composant].product.image }}" width="50px"></td>
                     <td><a href="{{ products_add[composant].product.links_ref }}">Lien fournisseur</a></td>
                     <td><a href="{{ products_add[composant].product.links }}">Datasheet</a></td>
 
@@ -283,9 +292,9 @@
                     <td>{{ products_error[composant].quantite }}</td>
                     <td>{{ products_error[composant].product.title }}</td>
                     <td>{{ products_error[composant].product.price }}</td>
-                    <td><img src="{{ products_error[composant].product.image }}"
+                    <td><img alt="Imprimante"
                              class="img-fluid mt-2"
-                             alt="Imprimante" width="50px"></td>
+                             src="{{ products_error[composant].product.image }}" width="50px"></td>
                     <td><a href="{{ products_error[composant].product.links_ref }}">Lien fournisseur</a></td>
                     <td><a href="{{ products_error[composant].product.links }}">Datasheet</a></td>
                 </tr>
@@ -295,7 +304,128 @@
         {% endfor %}
         {% endif %}
     </div>
+</div>
 
+<div class="container-animation-scanning">
+    <div class="container-svg" id="container-svg-loading">
+        <div class="popup-svg">
+            <svg class="loading-circle" viewBox="0 0 226.12 226.12" xml:space="preserve"
+                 xmlns="http://www.w3.org/2000/svg">
 
-    {% endblock %}
+                    <style type="text/css">
+                        .svg-loading-circle-fill {
+                            fill: #39aedc;
+                            transform-origin: 50% 50%;
+                            animation: loading-circle 2s infinite;
+                        }
+                    </style>
+                <!-- <rect x=".0099945" y=".0099933" width="226.11" height="226.11"/> -->
+                <path class="svg-loading-circle-fill"
+                      d="m113.06 226.12c-62.34 0-113.06-50.72-113.06-113.06s50.72-113.06 113.06-113.06c19.45 0 38.64 5.03 55.5 14.55 3.61 2.04 4.88 6.61 2.84 10.22s-6.61 4.88-10.22 2.84c-14.61-8.25-31.26-12.61-48.13-12.61-54.07 0-98.06 43.99-98.06 98.06s43.99 98.06 98.06 98.06c4.14 0 7.5 3.36 7.5 7.5s-3.34 7.5-7.49 7.5z"/>
+                </svg>
+        </div>
+    </div>
+    <div class="container-svg" id="container-svg-scanning">
+        <div class="popup-svg">
+            <svg class="scanner" viewBox="0 0 447.85 297.17" xml:space="preserve"
+                 xmlns="http://www.w3.org/2000/svg">
+                    <style type="text/css">
+                        .corner {
+                            fill: none;
+                            stroke: #6c757d;
+                            stroke-width: 6;
+                            stroke-linecap: round;
+                            stroke-linejoin: round;
+                            stroke-miterlimit: 10;
+                        }
 
+                        .code {
+                            fill: #6c757d
+                        }
+
+                        .red {
+                            fill: #e2007a;
+                            animation: scanner-movement 3s ease-in-out infinite alternate-reverse;
+                        }
+                    </style>
+                <polyline class="corner" points="115.93 219.41 63.93 219.41 63.93 271.41"
+                          transform="translate(-60.93,-216.41)"/>
+                <polyline class="corner" points="453.78 219.41 505.78 219.41 505.78 271.41"
+                          transform="translate(-60.93,-216.41)"/>
+                <polyline class="corner" points="115.93 510.58 63.93 510.58 63.93 458.58"
+                          transform="translate(-60.93,-216.41)"/>
+                <polyline class="corner" points="453.78 510.58 505.78 510.58 505.78 458.58"
+                          transform="translate(-60.93,-216.41)"/>
+                <g transform="translate(-60.93,-216.41)">
+                        <rect class="code" height="226.94" width="20.93" x="103.22" y="251.76"/>
+                    <rect class="code" height="226.94" width="10.46" x="139.32" y="251.76"/>
+                    <rect class="code" height="226.94" width="14.4" x="162.36" y="251.76"/>
+                    <rect class="code" height="226.94" width="19.39" x="190.01" y="251.76"/>
+                    <rect class="code" height="226.94" width="9.7" x="220.73" y="251.76"/>
+                    <rect class="code" height="226.94" width="11.71" x="238.39" y="251.76"/>
+                    <rect class="code" height="226.94" width="18.24" x="263.74" y="251.76"/>
+                    <rect class="code" height="226.94" width="9.12" x="297.64" y="251.76"/>
+                    <rect class="code" height="226.94" width="12.37" x="323.37" y="251.76"/>
+                    <rect class="code" height="226.94" width="7.76" x="347.94" y="251.76"/>
+                    <rect class="code" height="226.94" width="19.62" x="367.81" y="251.76"/>
+                    <rect class="code" height="226.94" width="14.87" x="402.23" y="251.76"/>
+                    <rect class="code" height="226.94" width="11.41" x="428.87" y="251.76"/>
+                    <rect class="code" height="226.94" width="17.75" x="453.78" y="251.76"/>
+                    </g>
+                <rect class="red" height="20.26" width="433.54" x="6.77" y="138.65"/>
+                </svg>
+        </div>
+    </div>
+    <div class="container-svg" id="container-svg-card-reader">
+        <div class="popup-svg">
+            <svg class="card-reader" viewBox="0 0 277.97 254.85" xml:space="preserve"
+                 xmlns="http://www.w3.org/2000/svg">
+					<style type="text/css">
+						.svg-card-content {
+                            fill: #6c757d;
+                        }
+
+                        .svg-card-stroke {
+                            fill: #ffffff;
+                            stroke: #6c757d;
+                            stroke-width: 8.5;
+                            stroke-miterlimit: 10;
+                        }
+
+                        .svg-card {
+                            animation: ease-in-out 3s card-movement infinite alternate-reverse;
+                        }
+					</style>
+                <g transform="translate(-143.79 -52.134)">
+						<g class="svg-card-reader" id="svg-card-reader" transform="translate(105.222 25.286)">
+							<path class="svg-card-stroke"
+                                  d="m288.19 277.45h-221.27c-13.31 0-24.1-10.79-24.1-24.1v-198.15c0-13.31 10.79-24.1 24.1-24.1h221.27c13.31 0 24.1 10.79 24.1 24.1v198.15c0 13.31-10.79 24.1-24.1 24.1z"/>
+                            <path class="svg-card-content"
+                                  d="m112.47 223.82c-1.59-0.53-2.58-1.29-4.79-3.68-15.08-16.29-23.54-35.15-25.78-57.46-0.32-3.21-0.32-13.68 0-16.84 1.35-13.31 4.55-24.34 10.3-35.55 3.94-7.69 8.5-14.22 14.58-20.94 3.87-4.27 4.85-4.9 7.68-4.91 1.5-0.01 1.8 0.06 2.97 0.63 1.51 0.74 2.55 1.8 3.27 3.35 0.43 0.92 0.52 1.38 0.52 2.77 0 2.29-0.5 3.31-2.85 5.81-3.93 4.17-6.91 7.89-9.61 12.01-11.51 17.52-15.85 38.76-12.2 59.74 2.71 15.55 9.87 29.82 21.02 41.86 3.26 3.52 3.65 4.22 3.65 6.61 0 1.5-0.08 1.93-0.52 2.86-0.28 0.61-0.84 1.46-1.25 1.91-1.64 1.8-4.67 2.59-6.99 1.83zm126.49 0.15c-1.95-0.49-3.59-1.83-4.49-3.67-0.58-1.19-0.64-1.47-0.64-3.08 0-2.39 0.38-3.09 3.64-6.61 4.31-4.68 7.69-9.15 10.63-14.06 12.39-20.73 15.07-46.17 7.27-68.94-3.96-11.57-9.83-21.18-18.75-30.69-0.93-0.99-1.93-2.27-2.23-2.84-0.48-0.91-0.55-1.26-0.55-2.8 0-1.5 0.07-1.93 0.51-2.86 0.73-1.55 1.76-2.61 3.27-3.35 1.16-0.57 1.47-0.64 2.97-0.63 2.46 0.01 3.47 0.53 5.96 3.09 6.92 7.12 12.98 15.82 17.37 24.91 16.63 34.39 11.21 75.66-13.71 104.52-3.35 3.88-5.47 5.93-6.75 6.52-1.28 0.58-3.26 0.81-4.5 0.49zm-106.88-19.49c-1.49-0.41-2.81-1.38-4.62-3.36-10.29-11.29-16.11-23.85-18.02-38.94-0.49-3.82-0.49-12.04 0-15.86 1.92-15.08 7.73-27.64 18.02-38.94 1.89-2.08 3.16-2.97 4.81-3.39 1.63-0.41 3.06-0.26 4.64 0.51 1.42 0.69 2.46 1.78 3.18 3.3 0.44 0.93 0.52 1.37 0.52 2.86 0 2.27-0.44 3.16-2.83 5.75-8.23 8.9-12.84 18.5-14.63 30.49-0.54 3.6-0.48 11.55 0.1 15.35 1.26 8.13 4.15 15.63 8.6 22.34 1.77 2.67 3.35 4.65 5.97 7.52 2.47 2.69 2.79 3.36 2.79 5.82 0 1.74-0.04 1.94-0.67 3.09-0.37 0.68-1.02 1.54-1.45 1.93-1.7 1.53-4.24 2.14-6.41 1.53zm87.49 0.1c-1.95-0.49-3.59-1.83-4.49-3.67-0.58-1.19-0.64-1.47-0.64-3.08 0-1.54 0.07-1.9 0.54-2.81 0.3-0.57 1.33-1.9 2.29-2.94 9.87-10.67 15.09-23.75 15.09-37.83s-5.21-27.16-15.09-37.83c-0.97-1.04-2-2.37-2.29-2.94-0.47-0.91-0.54-1.27-0.54-2.81 0-1.6 0.06-1.89 0.64-3.08 1.85-3.75 6.49-4.96 9.95-2.59 0.55 0.38 1.7 1.45 2.55 2.38 10.29 11.29 16.11 23.85 18.02 38.94 0.49 3.82 0.49 12.04 0 15.86-1.75 13.73-6.88 25.71-15.42 35.97-2.79 3.35-4.83 5.33-6.12 5.93-1.27 0.59-3.25 0.82-4.49 0.5zm-67.76-19.39c-2.44-0.61-5.45-3.5-8.67-8.34-7.99-11.99-8.95-27.98-2.48-40.86 2.81-5.58 7.09-10.89 9.82-12.17 3.32-1.56 7.38-0.07 8.95 3.31 0.47 1.01 0.55 1.42 0.55 2.94 0 2.26-0.46 3.23-2.66 5.67-3.47 3.85-5.71 8.26-6.76 13.32-0.5 2.43-0.52 7.91-0.02 10.28 1.09 5.21 3.26 9.52 6.78 13.42 2.2 2.44 2.66 3.42 2.66 5.68 0 1.6-0.06 1.89-0.64 3.07-0.77 1.58-2 2.72-3.51 3.29-1.28 0.48-3 0.65-4.02 0.39zm48.27-0.09c-2.05-0.57-3.37-1.62-4.37-3.46-0.63-1.16-0.67-1.35-0.67-3.1 0-1.64 0.06-1.99 0.54-2.94 0.3-0.59 1.25-1.87 2.12-2.83 3.49-3.87 5.66-8.18 6.78-13.42 0.53-2.49 0.48-8.03-0.09-10.62-1.14-5.18-3.2-9.12-7.01-13.39-2.02-2.27-2.34-3-2.34-5.37 0-1.66 0.06-1.97 0.56-2.94 0.75-1.44 2.23-2.81 3.61-3.35 1.67-0.65 3.7-0.62 5.23 0.09 1.86 0.86 4.9 4.09 7.48 7.97 6.24 9.37 8.27 21.57 5.45 32.69-1.72 6.8-5.28 13.19-10.15 18.21-2.24 2.32-4.66 3.16-7.14 2.46zm-25.4-17.45c-0.75-0.16-2.19-0.68-3.2-1.18-3.83-1.87-6.6-5.47-7.39-9.61-0.9-4.68 0.57-9.22 4.05-12.52 2-1.9 4.17-3.03 6.8-3.53 6.05-1.16 12.1 1.86 14.8 7.39 1.98 4.05 1.98 8.03 0 12.08-2.74 5.62-8.92 8.63-15.06 7.37z"/>
+                            <path class="svg-card-content"
+                                  d="m179.53 120.17 1.82 2.72 0.91-2.12 0.91 1.2v5.15c3.62-1.36 3.63-11.5 4.39-16.72 0.79-5.48-0.15-15.96 13.99-25.64-1.53-4.06-2.06-8.5-0.45-13.77 4.8 0.58 9.27 1.82 10.89 9.3l-5.22 1.44c1.92 3.96 2.92 8.04 2.27 12.41l-4.69-1.21-1.06 5.75-3.18-1.2-1.51 5.74-3.33-1.2 4.54 3.63 1.51-4.84 4.23 0.9 1.2-6.13 4.54 2.5c0.04-3.44 1.2-9.98-1.51-14.52l4.54 0.91c0.69-3.8-0.41-6.74-1.36-9.76l3.86 1.66c-0.08-4.31-5.15-9.77-10.59-10.06-3.48-0.19-9.76-4.33-9.3-8.92 0.34-3.42 3-7.33 7.41-8.55-7.57 6.28-1.66 11.57 0.91 12.63 0.76-1.97 3.02-11.88 0-22.39-6.95 3.93-15.42 11.19-16.03 25.41l-9.97 6.66-0.61 16.04 18.45-10.28 1.2 1.2-3.02 0.61-7.57 6.66-2.72-0.91-4.83 8.47-0.61 20.57 3.63 2.72-5.6 2.72-5.6-2.72 3.63-2.72-0.61-20.57-4.84-8.47-2.72 0.91-7.57-6.66-3.02-0.6 1.2-1.2 18.46 10.28-0.61-16.04-9.98-6.66c-0.6-14.23-9.07-21.49-16.03-25.43-3.02 10.51-0.76 20.42 0 22.39 2.58-1.06 8.47-6.35 0.91-12.63 4.41 1.22 7.08 5.13 7.41 8.55 0.45 4.6-5.83 8.74-9.3 8.92-5.44 0.3-10.52 5.75-10.59 10.06l3.86-1.66c-0.95 3.01-2.05 5.96-1.36 9.76l4.54-0.91c-2.71 4.54-1.56 11.08-1.51 14.52l4.54-2.5 1.2 6.13 4.24-0.91 1.51 4.84 4.54-3.62-3.33 1.2-1.51-5.75-3.18 1.2-1.06-5.75-4.69 1.2c-0.66-4.36 0.34-8.44 2.27-12.41l-5.22-1.44c1.62-7.48 6.1-8.73 10.89-9.3 1.61 5.27 1.07 9.71-0.45 13.77 14.14 9.68 13.2 20.16 13.99 25.64 0.76 5.22 0.77 15.35 4.39 16.72v-5.13l0.91-1.2 0.91 2.12 1.82-2.72 1.97 3.63zm13.61-16.34-2.72-1.81c1.28-0.75 2.37-1.45 3.33-2.12-0.1 1.25-0.05 2.38-0.61 3.93zm4.85-8.47c-0.07 1.88-0.15 3.72-0.3 5.45-1.35-0.32-2.68-0.65-3.63-1.2 1.41-1.37 2.67-2.81 3.93-4.25zm4.23 0.91c0-2.31-0.35-4.16-0.91-5.75-0.95 1.64-2.01 3.2-3.18 4.69zm0.61-13.92c3.34 2.2 4.78 5.79 5.14 9.68-2.12-0.78-4.24-1.6-6.35-1.82 0.87-2.06 1.14-4.83 1.21-7.86zm-0.31-7.86c0.14 2.46 0.32 4.96 0.3 7.26 3.31-1.39 5.12-1.67 7.57-2.42-1.82-3.26-4.67-4.39-7.87-4.84zm-40.54 29.34 2.72-1.81c-1.28-0.75-2.37-1.45-3.33-2.12 0.11 1.25 0.05 2.39 0.61 3.93zm-4.84-8.47c0.07 1.88 0.15 3.72 0.3 5.45 1.35-0.32 2.68-0.65 3.63-1.2-1.41-1.37-2.67-2.81-3.93-4.25zm-4.24 0.91c0-2.31 0.34-4.16 0.91-5.75 0.95 1.64 2.01 3.2 3.18 4.69zm-0.6-13.92c-3.34 2.2-4.78 5.79-5.14 9.68 2.12-0.78 4.24-1.6 6.36-1.82-0.86-2.06-1.14-4.84-1.2-7.87h-0.02zm0.3-7.86c-0.14 2.46-0.32 4.96-0.3 7.26-3.31-1.39-5.12-1.67-7.57-2.42 1.83-3.26 4.69-4.39 7.87-4.84z"/>
+						</g>
+                    <g class="svg-card" id="svg-card">
+							<path class="svg-card-stroke"
+                                  d="m320.75 299.58-127.79-107.72c-5.49-4.62-6.19-12.82-1.56-18.31l64.82-76.9c4.62-5.49 12.82-6.19 18.31-1.56l127.79 107.72c5.49 4.62 6.19 12.82 1.56 18.31l-64.82 76.9c-4.63 5.49-12.82 6.18-18.31 1.56z"/>
+                        <path class="svg-card-content"
+                              d="m282.74 209.24c4.49-10.6 1.84-18.32-2.9-25.73 5.98-1.5 11.5-4.95 15.24-9.39 8.51-10.09 7.21-25.31-2.88-33.82s-25.31-7.21-33.82 2.88c-3.74 4.43-6.05 10.59-6.65 16.89-7.64-3.04-15.55-4.21-25.23 2.01l-10.46 7.14c-1.88 1.3-2.99 3.24-3.23 5.39-0.09 2.28 0.8 4.33 2.48 5.75l51.23 43.18c1.68 1.42 3.86 1.94 6.09 1.47s3.8-2.03 4.76-4.1zm4.3-62.82c6.73 5.67 7.59 15.82 1.92 22.55-5.8 6.88-18.55 10.52-25.12 4.98-2.29-1.93-3.51-4.53-4.05-7.6-0.02-0.28-0.07-0.85-0.1-1.13-0.63-5.77 1.2-12.59 4.81-16.87 5.66-6.74 15.81-7.6 22.54-1.93zm-65.41 28.57 9.25-6.32c7.12-4.72 12.88-3.79 21.33 0.45 1.08 4.31 3.1 8.11 6.47 10.95 3.52 2.96 7.61 4.32 12.16 4.5 5.97 8.43 7.96 13.51 4.67 21.46l-4.8 10.34z"/>
+                        <path class="svg-card-content"
+                              d="m348.77 261.49-48.94-41.25c-1.68-1.42-4.22-1.2-5.64 0.48s-1.2 4.22 0.48 5.64l48.94 41.25c1.68 1.42 4.22 1.2 5.64-0.48s1.2-4.22-0.48-5.64z"/>
+                        <path class="svg-card-content"
+                              d="m328.67 221.86 31.35 26.42c1.68 1.42 1.9 3.95 0.48 5.64-1.42 1.68-3.95 1.9-5.64 0.48l-31.35-26.42c-1.68-1.42-1.9-3.95-0.48-5.64 1.42-1.68 3.95-1.9 5.64-0.48z"/>
+                        <path class="svg-card-content"
+                              d="m309.4 249.24-19.88-16.76c-1.68-1.42-4.22-1.2-5.64 0.48s-1.2 4.22 0.48 5.64l19.88 16.76c1.68 1.42 4.22 1.2 5.64-0.48 1.42-1.69 1.21-4.23-0.48-5.64z"/>
+                        <path class="svg-card-content"
+                              d="m311.01 206.98 4.59 3.87c1.68 1.42 1.9 3.95 0.48 5.64-1.42 1.68-3.95 1.9-5.64 0.48l-4.59-3.87c-1.68-1.42-1.9-3.95-0.48-5.64s3.96-1.89 5.64-0.48z"/>
+                        <path class="svg-card-content"
+                              d="m333.11 269.21-9.94-8.38c-1.68-1.42-4.22-1.2-5.64 0.48s-1.2 4.22 0.48 5.64l9.94 8.38c1.68 1.42 4.22 1.2 5.64-0.48s1.2-4.22-0.48-5.64z"/>
+                        <path class="svg-card-content"
+                              d="m352.52 223.45c-0.92-0.96-1.23-1.98-0.95-3.11 0.21-0.84 0.64-1.58 1.4-2.4 1.02-1.11 2.46-2.15 4.23-3.08 1.18-0.62 2.76-1.18 4.02-1.43 1.13-0.22 2.39-0.27 3.13-0.11 0.6 0.13 2.11 0.8 2.8 1.24 0.31 0.2 0.29 0.22-0.33 0.49-1.23 0.53-2.1 1.15-2.84 2.02-0.86 1.02-1.43 2.09-2.41 4.55-1.15 2.89-1.72 3.97-2.37 4.51-0.84 0.7-1.67 0.59-3.54-0.45-1.29-0.7-2.5-1.57-3.14-2.23zm16.46-8.87c0-0.03 0.29-0.18 0.63-0.34 1.24-0.57 2.11-1.23 2.93-2.21 0.5-0.59 0.55-0.67 0.87-1.34 0.18-0.39 0.64-1.48 1.01-2.4 0.37-0.93 0.82-2 0.99-2.39 1.48-3.35 2.55-3.85 5-2.33 1.09 0.67 3.3 2.38 3.67 2.83 0.54 0.66 0.77 1.86 0.53 2.75-0.2 0.73-0.44 1.15-1.15 1.99-1.35 1.6-2.99 2.75-5.37 3.78-1.92 0.82-4.13 1.32-5.47 1.23-0.67-0.05-1.72-0.38-2.66-0.85-0.5-0.26-0.99-0.61-0.98-0.72zm-12.42-8.97c-0.36-0.61-0.35-1.01 0.04-1.98 0.51-1.26 1.32-2.57 2.3-3.75 0.76-0.91 1-1.12 1.6-1.39 0.47-0.21 1.25-0.3 1.8-0.21 0.76 0.13 1.6 0.56 2.38 1.21 2.35 1.98 4.45 5.98 4.85 9.24 0.16 1.3 0.13 2.01-0.13 2.79-0.33 1.02-1.06 2.47-1.25 2.48-0.09 0.01-0.35-0.43-0.59-0.98-0.19-0.43-0.53-1.01-0.9-1.51-0.37-0.49-1.38-1.42-1.83-1.69-0.45-0.26-1.63-0.78-3.56-1.56-2.51-1.02-3.49-1.51-4.19-2.11-0.24-0.17-0.42-0.37-0.52-0.54zm14.63 24.01c-1.26-1.24-2.38-2.99-3.3-5.13-0.68-1.57-1.09-3.06-1.21-4.39-0.1-1.13-0.01-1.68 0.48-2.85 0.23-0.56 0.63-1.37 0.82-1.66l0.16-0.25 0.12 0.15c0.06 0.08 0.25 0.43 0.42 0.77 0.54 1.11 0.74 1.41 1.32 1.98 0.38 0.38 0.72 0.67 1.28 1.08 0.94 0.69 1.55 1 3.49 1.74 2.06 0.79 2.99 1.19 3.78 1.62 0.43 0.24 1.13 0.8 1.3 1.06 0.21 0.3 0.3 0.73 0.25 1.14-0.13 1.04-1.24 2.93-2.8 4.8-0.69 0.83-0.78 0.92-1.1 1.12-1.13 0.72-2.66 0.55-4.14-0.46-0.45-0.32-0.54-0.4-0.87-0.72z"/>
+						</g>
+					</g>
+				</svg>
+        </div>
+    </div>
+</div>
+{% endblock %}
