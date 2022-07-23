@@ -1,9 +1,11 @@
 import json
 import threading
+import time
 
 import requests
 from flask import Blueprint, render_template, request
 
+import barcode
 import common
 import config
 import fournisseurs
@@ -67,7 +69,6 @@ class Stock:
         member = json.loads(member)
         lock = True
         job = ""
-
         for member in member:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == self.actual_n_serie:
@@ -95,6 +96,9 @@ class Stock:
 
     def arrivage_fournisseur(self):
         self.fournisseur = request.form['fournisseur']
+        barcode.running_virtual_keyboard = True
+        time.sleep(0.5)
+        threading.Thread(target=barcode.read_virtual_barcode).start()
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             return render_template('stock.html', fournisseur=data[self.fournisseur], arrivage_recherche=True)
@@ -156,6 +160,7 @@ class Stock:
 
     def arrivage_confirm(self):
         global products
+        barcode.running_virtual_keyboard = False
         products = self.list_add
         thread_pool = []
         for composant in self.list_add:
@@ -185,15 +190,19 @@ class Stock:
                                                    headers=config.headers)
                             products_add[composant] = products[composant]
                     else:
+                        try:
+                            price = float(products[composant]["product"]["price"].replace("€", "").replace(",",
+                                                                                                           ".").replace(
+                                " ", ""))
+                        except ValueError:
+                            price = 0.0
                         # create dolibarr product and stockmovement
                         content = {
                             'label': products[composant]["product"]["title"],
                             'description': products[composant]["product"]["attributes"],
                             'other': None,
                             'type': '0',
-                            'cost_price': float(products[composant]["product"]["price"].replace("€", "").replace(",",
-                                                                                                                 ".").replace(
-                                " ", "")),
+                            'cost_price': price,
                             'status_buy': '1',
                             'url': str(products[composant]["product"]["links_ref"]),
                             'accountancy_code_buy': str(products[composant]["product"]["ref"]),
