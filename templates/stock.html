@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="content" class="container-fluid">
+<div class="container-fluid" id="content">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <!--        <h1 class="h1 mt-3 mb-0 text-gray-800">Caméléon</h1>-->
     </div>
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Stocks</h6>
         </a>
         <div class="collapse show card-body mb-4" id="scan">
@@ -17,21 +17,21 @@
                     <h4 class="font-weight-bold text-secondary mt-2">Rechercher</h4>
                     <form action="/stock/recherche" method="POST" onsubmit="document.getElementById('container-svg-loading')
                     .style.visibility = 'visible';return true;">
-                        <button type="submit" class="form-control btn btn-secondary">Débuter une recherche</button>
+                        <button class="form-control btn btn-secondary" type="submit">Débuter une recherche</button>
                         <div class="form-group">
-                            <label for="ref" class="mt-2">Référence</label>
-                            <input type="text" class="form-control" id="ref" name="ref" placeholder="Référence"
-                                   required>
+                            <label class="mt-2" for="ref">Référence</label>
+                            <input class="form-control" id="ref" name="ref" placeholder="Référence" required
+                                   type="text">
                         </div>
                         <div class="form-group">
                             <label for="name">Nom</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Nom"
-                                   disabled>
+                            <input class="form-control" disabled id="name" name="name" placeholder="Nom"
+                                   type="text">
                         </div>
                     </form>
                     <form action="/stock/recherche" method="GET" onsubmit="document.getElementById('container-svg-scanning')
                     .style.visibility = 'visible';return true;">
-                        <button type="submit" class="form-control btn btn-secondary">Scanner un code barre</button>
+                        <button class="form-control btn btn-secondary" type="submit">Scanner un code barre</button>
                     </form>
                     {% if unknow_composant %}
                     <div class="alert alert-danger" role="alert">
@@ -43,7 +43,7 @@
                     <h4 class="font-weight-bold text-secondary mt-2">Ajouter</h4>
 
                     <form action="/stock/arrivage" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Débuter un arrivage
+                        <button class="form-control btn btn-secondary" type="submit">Débuter un arrivage
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -56,6 +56,11 @@
                             d'EirLab
                             Community</p>
                     </form>
+                    {% if fournisseur %}
+                    <form action="/stock/arrivage/end" method="GET">
+                        <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
+                    </form>
+                    {% endif %}
                     {% if arrivage_error %}
                     <h4 class="font-weight-bold mt-2 text-danger">{{ arrivage_error }}</h4>
                     {% endif %}
@@ -65,7 +70,7 @@
                     <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
 
                     <form action="/stock/arrivage" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary" disabled>Débuter un inventaire
+                        <button class="form-control btn btn-secondary" disabled type="submit">Débuter un inventaire
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -87,8 +92,8 @@
     {% if recherche_composant %}
     {% for composant in recherche_composant %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche {{
                 recherche_composant[composant].fournisseur.name }}</h6>
         </a>
@@ -101,9 +106,9 @@
                             href="{{ recherche_composant[composant].links_ref }}" target="_blank">Lien {{
                         recherche_composant[composant].fournisseur.name }}</a></h5>
                     <div class="text-center">
-                        <img src="{{ recherche_composant[composant].fournisseur.image }}"
+                        <img alt="Imprimante"
                              class="img-fluid mt-2"
-                             alt="Imprimante" width="100px">
+                             src="{{ recherche_composant[composant].fournisseur.image }}" width="100px">
                     </div>
                     <p class="text-secondary font-weight-bold mt-2">{{ recherche_composant[composant].price }}</p>
                     <a class="mt-2" href="{{ recherche_composant[composant].links }}">{{
@@ -119,9 +124,9 @@
                         EirLab Community</h4>
                     {% endif %}
                     <div class="text-center">
-                        <img src="{{ recherche_composant[composant].image }}"
+                        <img alt="{{ recherche_composant[composant].title}}"
                              class="img-fluid mt-2"
-                             alt="{{ recherche_composant[composant].title}}" width="200px">
+                             src="{{ recherche_composant[composant].image }}" width="200px">
                     </div>
                 </div>
             </div>
@@ -148,24 +153,24 @@
 
     {% if arrivage %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Choix du fournisseur</h6>
         </a>
         <div class="collapse show card-body mb-4" id="choix">
             <form action="/stock/arrivage/fournisseur" method="POST">
                 {% for d in fournisseurs %}
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="fournisseur"
-                           id="{{ fournisseurs[d].name }}"
-                           value="{{ fournisseurs[d].ref  }}" required>
+                    <input class="form-check-input" id="{{ fournisseurs[d].name }}" name="fournisseur"
+                           required
+                           type="radio" value="{{ fournisseurs[d].ref  }}">
                     <label class="form-check-label" for="{{ fournisseurs[d].name }}"> <img
-                            src="{{ fournisseurs[d].image }}"
+                            alt="{{ fournisseurs[d].ref }}"
                             class="img-fluid mt-2"
-                            alt="{{ fournisseurs[d].ref }}"> </label>
+                            src="{{ fournisseurs[d].image }}"> </label>
                 </div>
                 {% endfor %}
-                <button type="submit" class="form-control btn btn-secondary mt-2">
+                <button class="form-control btn btn-secondary mt-2" type="submit">
                     Confirmer
                 </button>
             </form>
@@ -175,8 +180,8 @@
 
     {% if fournisseur %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Prise des références - {{ fournisseur.name }}</h6>
         </a>
         <script type="application/javascript">
@@ -188,15 +193,16 @@
                 <div class="col m-2">
                     <form action="/stock/arrivage/add" method="POST">
                         <div class="form-group">
-                            <label for="arrivage_ref" class="mt-2">Référence</label>
-                            <input type="text" class="form-control" id="arrivage_ref" name="arrivage_ref"
+                            <label class="mt-2" for="arrivage_ref">Référence</label>
+                            <input autofocus class="form-control" id="arrivage_ref" name="arrivage_ref"
                                    placeholder="Référence"
-                                   required autofocus>
-                            <label for="arrivage_ref" class="mt-2">Quantité</label>
-                            <input type="number" class="form-control" id="arrivage_qte" name="arrivage_qte"
-                                   placeholder="Quantité (défaut : 1, négatif pour enlever)">
+                                   required type="text">
+                            <label class="mt-2" for="arrivage_ref">Quantité</label>
+                            <input class="form-control" id="arrivage_qte" name="arrivage_qte"
+                                   placeholder="Quantité (défaut : 1, négatif pour enlever)"
+                                   type="number">
                         </div>
-                        <button type="submit" class="form-control btn btn-secondary">Ajouter</button>
+                        <button class="form-control btn btn-secondary" type="submit">Ajouter</button>
                     </form>
                 </div>
                 {% endif %}
@@ -214,9 +220,9 @@
                                 </div>
                                 <div class="col-md-4">
                                     <form action="/stock/arrivage/remove" method="POST">
-                                        <input type="hidden" name="composant" id="{{ composant }}"
+                                        <input id="{{ composant }}" name="composant" type="hidden"
                                                value="{{ composant }}">
-                                        <button type="submit" class="form-control btn btn-danger">Supprimer</button>
+                                        <button class="form-control btn btn-danger" type="submit">Supprimer</button>
                                     </form>
                                 </div>
                             </div>
@@ -224,7 +230,7 @@
                     </ul>
                     {% endfor %}
                     <form action="/stock/arrivage/confirm" method="GET">
-                        <button type="submit" class="form-control btn btn-secondary">Confirmer</button>
+                        <button class="form-control btn btn-secondary" type="submit">Confirmer</button>
                     </form>
                 </div>
                 {% endif %}
@@ -235,8 +241,8 @@
 
     {% if arrivage_confirm %}
     <div class="card shadow mb-4">
-        <a href="#select" class="d-block card-header py-3" data-toggle="collapse"
-           role="button" aria-expanded="true" aria-controls="select">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Confirmation de l'arrivage</h6>
         </a>
         <div class="collapse show card-body mb-4" id="add">
@@ -267,9 +273,9 @@
                     <td>{{ products_add[composant].quantite }}</td>
                     <td>{{ products_add[composant].product.title }}</td>
                     <td>{{ products_add[composant].product.price }}</td>
-                    <td><img src="{{ products_add[composant].product.image }}"
+                    <td><img alt="Imprimante"
                              class="img-fluid mt-2"
-                             alt="Imprimante" width="50px"></td>
+                             src="{{ products_add[composant].product.image }}" width="50px"></td>
                     <td><a href="{{ products_add[composant].product.links_ref }}">Lien fournisseur</a></td>
                     <td><a href="{{ products_add[composant].product.links }}">Datasheet</a></td>
 
@@ -285,9 +291,9 @@
                     <td>{{ products_error[composant].quantite }}</td>
                     <td>{{ products_error[composant].product.title }}</td>
                     <td>{{ products_error[composant].product.price }}</td>
-                    <td><img src="{{ products_error[composant].product.image }}"
+                    <td><img alt="Imprimante"
                              class="img-fluid mt-2"
-                             alt="Imprimante" width="50px"></td>
+                             src="{{ products_error[composant].product.image }}" width="50px"></td>
                     <td><a href="{{ products_error[composant].product.links_ref }}">Lien fournisseur</a></td>
                     <td><a href="{{ products_error[composant].product.links }}">Datasheet</a></td>
                 </tr>
@@ -298,50 +304,75 @@
         {% endif %}
     </div>
     <div class="container-animation-scanning">
-		<div id="container-svg-loading" class="container-svg">
-			<div class="popup-svg">
-                <svg class="loading-circle" viewBox="0 0 226.12 226.12" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+        <div class="container-svg" id="container-svg-loading">
+            <div class="popup-svg">
+                <svg class="loading-circle" viewBox="0 0 226.12 226.12" xml:space="preserve"
+                     xmlns="http://www.w3.org/2000/svg">
 
-					<style type="text/css">
-						.svg-loading-circle-fill{fill:#39aedc;transform-origin: 50% 50%;animation: loading-circle 2s infinite;}
-					</style>
-					<!-- <rect x=".0099945" y=".0099933" width="226.11" height="226.11"/> -->
-					<path class="svg-loading-circle-fill"d="m113.06 226.12c-62.34 0-113.06-50.72-113.06-113.06s50.72-113.06 113.06-113.06c19.45 0 38.64 5.03 55.5 14.55 3.61 2.04 4.88 6.61 2.84 10.22s-6.61 4.88-10.22 2.84c-14.61-8.25-31.26-12.61-48.13-12.61-54.07 0-98.06 43.99-98.06 98.06s43.99 98.06 98.06 98.06c4.14 0 7.5 3.36 7.5 7.5s-3.34 7.5-7.49 7.5z"/>
-				</svg>
+                    <style type="text/css">
+                        .svg-loading-circle-fill {
+                            fill: #39aedc;
+                            transform-origin: 50% 50%;
+                            animation: loading-circle 2s infinite;
+                        }
+                    </style>
+                    <!-- <rect x=".0099945" y=".0099933" width="226.11" height="226.11"/> -->
+                    <path class="svg-loading-circle-fill"
+                          d="m113.06 226.12c-62.34 0-113.06-50.72-113.06-113.06s50.72-113.06 113.06-113.06c19.45 0 38.64 5.03 55.5 14.55 3.61 2.04 4.88 6.61 2.84 10.22s-6.61 4.88-10.22 2.84c-14.61-8.25-31.26-12.61-48.13-12.61-54.07 0-98.06 43.99-98.06 98.06s43.99 98.06 98.06 98.06c4.14 0 7.5 3.36 7.5 7.5s-3.34 7.5-7.49 7.5z"/>
+                </svg>
             </div>
-		</div>
-        <div id="container-svg-scanning" class="container-svg">
-			<div class="popup-svg">
-                <svg class="scanner" viewBox="0 0 447.85 297.17" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-					<style type="text/css">
-						.corner{fill:none;stroke:#6c757d;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-						.code{fill:#6c757d}
-						.red{fill:#e2007a;animation: scanner-movement 3s ease-in-out infinite alternate-reverse;}
-					</style>
-					<polyline class="corner" transform="translate(-60.93,-216.41)" points="115.93 219.41 63.93 219.41 63.93 271.41"/>
-					<polyline class="corner" transform="translate(-60.93,-216.41)" points="453.78 219.41 505.78 219.41 505.78 271.41"/>
-					<polyline class="corner" transform="translate(-60.93,-216.41)" points="115.93 510.58 63.93 510.58 63.93 458.58"/>
-					<polyline class="corner" transform="translate(-60.93,-216.41)" points="453.78 510.58 505.78 510.58 505.78 458.58"/>
-					<g transform="translate(-60.93,-216.41)">
-						<rect class="code" x="103.22" y="251.76" width="20.93" height="226.94"/>
-						<rect class="code" x="139.32" y="251.76" width="10.46" height="226.94"/>
-						<rect class="code" x="162.36" y="251.76" width="14.4" height="226.94"/>
-						<rect class="code" x="190.01" y="251.76" width="19.39" height="226.94"/>
-						<rect class="code" x="220.73" y="251.76" width="9.7" height="226.94"/>
-						<rect class="code" x="238.39" y="251.76" width="11.71" height="226.94"/>
-						<rect class="code" x="263.74" y="251.76" width="18.24" height="226.94"/>
-						<rect class="code" x="297.64" y="251.76" width="9.12" height="226.94"/>
-						<rect class="code" x="323.37" y="251.76" width="12.37" height="226.94"/>
-						<rect class="code" x="347.94" y="251.76" width="7.76" height="226.94"/>
-						<rect class="code" x="367.81" y="251.76" width="19.62" height="226.94"/>
-						<rect class="code" x="402.23" y="251.76" width="14.87" height="226.94"/>
-						<rect class="code" x="428.87" y="251.76" width="11.41" height="226.94"/>
-						<rect class="code" x="453.78" y="251.76" width="17.75" height="226.94"/>
-					</g>
-					<rect class="red" x="6.77" y="138.65" width="433.54" height="20.26"/>
-				</svg>
+        </div>
+        <div class="container-svg" id="container-svg-scanning">
+            <div class="popup-svg">
+                <svg class="scanner" viewBox="0 0 447.85 297.17" xml:space="preserve"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <style type="text/css">
+                        .corner {
+                            fill: none;
+                            stroke: #6c757d;
+                            stroke-width: 6;
+                            stroke-linecap: round;
+                            stroke-linejoin: round;
+                            stroke-miterlimit: 10;
+                        }
+
+                        .code {
+                            fill: #6c757d
+                        }
+
+                        .red {
+                            fill: #e2007a;
+                            animation: scanner-movement 3s ease-in-out infinite alternate-reverse;
+                        }
+                    </style>
+                    <polyline class="corner" points="115.93 219.41 63.93 219.41 63.93 271.41"
+                              transform="translate(-60.93,-216.41)"/>
+                    <polyline class="corner" points="453.78 219.41 505.78 219.41 505.78 271.41"
+                              transform="translate(-60.93,-216.41)"/>
+                    <polyline class="corner" points="115.93 510.58 63.93 510.58 63.93 458.58"
+                              transform="translate(-60.93,-216.41)"/>
+                    <polyline class="corner" points="453.78 510.58 505.78 510.58 505.78 458.58"
+                              transform="translate(-60.93,-216.41)"/>
+                    <g transform="translate(-60.93,-216.41)">
+                        <rect class="code" height="226.94" width="20.93" x="103.22" y="251.76"/>
+                        <rect class="code" height="226.94" width="10.46" x="139.32" y="251.76"/>
+                        <rect class="code" height="226.94" width="14.4" x="162.36" y="251.76"/>
+                        <rect class="code" height="226.94" width="19.39" x="190.01" y="251.76"/>
+                        <rect class="code" height="226.94" width="9.7" x="220.73" y="251.76"/>
+                        <rect class="code" height="226.94" width="11.71" x="238.39" y="251.76"/>
+                        <rect class="code" height="226.94" width="18.24" x="263.74" y="251.76"/>
+                        <rect class="code" height="226.94" width="9.12" x="297.64" y="251.76"/>
+                        <rect class="code" height="226.94" width="12.37" x="323.37" y="251.76"/>
+                        <rect class="code" height="226.94" width="7.76" x="347.94" y="251.76"/>
+                        <rect class="code" height="226.94" width="19.62" x="367.81" y="251.76"/>
+                        <rect class="code" height="226.94" width="14.87" x="402.23" y="251.76"/>
+                        <rect class="code" height="226.94" width="11.41" x="428.87" y="251.76"/>
+                        <rect class="code" height="226.94" width="17.75" x="453.78" y="251.76"/>
+                    </g>
+                    <rect class="red" height="20.26" width="433.54" x="6.77" y="138.65"/>
+                </svg>
             </div>
-		</div>
-	</div>
+        </div>
+    </div>
     {% endblock %}
 </div>
