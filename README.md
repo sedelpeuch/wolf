@@ -12,17 +12,14 @@ Le projet comporte actuellement les fonctionnalités suivantes :
 
 ## Installation
 
-Pour installer le projet il est nécessaire d'avoir un environnement python3 avec Flaks installé. Il suffit ensuite de
-lancer le projet avec la commande :
+- Cloner le projet sur son poste : `git clone git@github.com:Eirlab/wolf.git`
+- Configurer le token pour requêter vers l'API Dolibarr. Aller dans `config.py` et éditer la variable `token`
+- Il est nécessaire d'avoir un environnement Python3 avec Flaks installé
+- Il suffit ensuite de lancer le projet avec la commande : `python3 run_api.py`
 
-Pour une installation sur un PC, il faut déployer et activer `wolf.service`. Il faut copier le fichier
-das `/etc/systemd/system/` puis lancer la commande `systemctl enable wolf.service`. Le service ce lancera alors
-automatiquement, si il meurt il sera aussi relancé automatiquement.
+Pour une installation sur un PC, il faut déployer et activer `wolf.service`.
+Copier ce fichier dans `/etc/systemd/system/` puis lancer la commande `systemctl enable wolf.service`. Le service se 
+lancera alors au démarrage du poste et sera relancé automatiquement en cas de plantage.
 
-```python
-python3
-run_api.py
-```
-
-Le site sera accessible sur `http://localhost:5000/`. ou `http://<ip_adress>:5000`.
-
+Le site sera accessible sur `http://localhost:5000/` ou `http://<adresse_ip_hôte>:5000` pour un accès depuis un autre
+poste du même réseau.
