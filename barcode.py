@@ -1,7 +1,28 @@
+import logging
 import time
 
+import pyautogui
 import serial
-import logging
+
+running_virtual_keyboard = True
+
+def read_virtual_barcode():
+    barcode_reader = BarcodeReader()
+    print("Barcode reader started", running_virtual_keyboard)
+    while running_virtual_keyboard:
+        try:
+            barcode = barcode_reader.ser.readline().decode("utf-8").strip("\r\n")
+            barcode_len = len(barcode)
+            if barcode_len > 0:
+                for char in barcode:
+                    pyautogui.press(char)
+                pyautogui.press("enter")
+        except serial.SerialException as error:
+            logging.error("Barcode reader error: {}".format(error))
+            barcode_reader.close()
+            barcode_reader.open()
+    barcode_reader.close()
+
 
 class BarcodeReader:
     """Bluetooth barcode reader"""
@@ -43,18 +64,6 @@ class BarcodeReader:
             self.close()
             self.open()
 
-    def read_multiple(self):
-        try:
-            barcode = self.ser.read(self.ser.inWaiting())
-            barcode_len = len(barcode)
-            if barcode_len > 0:
-                barcode = barcode.decode("utf-8")
-                return barcode
-        except serial.SerialException as error:
-            logging.error("Barcode reader error: {}".format(error))
-            self.close()
-            self.open()
-
     def read_barcode(self):
         time.sleep(0.2)
         barcode = None
@@ -66,9 +75,8 @@ class BarcodeReader:
 if __name__ == "__main__":
     br = BarcodeReader()
     br.open()
-    time.sleep(10)
-    barcode = br.read()
-    print(barcode)
+    while True:
+        barcode = br.read_virtual_barcode()
     br.close()
     del br
     print("Done")
