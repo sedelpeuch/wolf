@@ -1,4 +1,4 @@
-token = ""
+token = "08b977403545a0c5eafd4ee04d6ce84105f6c229"
 url = "https://gestion.eirlab.net/api/index.php/"
 headers = {
     "Accept": "application/json",
