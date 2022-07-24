@@ -40,7 +40,7 @@ html_logo = '../img/logo.png'
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
 master_doc = 'index'
-
+os.environ['DISPLAY'] = ':0'
 
 
 
