@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="✨feat(stock): add search function">
-      <change afterPath="$PROJECT_DIR$/barcode.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_07_2022,_11_10_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_07_2022__11_10__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/wolf.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wolf.iml" afterDir="false" />
+    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="✨feat(stock): add animation">
+      <change afterPath="$PROJECT_DIR$/.readthedocs.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/Makefile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/img/logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/make.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/make.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/adherent.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/barcode.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/common.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/conf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/formation.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/index.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/source/rfid.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formation.py" beforeDir="false" afterPath="$PROJECT_DIR$/formation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fournisseurs.json" beforeDir="false" afterPath="$PROJECT_DIR$/fournisseurs.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fournisseurs.py" beforeDir="false" afterPath="$PROJECT_DIR$/fournisseurs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/img/makershop.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/img/makershop.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/img/otelo.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/img/otelo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/img/rs.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/img/rs.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/stock.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -71,7 +77,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/opt/wolf&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/opt/wolf/doc/source&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
@@ -80,11 +86,22 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/doc/source" />
+      <recent name="$PROJECT_DIR$/doc/source/img" />
+      <recent name="$PROJECT_DIR$/doc" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/templates" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/doc" />
+    </key>
   </component>
-  <component name="RunManager" selected="Python.run_api">
+  <component name="RunManager" selected="BashSupport Pro.make.sh">
+    <configuration name="make.sh" type="BashProRunConfiguration" temporary="true">
+      <option name="scriptPath" value="$PROJECT_DIR$/doc/make.sh" />
+      <RunnerSettings bashdbVersion="Automatic" bashPathMapper="Automatic" RunnerId="pro.bashsupport.shDebugRunner" />
+      <method v="2" />
+    </configuration>
     <configuration name="barcode" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="wolf" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -151,28 +168,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="rs_parser_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="wolf" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/rs_parser_test.py" />
-      <option name="PARAMETERS" value="138261" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="run_api" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="wolf" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -196,18 +191,18 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="BashSupport Pro.make.sh" />
       <item itemvalue="Python.barcode" />
       <item itemvalue="Python.fournisseurs" />
       <item itemvalue="Python.main" />
-      <item itemvalue="Python.rs_parser_test" />
       <item itemvalue="Python.run_api" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="BashSupport Pro.make.sh" />
         <item itemvalue="Python.run_api" />
         <item itemvalue="Python.barcode" />
         <item itemvalue="Python.fournisseurs" />
-        <item itemvalue="Python.rs_parser_test" />
         <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
@@ -235,6 +230,7 @@
       <workItem from="1658507866381" duration="3028000" />
       <workItem from="1658564084816" duration="13928000" />
       <workItem from="1658581316678" duration="9632000" />
+      <workItem from="1658679036061" duration="950000" />
     </task>
     <task id="LOCAL-00001" summary="✨feat(esp32): add serializer json">
       <created>1657961977289</created>
@@ -242,6 +238,13 @@
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
       <updated>1657961977289</updated>
+    </task>
+    <task id="LOCAL-00002" summary="✨feat(stock): add exit button">
+      <created>1658593959658</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1658593959658</updated>
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
@@ -276,10 +279,10 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/wolf$barcode.coverage" NAME="barcode Coverage Results" MODIFIED="1658565939593" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$barcode.coverage" NAME="barcode Coverage Results" MODIFIED="1658592088121" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$main.coverage" NAME="main Coverage Results" MODIFIED="1657460230445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$rs_parser_test.coverage" NAME="rs_parser_test Coverage Results" MODIFIED="1658170548305" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1658588656797" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1658674314916" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$fournisseurs.coverage" NAME="fournisseurs Coverage Results" MODIFIED="1658509164241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
