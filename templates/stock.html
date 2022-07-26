@@ -117,7 +117,7 @@
                     <!--                    display recherche_composant[composant].attributes with key and value -->
                 </div>
                 <div class="col m-2">
-                    {% if composant_eirlab %}
+                    {% if recherche_composant[composant].eirlab %}
                     <h4 class="text-success font-weight-bold mt-2">Le composant est disponible à EirLab
                         Community</h4>
                     {% else %}
@@ -265,7 +265,6 @@
                 </tr>
                 </thead>
                 {% for composant in products_add %}
-
                 <tbody>
                 <tr>
                     <td><i class="fas fa-check text-success"></i></td>
@@ -277,8 +276,8 @@
                     <td><img alt="Imprimante"
                              class="img-fluid mt-2"
                              src="{{ products_add[composant].product.image }}" width="50px"></td>
-                    <td><a href="{{ products_add[composant].product.links_ref }}">Lien fournisseur</a></td>
-                    <td><a href="{{ products_add[composant].product.links }}">Datasheet</a></td>
+                    <td><a target="_blank" href="{{ products_add[composant].product.links_ref }}">Lien fournisseur</a></td>
+                    <td><a target="_blank" href="{{ products_add[composant].product.links }}">Datasheet</a></td>
 
                 </tr>
                 </tbody>
@@ -295,13 +294,13 @@
                     <td><img alt="Imprimante"
                              class="img-fluid mt-2"
                              src="{{ products_error[composant].product.image }}" width="50px"></td>
-                    <td><a href="{{ products_error[composant].product.links_ref }}">Lien fournisseur</a></td>
-                    <td><a href="{{ products_error[composant].product.links }}">Datasheet</a></td>
+                    <td><a target="_blank" href="{{ products_error[composant].product.links_ref }}">Lien fournisseur</a></td>
+                    <td><a target="_blank" href="{{ products_error[composant].product.links }}">Datasheet</a></td>
                 </tr>
                 </tbody>
+                {% endfor %}
             </table>
         </div>
-        {% endfor %}
         {% endif %}
     </div>
 </div>

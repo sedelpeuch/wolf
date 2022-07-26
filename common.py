@@ -12,7 +12,6 @@ PUB = True
 def update_member(member, formation, actual_n_serie):
     """
     Actualise un membre dans la base de données avec son numéro de série et ou les formations qu'il a suivi
-
     :param member: le membre à mettre à jour
     :param formation: la formation à ajouter ou None si il n'y en a pas
     :param actual_n_serie: le numéro de série de la carte RFID lue
