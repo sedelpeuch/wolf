@@ -1,0 +1,10 @@
+[Unit]
+Description=Barcode reader rfcomm binding service
+After=bluetooth.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rfcomm bind 0 00:06:62:3A:15:11 1
+
+[Install]
+WantedBy=multi-user.target
