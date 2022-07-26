@@ -1,0 +1,11 @@
+pip==21.3.1
+setuptools==59.6.0
+wheel==0.37.1
+myst_parser==0.16.1
+attrs==21.4.0
+unidecode==1.1.1
+pyautogui==0.9.53
+flask==2.1.1
+flask-cors==3.0.10
+flask-socketio==5.1.1
+pyserial==3.5

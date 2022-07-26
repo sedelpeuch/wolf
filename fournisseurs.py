@@ -26,7 +26,7 @@ class Fournisseurs:
         if ref is None:
             return None, None
         else:
-            result, id = self.find_dolibarr(ref)
+            result, id, fournisseur = self.find_dolibarr(ref)
             thread_rs = threading.Thread(target=self.rs, args=(ref,))
             thread_rs.start()
 
@@ -40,7 +40,15 @@ class Fournisseurs:
             thread_otelo.join()
             thread_makershop.join()
 
-            self.makershop(ref)
+            for item in product:
+                try:
+                    if product[item]['fournisseur']['ref'] == fournisseur:
+                        product[item]['eirlab'] = True
+                    else:
+                        product[item]['eirlab'] = False
+                except KeyError:
+                    product[item]['eirlab'] = False
+
             return result, product
 
     def find_dolibarr(self, ref):
@@ -48,10 +56,10 @@ class Fournisseurs:
         ref = ref.replace('-', '')
         products = requests.get(config.url + config.url_product, headers=config.headers).text
         products = json.loads(products)
-        for product in products:
-            if product["accountancy_code_buy"] == ref:
-                return True, product["id"]
-        return False, None
+        for item in products:
+            if item["accountancy_code_buy"] == ref:
+                return True, item["id"], item["accountancy_code_buy_intra"]
+        return False, None, None
 
     def rs(self, ref):
         global product
@@ -86,6 +94,8 @@ class Fournisseurs:
                     row.find('td', attrs={'data-testid': 'specification-attributes-value'}).text
         except AttributeError:
             dict_attributes = {}
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+            return
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             product['rs'] = {"fournisseur": data['rs'], "title": title, "price": price, "links": links,
@@ -126,7 +136,8 @@ class Fournisseurs:
                     dict_attributes[tr.find_all('td')[0].text] = tr.find_all('td')[1].text
         except AttributeError:
             dict_attributes = {}
-
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+            return
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             product['otelo'] = {"fournisseur": data['otelo'], "title": title, "price": price, "links": links,
@@ -150,6 +161,8 @@ class Fournisseurs:
             title = ""
         try:
             price = parsed_html.body.find('span', attrs={'class': 'col-xs-4 price'}).text
+            price = price.replace('TTC', '')
+            price = price.replace('€', ',')
         except AttributeError:
             price = ""
         links = ""
@@ -163,10 +176,12 @@ class Fournisseurs:
             image = parsed_html.body.find('a', attrs={'class': 'fancybox shown'}).get('href')
         except AttributeError:
             image = ""
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+            return
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             product['makershop'] = {"fournisseur": data['makershop'], "title": title, "price": price,
                                     "links": links,
                                     "attributes": dict_attributes, "ref": ref, "image": image,
-                                    "links_ref": self.url_otelo + ref}
+                                    "links_ref": self.url_makershop + ref}
             return product
