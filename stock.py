@@ -157,7 +157,6 @@ class Stock:
     def thread_search(self, ref):
         global products
         products[ref]["product"] = getattr(self.fournisseurs, self.fournisseur)(ref)[self.fournisseur]
-        # here put on dolibarr
 
     def arrivage_confirm(self):
         global products
@@ -179,7 +178,7 @@ class Stock:
             try:
                 if products[composant]["product"] is not None:
                     ref = products[composant]["product"]["ref"]
-                    status, id = self.fournisseurs.find_dolibarr(ref)
+                    status, id, four = self.fournisseurs.find_dolibarr(ref)
                     if status:
                         # update dolibarr with stockmovement
                         price = products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(" ",
@@ -232,7 +231,7 @@ class Stock:
                             'localtax2_type': '0',
                             'lifetime': None,
                             'qc_frequency': None,
-                            'stock_reel': '10',
+                            'stock_reel': None,
                             'stock_theorique': None,
                             'pmp': '0.00000000',
                             'seuil_stock_alerte': '0',
@@ -262,7 +261,7 @@ class Stock:
                             'accountancy_code_sell': '',
                             'accountancy_code_sell_intra': '',
                             'accountancy_code_sell_export': '',
-                            'accountancy_code_buy_intra': '',
+                            'accountancy_code_buy_intra': self.fournisseur,
                             'accountancy_code_buy_export': '',
                             'date_creation': None,
                             'date_modification': None,
@@ -287,7 +286,7 @@ class Stock:
                             'region_id': None,
                             'barcode_type_coder': None,
                             'last_main_doc': None,
-                            'note_public': None,
+                            'note_public': '',
                             'note_private': '',
                             'total_ht': None,
                             'total_tva': None,
@@ -304,9 +303,7 @@ class Stock:
                                 id = status.json()
                                 stockmovement = {"product_id": id, "warehouse_id": 1,
                                                  "qty": products[composant]["quantite"],
-                                                 "price": float(
-                                                     products[composant]["product"]["price"].replace("€", "").replace(
-                                                         ",", ".").replace(" ", ""))}
+                                                 "price": price}
                                 status = requests.post(config.url + "stockmovements", json=stockmovement,
                                                        headers=config.headers)
                                 products_add[composant] = products[composant]
@@ -315,6 +312,13 @@ class Stock:
                                 products_error[composant] = products[composant]
             except KeyError:
                 products[composant]["status"] = "Référence incorrecte"
+                products[composant]["product"] = {}
+                products[composant]["product"]["title"] = ""
+                products[composant]["product"]["price"] = ""
+                products[composant]["product"]["image"] = ""
+                products[composant]["product"]["links_ref"] = ""
+                products[composant]["product"]["links"] = ""
+
                 products_error[composant] = products[composant]
         print("products_add", products_add)
         print("products_error", products_error)
