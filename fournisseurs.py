@@ -17,6 +17,7 @@ class Fournisseurs:
         self.url_otelo = "https://www.otelo.fr/is-bin/INTERSHOP.enfinity/WFS/Otelo-France-Site/fr_FR/-/EUR/Navigation" \
                          "-Dispatch?Ntk=Default_OTFR&Ntt="
         self.url_makershop = "https://www.makershop.fr/recherche?search_query="
+        self.url_conrad = "https://www.conrad.fr/restservices/FR/products/"
         self.rfid = rfid.Serial()
         self.barcode = barcode.BarcodeReader()
 
@@ -36,9 +37,13 @@ class Fournisseurs:
             thread_makershop = threading.Thread(target=self.makershop, args=(ref,))
             thread_makershop.start()
 
+            thread_conrad = threading.Thread(target=self.conrad, args=(ref,))
+            thread_conrad.start()
+
             thread_rs.join()
             thread_otelo.join()
             thread_makershop.join()
+            thread_conrad.join()
 
             for item in product:
                 try:
@@ -57,8 +62,11 @@ class Fournisseurs:
         products = requests.get(config.url + config.url_product, headers=config.headers).text
         products = json.loads(products)
         for item in products:
-            if item["accountancy_code_buy"] == ref:
-                return True, item["id"], item["accountancy_code_buy_intra"]
+            try:
+                if item["accountancy_code_buy"] == ref:
+                    return True, item["id"], item["accountancy_code_buy_intra"]
+            except TypeError:
+                pass
         return False, None, None
 
     def rs(self, ref):
@@ -78,7 +86,7 @@ class Fournisseurs:
             price = ""
         try:
             links = parsed_html.body.find('ul', attrs={'data-testid': 'technical-documents'}).find_all('a')[0].get(
-                'href')
+                    'href')
         except AttributeError:
             links = ""
         try:
@@ -90,8 +98,8 @@ class Fournisseurs:
             dict_attributes = {}
             for row in parsed_html.body.find('table', attrs={'data-testid': 'specification-attributes'}).find(
                     'tbody').find_all('tr'):
-                dict_attributes[row.find('td', attrs={'data-testid': 'specification-attributes-key'}).text] = \
-                    row.find('td', attrs={'data-testid': 'specification-attributes-value'}).text
+                dict_attributes[row.find('td', attrs={'data-testid': 'specification-attributes-key'}).text] = row.find(
+                        'td', attrs={'data-testid': 'specification-attributes-value'}).text
         except AttributeError:
             dict_attributes = {}
         if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
@@ -180,8 +188,55 @@ class Fournisseurs:
             return
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
-            product['makershop'] = {"fournisseur": data['makershop'], "title": title, "price": price,
-                                    "links": links,
+            product['makershop'] = {"fournisseur": data['makershop'], "title": title, "price": price, "links": links,
                                     "attributes": dict_attributes, "ref": ref, "image": image,
                                     "links_ref": self.url_makershop + ref}
             return product
+
+    def conrad(self, ref):
+        global product
+        # remove all 0 at the beginning of the ref
+        ref = ref.lstrip('0')
+        try:
+            json_product = requests.get(self.url_conrad + ref).json()['body']
+        except KeyError:
+            return
+        try:
+            title = json_product['title']
+        except AttributeError:
+            title = ""
+        try:
+            price = json_product['price']['unit']['gross']
+        except AttributeError:
+            price = ""
+        try:
+            links = json_product['productMedia'][0]['url']
+        except AttributeError:
+            links = ""
+        try:
+            image = json_product['image']['url']
+        except AttributeError:
+            image = ""
+        dict_attributes = {}
+        try:
+            for tr in json_product['technicalAttributes']:
+                dict_attributes[tr['name']] = tr['values'][0]['value']
+        except AttributeError:
+            dict_attributes = {}
+        try:
+            links_ref = "www.conrad.fr" + json_product['urlPath']
+        except AttributeError:
+            links_ref = ""
+
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+            return
+        with open('/opt/wolf/fournisseurs.json', 'r') as f:
+            data = json.load(f)
+            product['conrad'] = {"fournisseur": data['conrad'], "title": title, "price": price, "links": links,
+                                 "attributes": dict_attributes, "ref": ref, "image": image, "links_ref": links_ref}
+            return product
+
+
+if __name__ == '__main__':
+    four = Fournisseurs()
+    four.conrad('001693994')
