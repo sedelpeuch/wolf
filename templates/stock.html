@@ -118,11 +118,22 @@
                 </div>
                 <div class="col m-2">
                     {% if recherche_composant[composant].eirlab %}
-                    <h4 class="text-success font-weight-bold mt-2">Le composant est disponible à EirLab
-                        Community</h4>
+                    <form action="/stock/recherche/rupture" method="POST">
+                        <h4 class="text-success font-weight-bold mt-2">Le composant est disponible à EirLab
+                            Community</h4>
+                        <p class="text-secondary font-weight-bold mt-2"> {{
+                            recherche_composant[composant].warehouse.lieu }}</p>
+                        <button class="btn btn-outline-warning" type="submit">Signaler une rupture de stock
+                        </button>
+                        <input name="fournisseur" type="hidden"
+                               value="{{ recherche_composant[composant].fournisseur.ref }}">
+                    </form>
                     {% else %}
                     <h4 class="text-danger font-weight-bold mt-2">Le composant n'est pas disponible à
                         EirLab Community</h4>
+                    <form action="/stock/recherche/achat" method="GET">
+                        <button class="btn btn-outline-danger" disabled type="submit">Faire une demande d'achat</button>
+                    </form>
                     {% endif %}
                     <div class="text-center">
                         <img alt="{{ recherche_composant[composant].title}}"
@@ -156,21 +167,36 @@
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#select" role="button">
-            <h6 class="m-0 font-weight-bold text-secondary">Choix du fournisseur</h6>
+            <h6 class="m-0 font-weight-bold text-secondary">Paramètres d'arrivage</h6>
         </a>
         <div class="collapse show card-body mb-4" id="choix">
             <form action="/stock/arrivage/fournisseur" method="POST">
-                {% for d in fournisseurs %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" id="{{ fournisseurs[d].name }}" name="fournisseur"
-                           required
-                           type="radio" value="{{ fournisseurs[d].ref  }}">
-                    <label class="form-check-label" for="{{ fournisseurs[d].name }}"> <img
-                            alt="{{ fournisseurs[d].ref }}"
-                            class="img-fluid mt-2"
-                            src="{{ fournisseurs[d].image }}"> </label>
+                <div class="row">
+                    <div class="col m-2">
+                        <p class="text-secondary mt-2">Choix du fournisseur</p>
+                        {% for d in fournisseurs %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" id="{{ fournisseurs[d].name }}" name="fournisseur"
+                                   required
+                                   type="radio" value="{{ fournisseurs[d].ref  }}">
+                            <label class="form-check-label" for="{{ fournisseurs[d].name }}"> <img
+                                    alt="{{ fournisseurs[d].ref }}"
+                                    class="img-fluid mt-2"
+                                    src="{{ fournisseurs[d].image }}" width="150px"> </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col m-2">
+                        <div class="form-group">
+                            <label for="warehouse">Sélection du stockage</label>
+                            <select class="form-control" id="warehouse" name="warehouse">
+                                {% for w in warehouses %}
+                                <option>{{ w.lieu }} - {{ w.label }} - {{ w.id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                {% endfor %}
                 <button class="form-control btn btn-secondary mt-2" type="submit">
                     Confirmer
                 </button>
@@ -185,9 +211,6 @@
            data-toggle="collapse" href="#select" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Prise des références - {{ fournisseur.name }}</h6>
         </a>
-        <script type="application/javascript">
-
-        </script>
         <div class="collapse show card-body mb-4" id="prise">
             <div class="row">
                 {% if arrivage_recherche %}
@@ -223,7 +246,8 @@
                                     <form action="/stock/arrivage/remove" method="POST">
                                         <input id="{{ composant }}" name="composant" type="hidden"
                                                value="{{ composant }}">
-                                        <button class="form-control btn btn-danger" type="submit">Supprimer</button>
+                                        <button class="form-control btn btn-danger" type="submit">Supprimer
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -276,8 +300,9 @@
                     <td><img alt="Imprimante"
                              class="img-fluid mt-2"
                              src="{{ products_add[composant].product.image }}" width="50px"></td>
-                    <td><a target="_blank" href="{{ products_add[composant].product.links_ref }}">Lien fournisseur</a></td>
-                    <td><a target="_blank" href="{{ products_add[composant].product.links }}">Datasheet</a></td>
+                    <td><a href="{{ products_add[composant].product.links_ref }}" target="_blank">Lien
+                        fournisseur</a></td>
+                    <td><a href="{{ products_add[composant].product.links }}" target="_blank">Datasheet</a></td>
 
                 </tr>
                 </tbody>
@@ -294,8 +319,10 @@
                     <td><img alt="Imprimante"
                              class="img-fluid mt-2"
                              src="{{ products_error[composant].product.image }}" width="50px"></td>
-                    <td><a target="_blank" href="{{ products_error[composant].product.links_ref }}">Lien fournisseur</a></td>
-                    <td><a target="_blank" href="{{ products_error[composant].product.links }}">Datasheet</a></td>
+                    <td><a href="{{ products_error[composant].product.links_ref }}" target="_blank">Lien
+                        fournisseur</a></td>
+                    <td><a href="{{ products_error[composant].product.links }}" target="_blank">Datasheet</a>
+                    </td>
                 </tr>
                 </tbody>
                 {% endfor %}

@@ -24,10 +24,15 @@ class Fournisseurs:
     def find(self, ref=None):
         global product
         product = {}
+        fournisseur = None
+        id = None
         if ref is None:
             return None, None
         else:
-            result, id, fournisseur = self.find_dolibarr(ref)
+            result, item, warehouse = self.find_dolibarr(ref)
+            if item is not None:
+                id = item["id"]
+                fournisseur = item["accountancy_code_buy_intra"]
             thread_rs = threading.Thread(target=self.rs, args=(ref,))
             thread_rs.start()
 
@@ -45,14 +50,16 @@ class Fournisseurs:
             thread_makershop.join()
             thread_conrad.join()
 
-            for item in product:
+            for prod in product:
                 try:
-                    if product[item]['fournisseur']['ref'] == fournisseur:
-                        product[item]['eirlab'] = True
+                    if product[prod]['fournisseur']['ref'] == fournisseur:
+                        product[prod]['eirlab'] = True
+                        product[prod]['warehouse'] = warehouse
+                        product[prod]['dolibarr'] = item
                     else:
-                        product[item]['eirlab'] = False
+                        product[prod]['eirlab'] = False
                 except KeyError:
-                    product[item]['eirlab'] = False
+                    product[prod]['eirlab'] = False
 
             return result, product
 
@@ -61,10 +68,15 @@ class Fournisseurs:
         ref = ref.replace('-', '')
         products = requests.get(config.url + config.url_product, headers=config.headers).text
         products = json.loads(products)
+        warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
+        warehouses = json.loads(warehouses)
         for item in products:
             try:
                 if item["accountancy_code_buy"] == ref:
-                    return True, item["id"], item["accountancy_code_buy_intra"]
+                    for warehouse in warehouses:
+                        if warehouse["id"] == item["fk_default_warehouse"]:
+                            print(item)
+                            return True, item, warehouse
             except TypeError:
                 pass
         return False, None, None

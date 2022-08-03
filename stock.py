@@ -17,6 +17,7 @@ class Stock:
     def __init__(self):
         self.bp = Blueprint('fournisseur', __name__, url_prefix='/stock')
         self.bp.route('/recherche', methods=['POST', 'GET'])(self.recherche)
+        self.bp.route('/recherche/rupture', methods=['POST'])(self.recherche_rupture)
 
         self.bp.route('/arrivage', methods=['GET'])(self.arrivage)
         self.bp.route('/arrivage/fournisseur', methods=['POST'])(self.arrivage_fournisseur)
@@ -35,6 +36,7 @@ class Stock:
         self.job = ""
         self.list_add = {}
         self.actual_n_serie = ""
+        self.warehouse = None
 
     def recherche(self):
         recherche_composant = {}
@@ -45,11 +47,24 @@ class Stock:
             ref = self.fournisseurs.barcode.read_barcode()
             composant_eirlab, recherche_composant = self.fournisseurs.find(ref)
             self.fournisseurs.barcode.close()
+        self.recherche_composant = recherche_composant
+        self.composant_eirlab = composant_eirlab
         if recherche_composant == {}:
             return render_template('stock.html', unknow_composant=True)
         else:
             return render_template('stock.html', recherche_composant=recherche_composant, recherche=True,
                                    composant_eirlab=composant_eirlab)
+
+    def recherche_rupture(self):
+        fournisseur = request.form['fournisseur']
+        id = self.recherche_composant[fournisseur]["dolibarr"]["id"]
+        warehouse = self.recherche_composant[fournisseur]["warehouse"]
+        quantite = self.recherche_composant[fournisseur]["dolibarr"]["stock_reel"]
+        stockmovement = {"product_id": id, "warehouse_id": warehouse["id"], "qty": -int(quantite)}
+        print(stockmovement)
+        status = requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
+        return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
+                               composant_eirlab=self.composant_eirlab)
 
     def arrivage(self):
         status = self.fournisseurs.rfid.initialize()
@@ -79,8 +94,8 @@ class Stock:
         for user in users:
             if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
                 groups = requests.get(
-                    config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                    headers=config.headers).text
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
                 groups = json.loads(groups)
                 self.job = user["job"]
                 for group in groups:
@@ -91,12 +106,17 @@ class Stock:
         if not lock:
             with open('/opt/wolf/fournisseurs.json', 'r') as f:
                 data = json.load(f)
-                return render_template('stock.html', arrivage=True, fournisseurs=data)
+                warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
+                warehouses = json.loads(warehouses)
+                print(warehouses)
+                return render_template('stock.html', arrivage=True, fournisseurs=data, warehouses=warehouses)
         else:
             return render_template('stock.html', arrivage_error="Vous n'êtes pas autorisé à accéder à cette page")
 
     def arrivage_fournisseur(self):
         self.fournisseur = request.form['fournisseur']
+        self.warehouse = request.form['warehouse']
+        self.warehouse = self.warehouse.split('-')[2]
         barcode.running_virtual_keyboard = True
         time.sleep(0.5)
         threading.Thread(target=barcode.read_virtual_barcode).start()
@@ -165,8 +185,7 @@ class Stock:
         thread_pool = []
         for composant in self.list_add:
             composant = self.list_add[composant]
-            thread_pool.append(
-                threading.Thread(target=self.thread_search, args=(composant['ref'],)))
+            thread_pool.append(threading.Thread(target=self.thread_search, args=(composant['ref'],)))
         for thread in thread_pool:
             thread.start()
         for thread in thread_pool:
@@ -178,7 +197,10 @@ class Stock:
             try:
                 if products[composant]["product"] is not None:
                     ref = products[composant]["product"]["ref"]
-                    status, id, four = self.fournisseurs.find_dolibarr(ref)
+                    status, item, warehouse = self.fournisseurs.find_dolibarr(ref)
+                    if item is not None:
+                        id = item['id']
+                        four = item['accountancy_code_buy_intra']
                     if status:
                         # update dolibarr with stockmovement
                         price = products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(" ",
@@ -191,119 +213,54 @@ class Stock:
                             products_add[composant] = products[composant]
                     else:
                         try:
-                            price = float(products[composant]["product"]["price"].replace("€", "").replace(",",
-                                                                                                           ".").replace(
-                                " ", ""))
+                            price = float(
+                                    products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(
+                                            " ", ""))
                         except ValueError:
                             price = 0.0
+                        except AttributeError:
+                            price = products[composant]["product"]["price"]
                         # create dolibarr product and stockmovement
-                        content = {
-                            'label': products[composant]["product"]["title"],
-                            'description': products[composant]["product"]["attributes"],
-                            'other': None,
-                            'type': '0',
-                            'cost_price': price,
-                            'status_buy': '1',
-                            'url': str(products[composant]["product"]["links_ref"]),
-                            'accountancy_code_buy': str(products[composant]["product"]["ref"]),
-                            'barcode': str(products[composant]["product"]["ref"]),
-                            'barcode_type': '1',
-                            'ref': str(products[composant]["product"]["ref"]),
-                            'price': '0.00',
-                            'price_ttc': '0.00',
-                            'price_min': '0.00000000',
-                            'price_min_ttc': '0.00000000',
-                            'price_base_type': 'TTC',
-                            'multiprices': [],
-                            'multiprices_ttc': [],
-                            'multiprices_base_type': [],
-                            'multiprices_min': [],
-                            'multiprices_min_ttc': [],
-                            'multiprices_tva_tx': [],
-                            'prices_by_qty': [],
-                            'prices_by_qty_list': [],
-                            'multilangs': [],
-                            'default_vat_code': None,
-                            'tva_tx': '0.000',
-                            'localtax1_tx': '0.000',
-                            'localtax2_tx': '0.000',
-                            'localtax1_type': '0',
-                            'localtax2_type': '0',
-                            'lifetime': None,
-                            'qc_frequency': None,
-                            'stock_reel': None,
-                            'stock_theorique': None,
-                            'pmp': '0.00000000',
-                            'seuil_stock_alerte': '0',
-                            'desiredstock': None,
-                            'duration_value': False,
-                            'duration_unit': '',
-                            'status': '0',
-                            'finished': None,
-                            'fk_default_bom': None,
-                            'status_batch': '0',
-                            'batch_mask': '',
-                            'customcode': '',
-                            'weight': None,
-                            'weight_units': '0',
-                            'length': None,
-                            'length_units': '-3',
-                            'width': None,
-                            'width_units': '-3',
-                            'height': None,
-                            'height_units': '-3',
-                            'surface': None,
-                            'surface_units': '-6',
-                            'volume': None,
-                            'volume_units': '-9',
-                            'net_measure': None,
-                            'net_measure_units': None,
-                            'accountancy_code_sell': '',
-                            'accountancy_code_sell_intra': '',
-                            'accountancy_code_sell_export': '',
-                            'accountancy_code_buy_intra': self.fournisseur,
-                            'accountancy_code_buy_export': '',
-                            'date_creation': None,
-                            'date_modification': None,
-                            'stock_warehouse': [],
-                            'fk_default_warehouse': '1',
-                            'fk_price_expression': None,
-                            'fk_unit': None,
-                            'price_autogen': '0',
-                            'is_object_used': None,
-                            'mandatory_period': '0',
-                            'entity': '1',
-                            'validateFieldsErrors': [],
-                            'import_key': None,
-                            'array_options': [],
-                            'array_languages': None,
-                            'linkedObjectsIds': None,
-                            'canvas': '',
-                            'ref_ext': None,
-                            'country_id': None,
-                            'country_code': '',
-                            'state_id': None,
-                            'region_id': None,
-                            'barcode_type_coder': None,
-                            'last_main_doc': None,
-                            'note_public': '',
-                            'note_private': '',
-                            'total_ht': None,
-                            'total_tva': None,
-                            'total_localtax1': None,
-                            'total_localtax2': None,
-                            'total_ttc': None,
-                            'date_validation': None,
-                            'specimen': 0,
-                            'duration': ''
-                        }
+                        content = {'label': products[composant]["product"]["title"],
+                                   'description': products[composant]["product"]["attributes"], 'other': None,
+                                   'type': '0', 'cost_price': price, 'status_buy': '1',
+                                   'url': str(products[composant]["product"]["links_ref"]),
+                                   'accountancy_code_buy': str(products[composant]["product"]["ref"]),
+                                   'barcode': str(products[composant]["product"]["ref"]), 'barcode_type': '1',
+                                   'ref': str(products[composant]["product"]["ref"]), 'price': '0.00',
+                                   'price_ttc': '0.00', 'price_min': '0.00000000', 'price_min_ttc': '0.00000000',
+                                   'price_base_type': 'TTC', 'multiprices': [], 'multiprices_ttc': [],
+                                   'multiprices_base_type': [], 'multiprices_min': [], 'multiprices_min_ttc': [],
+                                   'multiprices_tva_tx': [], 'prices_by_qty': [], 'prices_by_qty_list': [],
+                                   'multilangs': [], 'default_vat_code': None, 'tva_tx': '0.000',
+                                   'localtax1_tx': '0.000', 'localtax2_tx': '0.000', 'localtax1_type': '0',
+                                   'localtax2_type': '0', 'lifetime': None, 'qc_frequency': None, 'stock_reel': None,
+                                   'stock_theorique': None, 'pmp': '0.00000000', 'seuil_stock_alerte': '0',
+                                   'desiredstock': None, 'duration_value': False, 'duration_unit': '', 'status': '0',
+                                   'finished': None, 'fk_default_bom': None, 'status_batch': '0', 'batch_mask': '',
+                                   'customcode': '', 'weight': None, 'weight_units': '0', 'length': None,
+                                   'length_units': '-3', 'width': None, 'width_units': '-3', 'height': None,
+                                   'height_units': '-3', 'surface': None, 'surface_units': '-6', 'volume': None,
+                                   'volume_units': '-9', 'net_measure': None, 'net_measure_units': None,
+                                   'accountancy_code_sell': '', 'accountancy_code_sell_intra': '',
+                                   'accountancy_code_sell_export': '', 'accountancy_code_buy_intra': self.fournisseur,
+                                   'accountancy_code_buy_export': '', 'date_creation': None, 'date_modification': None,
+                                   'stock_warehouse': [], 'fk_default_warehouse': str(self.warehouse),
+                                   'fk_price_expression': None, 'fk_unit': None, 'price_autogen': '0',
+                                   'is_object_used': None, 'mandatory_period': '0', 'entity': '1',
+                                   'validateFieldsErrors': [], 'import_key': None, 'array_options': [],
+                                   'array_languages': None, 'linkedObjectsIds': None, 'canvas': '', 'ref_ext': None,
+                                   'country_id': None, 'country_code': '', 'state_id': None, 'region_id': None,
+                                   'barcode_type_coder': None, 'last_main_doc': None, 'note_public': '',
+                                   'note_private': '', 'total_ht': None, 'total_tva': None, 'total_localtax1': None,
+                                   'total_localtax2': None, 'total_ttc': None, 'date_validation': None, 'specimen': 0,
+                                   'duration': ''}
                         if common.PUB:
                             status = requests.post(config.url + "products", json=content, headers=config.headers)
                             if status.status_code == 200:
                                 id = status.json()
-                                stockmovement = {"product_id": id, "warehouse_id": 1,
-                                                 "qty": products[composant]["quantite"],
-                                                 "price": price}
+                                stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse),
+                                                 "qty": products[composant]["quantite"], "price": price}
                                 status = requests.post(config.url + "stockmovements", json=stockmovement,
                                                        headers=config.headers)
                                 products_add[composant] = products[composant]
@@ -322,8 +279,8 @@ class Stock:
                 products_error[composant] = products[composant]
         print("products_add", products_add)
         print("products_error", products_error)
-        return render_template('stock.html', arrivage_confirm=True,
-                               products_add=products_add, products_error=products_error)
+        return render_template('stock.html', arrivage_confirm=True, products_add=products_add,
+                               products_error=products_error)
 
     def arrivage_end(self):
         barcode.running_virtual_keyboard = False
