@@ -108,8 +108,8 @@ class BarcodeReader:
 if __name__ == "__main__":
     br = BarcodeReader()
     br.open()
-    while True:
-        barcode = br.read_virtual_barcode()
+    running_virtual_keyboard = True
+    read_virtual_barcode()
     br.close()
     del br
     print("Done")

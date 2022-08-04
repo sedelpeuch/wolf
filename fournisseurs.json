@@ -16,5 +16,11 @@
     "image": "/static/img/makershop.jpg",
     "id": "3",
     "ref": "makershop"
+  },
+  "conrad": {
+    "name": "Conrad",
+    "image": "/static/img/conrad.png",
+    "id": "4",
+    "ref": "conrad"
   }
 }
