@@ -12,8 +12,7 @@ project = 'Wolf'
 copyright = '2022, EirLab Community'
 author = 'Delpeuch Sebastien'
 
-release = '0.1'
-version = '0.1.2'
+version = '1.3'
 
 # -- General configuration
 
