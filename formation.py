@@ -10,6 +10,10 @@ import rfid
 
 
 class Formations:
+    """
+    La classe formation permet d'ajouter une formation à un ou plusieurs adhérents
+    """
+
     def __init__(self):
         self.bp = Blueprint('formations', __name__, url_prefix='/formations')
 
@@ -27,9 +31,11 @@ class Formations:
 
     def start(self):
         """
-        Start the formation process by unlock the RFID reader with Fabmanager's card, return the list possible
-        formations
-        :return:
+        Débute le processus d'ajout de formations aux adhérents. Initialise le lecteur RFID et attend qu'une carte
+        soit posée. Lorsqu'elle est posée la fonciton vérifie qu'il fait bien parti du groupe "Fabmanager" sur dolibarr
+
+        :return: formation.html avec les informations du fabmanager et la liste des formations qu'il peut donner si la carte est celle d'un fabmanager
+        :return: formation.html avec un message d'erreur sinon
         """
         self.rfid.initialize()
         self.formation = None
@@ -55,8 +61,8 @@ class Formations:
         for user in users:
             if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
                 groups = requests.get(
-                    config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                    headers=config.headers).text
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
                 groups = json.loads(groups)
                 self.job = user["job"]
                 for group in groups:
@@ -72,8 +78,10 @@ class Formations:
 
     def confirm(self):
         """
-        Confirm the formation by choosing the formation and the Fabmanager
-        :return:
+        Récupère la formation choisie par le fabmanager
+
+        :return: formation.html avec le fabmanager ainsi que la formation en cours
+        :return: formation.html avec un message d'erreur demandant de choisir une formation sinon
         """
         try:
             self.formation = request.form['formations']
@@ -84,8 +92,11 @@ class Formations:
 
     def add(self):
         """
-        Add the member to the list of members to add to the formation by scanning the RFID
-        :return:
+        Initialise le lecteur RFID et attends la lecture d'une carte puis lui ajoute la formation choisie par le
+        fabmanager
+
+        :return: formation.html avec la liste des adhérents ajoutés à la formation et la fiche de la dernière personne ajoutée
+        :return: formation.html avec la liste des adhérents ajoutés à la formation et un formulaire pour remplir un nom et prénom si la carte n'a pas été reconnue
         """
         self.rfid.initialize()
         self.actual_n_serie = self.rfid.read_serie()
@@ -109,13 +120,14 @@ class Formations:
                                    success=True, fabmanager=self.fabmanager, formation=self.formation)
         if member is None:
             return render_template('formations.html', error="Votre carte n'est pas relié avec un adhérent",
-                                   job=self.job,
-                                   fabmanager=self.fabmanager, formation=self.formation)
+                                   job=self.job, fabmanager=self.fabmanager, formation=self.formation)
 
     def new_link(self):
         """
-        Link the RFID to the member by scanning the RFID and update the member in the database
-        :return:
+        Récupère le nom et le prénom transmis via le formulaire et vérifie s'il est adhérent dans dolibarr
+
+        :return: formation.html avec la liste des personnes formées, la formation en cours, le fabmanager et un bouton permettant de confirmer le lien en scannant la carte d'un administrateur.
+        :return: formation.html avec la liste des personnes formées, la formation en cours, le fabmanager et un message d'erreur si le nom et le prénom ne sont pas valides.
         """
         lastname = request.form['lastname']
         lastname = unidecode.unidecode(lastname)
@@ -140,17 +152,20 @@ class Formations:
             self.actual_member = found
             return render_template(template_name_or_list='formations.html', status='Adhérent non lié', job=self.job,
                                    fabmanager=self.fabmanager, formation=self.formation, to_link=True,
-                                   lastname=self.actual_member["lastname"],
-                                   firstname=self.actual_member["firstname"], list_add=self.list_add,
-                                   student=self.actual_member)
+                                   lastname=self.actual_member["lastname"], firstname=self.actual_member["firstname"],
+                                   list_add=self.list_add, student=self.actual_member)
 
-        return render_template('formations.html', error=True, job=self.job,
-                               fabmanager=self.fabmanager, formation=self.formation, list_add=self.list_add)
+        return render_template('formations.html', error=True, job=self.job, fabmanager=self.fabmanager,
+                               formation=self.formation, list_add=self.list_add)
 
     def confirm_link(self):
         """
-        Confirm the link of the RFID to the member by a adminitrator
-        :return:
+        Permet de confirmer la liaison d'une carte RFID à un adhérent à partir de son nom et prénom, le bouton de
+        confirmation n'est accessible que si l'adhérent a été trouvé par la fonction new_link mais qu'il n'est pas
+        lié à une carte RFID. Un membre du conseil d'administration est nécessaire pour confirmer la liaison.
+
+        :return: formation.html, la liste des personnes formées, la formation en cours et le fabmanager avec le message d'erreur "Adhérent non lié" si l'administrateur n'est pas trouvé
+        :return: formation.html avec "Adhérent lié", la liste des personnes formées, la formation en cours et le fabmanager si la liaison a été effectuée, la fiche de l'adhérent est mise à jour avec la formation qu'il vient d'aquérir
         """
         self.rfid.initialize()
         n_serie = self.rfid.read_serie()
@@ -170,8 +185,8 @@ class Formations:
         for user in users:
             if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
                 groups = requests.get(
-                    config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                    headers=config.headers).text
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
                 print(groups)
                 groups = json.loads(groups)
                 for group in groups:
@@ -185,9 +200,8 @@ class Formations:
             self.actual_member = common.update_member(self.actual_member, self.formation, self.actual_n_serie)
             self.actual_member = common.process_formations(self.actual_member)
             return render_template(template_name_or_list='formations.html', status='Adhérent lié', new=True,
-                                   success=True, student=self.actual_member, job=self.job,
-                                   fabmanager=self.fabmanager, formation=self.formation, linked=True,
-                                   list_add=self.list_add)
+                                   success=True, student=self.actual_member, job=self.job, fabmanager=self.fabmanager,
+                                   formation=self.formation, linked=True, list_add=self.list_add)
         else:
             return render_template(template_name_or_list='formations.html', status='Adhérent non lié', new=True,
                                    student=self.actual_member, not_linked=True, job=self.job,

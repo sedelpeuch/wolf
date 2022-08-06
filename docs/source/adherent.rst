@@ -1,15 +1,13 @@
 Adhérents
 ===========================================================
 
-.. versionadded:: 1.0
+.. versionadded:: 0.1
 
     Le module adhérent permet d'obtenir les informations d'un adhérent à partir de sa carte étudiante / professionnelle.
 
-.. versionadded:: 1.1
+.. versionadded:: 0.2
 
     Relier un adhérent à une carte étudiante / professionnelle.
-
-.. versionadded:: 1.1.1
 
     Signale aux adhérents l'expiration de leur adhésion.
 
