@@ -176,7 +176,10 @@ class Stock:
 
     def thread_search(self, ref):
         global products
-        products[ref]["product"] = getattr(self.fournisseurs, self.fournisseur)(ref)[self.fournisseur]
+        try:
+            products[ref]["product"] = getattr(self.fournisseurs, self.fournisseur)(ref)[self.fournisseur]
+        except TypeError:
+            pass
 
     def arrivage_confirm(self):
         global products

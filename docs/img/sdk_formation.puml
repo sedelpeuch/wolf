@@ -1,0 +1,34 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:**Cliquer** sur le bouton "Scanner";
+:Attente du lecteur RFID\n **Poser** la carte d'un <color red>fabmanager</color>;
+:Recherche dans Dolibarr;
+if (Numéro de série d'un fabmanager) then (Oui)
+  :Choix de la formation;
+  :**Cliquer** sur le bouton "Confirmer";
+  repeat
+      :Scanner la carte d'un adhérent;
+      if (Numéro de série connu) then (Oui)
+      :Ajout de la formation à l'adhérent;
+      else (Non)
+      :**Remplir** le nom prénom de l'adhérent;
+          if (Adhérent connu) then (Oui)
+          :**Cliquer** sur le bouton "Confirmer";
+          :**Scanner** la carte d'un <color red>administrateur</color>;
+          if (Numéro de série d'un administrateur) then (Oui)
+            :Ajout de la formation à l'adhérent;
+            else (Non)
+            :Message d'erreur;
+            endif;
+          else (Non)
+          :Message d'erreur;
+          endif
+      endif
+  repeat while (Reste t-il des adhérents à ajouter ?) is (Oui) not (Non);
+else (Non)
+  :Message d'erreur;
+endif;
+stop
+@enduml

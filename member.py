@@ -35,12 +35,10 @@ class Member:
     def scan_member(self):
         """
         Permet de lire la carte RFID et de demander la correspondance à la base de données sur dolibarr
-        :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données
-        n'est pas établie
-        :return: index.html avec le message d'erreur "Connectez le lecteur RFID et réessayez" si la lecture de la carte
-        n'est pas possible
-        :return: index.html avec le message d'erreur "Adhérent inconnu" si l'adhérent n'est pas trouvé,
-        l'onglet "Adhérent inconnu" avec le formulaire nom prénom apparait
+
+        :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données n'est pas établie
+        :return: index.html avec le message d'erreur "Connectez le lecteur RFID et réessayez" si la lecture de la carte n'est pas possible
+        :return: index.html avec le message d'erreur "Adhérent inconnu" si l'adhérent n'est pas trouvé, l'onglet "Adhérent inconnu" avec le formulaire nom prénom apparait
         :return: index.html avec la fiche de l'adhérent si l'adhérent est trouvé
         """
         status = self.rfid.initialize()
@@ -65,14 +63,11 @@ class Member:
         """
         Permet de lier une carte RFID à un adhérent à partir de son nom et prénom, l'onglet "Adhérent inconnu" est
         accessible uniquement après avoir scanné une carte (fonction scan_member)
-        :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données
-        n'est pas établie
+
+        :return: index.html avec le message d'erreur "Connectez le PC à internet" si la connexion à la base de données n'est pas établie
         :return: index.html avec le message "Non adhérent" si l'adhérent n'est pas trouvé
-        :return: index.html avec le message d'erreur "Adhérent déjà lié" si la carte RFID est déjà liée à un
-        adhérent, la fiche de
-        l'adhérent apparait
-        :return: index.html avec le message d'erreur "Adhérent non lié" si la carte RFID n'est pas liée, la fiche de
-        l'adhérent apparait
+        :return: index.html avec le message d'erreur "Adhérent déjà lié" si la carte RFID est déjà liée à un adhérent, la fiche de l'adhérent apparait
+        :return: index.html avec le message d'erreur "Adhérent non lié" si la carte RFID n'est pas liée, la fiche de l'adhérent apparait
         """
         lastname = request.form['lastname']
         lastname = unidecode.unidecode(lastname)
@@ -95,18 +90,18 @@ class Member:
         elif found["array_options"]["options_nserie"] is None or found["array_options"]["options_nserie"] == "":
             self.actual_member = found
             return render_template(template_name_or_list='index.html', status='Adhérent non lié', new=True,
-                                   to_link=True,
-                                   lastname=lastname, firstname=firstname, member=found)
+                                   to_link=True, lastname=lastname, firstname=firstname, member=found)
         else:
             return render_template(template_name_or_list='index.html', status='Adhérent déjà lié', new=True,
-                                   adhesion=False, already_link=True,
-                                   lastname=lastname, firstname=firstname, member=found)
+                                   adhesion=False, already_link=True, lastname=lastname, firstname=firstname,
+                                   member=found)
 
     def confirm_link(self):
         """
         Permet de confirmer la liaison d'une carte RFID à un adhérent à partir de son nom et prénom, le bouton de
         confirmation n'est accessible que si l'adhérent a été trouvé par la fonction new_link mais qu'il n'est pas
         lié à une carte RFID. Un membre du conseil d'administration est nécessaire pour confirmer la liaison.
+
         :return: index.html avec le message d'erreur "Adhérent non lié" si l'administrateur n'est pas trouvé
         :return: index.html avec "Adhérent lié" si la liaison a été effectuée
         """
@@ -129,8 +124,8 @@ class Member:
         for user in users:
             if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
                 groups = requests.get(
-                    config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                    headers=config.headers).text
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
                 print(groups)
                 groups = json.loads(groups)
                 for group in groups:

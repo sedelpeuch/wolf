@@ -1,7 +1,6 @@
-import time
-
 import serial
 
+DEBUG = False
 
 class Serial:
     def __init__(self):
@@ -10,6 +9,9 @@ class Serial:
         self.baudrate = 9600
 
     def initialize(self):
+        global DEBUG
+        if DEBUG:
+            return True
         for i in range(0, 10):
             try:
                 self.ser = serial.Serial(self.port_USB + str(i), self.baudrate)
@@ -20,6 +22,9 @@ class Serial:
             return False
 
     def read_serie(self):
+        global DEBUG
+        if DEBUG:
+            return "4:28:28:AA:7A:57:80"
         try:
             line = self.ser.readline().strip().decode('utf-8')
             self.ser.close()
