@@ -18,6 +18,7 @@ class Fournisseurs:
                          "-Dispatch?Ntk=Default_OTFR&Ntt="
         self.url_makershop = "https://www.makershop.fr/recherche?search_query="
         self.url_conrad = "https://www.conrad.fr/restservices/FR/products/"
+        self.url_farnell = "https://fr.farnell.com/"
         self.rfid = rfid.Serial()
         self.barcode = barcode.BarcodeReader()
 
@@ -45,10 +46,14 @@ class Fournisseurs:
             thread_conrad = threading.Thread(target=self.conrad, args=(ref,))
             thread_conrad.start()
 
+            thread_farnell = threading.Thread(target=self.farnell, args=(ref,))
+            thread_farnell.start()
+
             thread_rs.join()
             thread_otelo.join()
             thread_makershop.join()
             thread_conrad.join()
+            thread_farnell.join()
 
             for prod in product:
                 try:
@@ -248,7 +253,75 @@ class Fournisseurs:
                                  "attributes": dict_attributes, "ref": ref, "image": image, "links_ref": links_ref}
             return product
 
+    def farnell(self, ref):
+        global product
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                 'Chrome/83.0.4103.116 Safari/537.36'}
+        html = requests.get(self.url_farnell + ref, headers=headers).text
+        html = html.replace('\n', '')
+        html = html.replace('\t', '')
+        html = html.replace('\r', '')
+        try:
+            parsed_html = BeautifulSoup(html, "html.parser")
+        except AttributeError:
+            return
+
+        try:
+            title = parsed_html.body.find('h1', attrs={'class': 'pdpMainPartNumber'}).text
+        except AttributeError:
+            title = ""
+
+        try:
+            price = parsed_html.body.find('span', attrs={'class': 'price vatExcl'}).text
+            price = price.replace('€', ',')
+        except AttributeError:
+            price = ""
+
+        try:
+            links = parsed_html.body.find('a', attrs={'rel': 'nofollow noopener'}).get('href')
+        except AttributeError:
+            links = ""
+
+        try:
+            image = parsed_html.body.find('img', attrs={'id': 'productMainImage'}).get('src')
+        except AttributeError:
+            image = ""
+
+        try:
+            table_label = []
+            table_value = []
+            dict_attributes = {}
+            all_dl = parsed_html.find_all('dl')
+            for dl in all_dl:
+                dt = dl.find_all('dt')
+                for element in dt:
+                    label = element.find('label')
+                    if label is not None:
+                        table_label.append(label.text)
+            all_dd = parsed_html.find_all('dd')
+            for dd in all_dd:
+                # check if id begin with descAttributeValue
+                if dd.get('id') is not None and dd.get('id').startswith('descAttributeValue'):
+                    table_value.append(dd.text)
+
+            if len(table_label) != len(table_value):
+                dict_attributes = {}
+            else:
+                for i in range(len(table_label)):
+                    dict_attributes[table_label[i]] = table_value[i]
+        except TypeError:
+            dict_attributes = {}
+
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+            return
+        with open('/opt/wolf/fournisseurs.json', 'r') as f:
+            data = json.load(f)
+            product['farnell'] = {"fournisseur": data['farnell'], "title": title, "price": price, "links": links,
+                                  "attributes": dict_attributes, "ref": ref, "image": image,
+                                  "links_ref": self.url_farnell + ref}
+            return product
+
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    four.conrad('001693994')
+    print(four.farnell('2508452'))

@@ -18,6 +18,7 @@ class Stock:
         self.bp = Blueprint('fournisseur', __name__, url_prefix='/stock')
         self.bp.route('/recherche', methods=['POST', 'GET'])(self.recherche)
         self.bp.route('/recherche/rupture', methods=['POST'])(self.recherche_rupture)
+        self.bp.route('/recherche/achat', methods=['POST'])(self.recherche_achat)
 
         self.bp.route('/arrivage', methods=['GET'])(self.arrivage)
         self.bp.route('/arrivage/fournisseur', methods=['POST'])(self.arrivage_fournisseur)
@@ -56,13 +57,28 @@ class Stock:
                                    composant_eirlab=composant_eirlab)
 
     def recherche_rupture(self):
-        fournisseur = request.form['fournisseur']
+        fournisseur = request.form['rupture_fournisseur']
+        identity = request.form['rupture_identity']
+        description = request.form['rupture_description']
+
+        # Add stockmovement
         id = self.recherche_composant[fournisseur]["dolibarr"]["id"]
         warehouse = self.recherche_composant[fournisseur]["warehouse"]
         quantite = self.recherche_composant[fournisseur]["dolibarr"]["stock_reel"]
         stockmovement = {"product_id": id, "warehouse_id": warehouse["id"], "qty": -int(quantite)}
-        print(stockmovement)
         status = requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
+
+        # Update notes with identity and description
+        print(description, identity)
+        product = {"note_public": description, "note_private": identity}
+        status = requests.put(config.url + "products/" + str(id), json=product, headers=config.headers)
+        print(product)
+        print(status.status_code, status.reason)
+
+        return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
+                               composant_eirlab=self.composant_eirlab)
+
+    def recherche_achat(self):
         return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
                                composant_eirlab=self.composant_eirlab)
 
@@ -206,8 +222,14 @@ class Stock:
                         four = item['accountancy_code_buy_intra']
                     if status:
                         # update dolibarr with stockmovement
-                        price = products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(" ",
-                                                                                                                   "")
+                        try:
+                            price = float(
+                                    products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(
+                                            " ", ""))
+                        except ValueError:
+                            price = 0.0
+                        except AttributeError:
+                            price = products[composant]["product"]["price"]
                         stockmovement = {"product_id": id, "warehouse_id": 1, "qty": products[composant]["quantite"],
                                          "price": price}
                         if common.PUB:

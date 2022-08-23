@@ -22,5 +22,11 @@
     "image": "/static/img/conrad.png",
     "id": "4",
     "ref": "conrad"
+  },
+  "farnell": {
+    "name": "Farnell",
+    "image": "/static/img/farnell.png",
+    "id": "5",
+    "ref": "farnell"
   }
 }
