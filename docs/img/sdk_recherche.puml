@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+fork
+: **Saisir** la référence;
+: **Cliquer** sur le bouton "Débuter une recherche";
+fork again
+: **Cliquer** sur le bouton "Scanner un code barre";
+: Initialisation du lecteur de code barre;
+end fork
+:Récupération de la référence;
+if (Recherche chez les fournisseurs) then (Aucun résultat)
+: Affichage d'un message d'erreur;
+else (Référence trouvée)
+: Vérification dans dolibarr;
+: Affichage de la fiche du composant;
+endif
+stop
+
+@enduml
