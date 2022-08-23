@@ -8,7 +8,7 @@
     </div>
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#select" role="button">
+           data-toggle="collapse" href="#scan" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Session de formation</h6>
         </a>
         <div class="collapse show card-body mb-4" id="scan">
@@ -41,7 +41,7 @@
     {% if member %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#select" role="button">
+           data-toggle="collapse" href="#choix" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Choix de la formation</h6>
         </a>
         <div class="collapse show card-body mb-4" id="choix">
@@ -83,7 +83,7 @@
     {% if formation %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#select" role="button">
+           data-toggle="collapse" href="#add" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Personnes formées</h6>
         </a>
         <div class="collapse show card-body mb-4" id="add">
@@ -173,7 +173,7 @@
     {% if student %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#select" role="button">
+           data-toggle="collapse" href="#fiche" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Fiche adhérent</h6>
             {% if student.expired %}
             <h2 class="font-weight-bold text-danger mt-2">Adhésion Expirée</h2>
