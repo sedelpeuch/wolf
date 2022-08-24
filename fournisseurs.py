@@ -56,6 +56,7 @@ class Fournisseurs:
             thread_farnell.join()
 
             for prod in product:
+                print(prod)
                 try:
                     if product[prod]['fournisseur']['ref'] == fournisseur:
                         product[prod]['eirlab'] = True
@@ -66,7 +67,16 @@ class Fournisseurs:
                 except KeyError:
                     product[prod]['eirlab'] = False
 
-            return result, product
+            # if all product[prod]['eirlab'] are False, return result, product, item else return result, product, None
+            if all(product[prod]['eirlab'] == False for prod in product) and item is not None:
+                product['eirlab'] = {
+                    'fournisseur': {'name': 'EirLab', 'image': '/static/img/eirlab.png', 'id': '6', 'ref': 'eirlab'},
+                    'title': item['label'], 'price': item['cost_price'], 'links': item['url'], 'attributes': {},
+                    'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '', 'eirlab': True}
+                product['eirlab']['warehouse'] = warehouse
+                product['eirlab']['dolibarr'] = item
+                return result, product, item
+            return result, product, None
 
     def find_dolibarr(self, ref):
         # remove '-' from ref
@@ -80,14 +90,21 @@ class Fournisseurs:
                 if item["accountancy_code_buy"] == ref:
                     for warehouse in warehouses:
                         if warehouse["id"] == item["fk_default_warehouse"]:
-                            print(item)
                             return True, item, warehouse
             except TypeError:
                 pass
         return False, None, None
 
+    def find_dolibarr_name(self, name):
+        products = requests.get(config.url + config.url_product, headers=config.headers).text
+        products = json.loads(products)
+        warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
+        warehouses = json.loads(warehouses)
+
     def rs(self, ref):
         global product
+        headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                    'Chrome/51.0.2704.103 Safari/537.36'}
         html = requests.get(self.url_rs + ref).text
         try:
             parsed_html = BeautifulSoup(html, "html.parser")
@@ -119,13 +136,19 @@ class Fournisseurs:
                         'td', attrs={'data-testid': 'specification-attributes-value'}).text
         except AttributeError:
             dict_attributes = {}
-        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+
+        try:
+            packaging = parsed_html.body.find('input', attrs={'id': 'quantity-input'}).get('value')
+        except AttributeError:
+            packaging = ""
+
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {} and packaging == "":
             return
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             product['rs'] = {"fournisseur": data['rs'], "title": title, "price": price, "links": links,
                              "attributes": dict_attributes, "ref": ref.replace('-', ''), "image": image,
-                             "links_ref": self.url_rs + ref}
+                             "links_ref": self.url_rs + ref, "packaging": packaging}
             return product
 
     def otelo(self, ref):
@@ -226,6 +249,8 @@ class Fournisseurs:
             price = json_product['price']['unit']['gross']
         except AttributeError:
             price = ""
+        except KeyError:
+            price = ""
         try:
             links = json_product['productMedia'][0]['url']
         except AttributeError:
@@ -324,4 +349,4 @@ class Fournisseurs:
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    print(four.farnell('2508452'))
+    print(four.rs('707-7745'))

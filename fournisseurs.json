@@ -28,5 +28,11 @@
     "image": "/static/img/farnell.png",
     "id": "5",
     "ref": "farnell"
+  },
+  "eirlab": {
+    "name": "EirLab",
+    "image": "/static/img/eirlab.png",
+    "id": "6",
+    "ref": "eirlab"
   }
 }
