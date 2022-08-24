@@ -104,7 +104,7 @@ class Fournisseurs:
     def rs(self, ref):
         global product
         headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                    'Chrome/51.0.2704.103 Safari/537.36'}
+                                 'Chrome/51.0.2704.103 Safari/537.36'}
         html = requests.get(self.url_rs + ref).text
         try:
             parsed_html = BeautifulSoup(html, "html.parser")
@@ -190,7 +190,7 @@ class Fournisseurs:
             data = json.load(f)
             product['otelo'] = {"fournisseur": data['otelo'], "title": title, "price": price, "links": links,
                                 "attributes": dict_attributes, "ref": ref, "image": image,
-                                "links_ref": self.url_otelo + ref}
+                                "links_ref": self.url_otelo + ref, "packaging": "1"}
             return product
 
     def makershop(self, ref):
@@ -204,7 +204,7 @@ class Fournisseurs:
         except AttributeError:
             return
         try:
-            title = parsed_html.body.find('h1', attrs={'class': 'product-name pull-right col-xs-12 col-md-7'}).text
+            title = parsed_html.body.find('h1', attrs={'class': 'product-name'}).text
         except AttributeError:
             title = ""
         try:
@@ -212,7 +212,20 @@ class Fournisseurs:
             price = price.replace('TTC', '')
             price = price.replace('€', ',')
         except AttributeError:
-            price = ""
+            try:
+                # <div class="our_price_display" itemprop="offers" itemscope=""
+                # itemtype="http://schema.org/Offer"><link itemprop="availability"
+                # href="http://schema.org/InStock"><meta itemprop="priceCurrency" content="EUR"><meta
+                # itemprop="gtin13" content="8718836379383"><meta itemprop="price" content="6350.02"> <span
+                # class="our_price_display">6 350€<sup>02 HT <span class="price-without-taxes"> / <span
+                # class="without-taxes-value">7 620€<sup>02 TTC</sup></span></span> </sup></span></div>
+                price = parsed_html.body.find('span', attrs={'class': 'our_price_display'}).text
+                price = price.replace('TTC', '')
+                price = price.replace('HT', '')
+                price = price.replace('€', ',')
+                price = price.split('/')[1]
+            except AttributeError:
+                price = ""
         links = ""
         dict_attributes = {}
         try:
@@ -230,7 +243,7 @@ class Fournisseurs:
             data = json.load(f)
             product['makershop'] = {"fournisseur": data['makershop'], "title": title, "price": price, "links": links,
                                     "attributes": dict_attributes, "ref": ref, "image": image,
-                                    "links_ref": self.url_makershop + ref}
+                                    "links_ref": self.url_makershop + ref, "packaging": "1"}
             return product
 
     def conrad(self, ref):
@@ -263,6 +276,10 @@ class Fournisseurs:
         try:
             for tr in json_product['technicalAttributes']:
                 dict_attributes[tr['name']] = tr['values'][0]['value']
+            if 'Contenu' in dict_attributes:
+                packaging = dict_attributes["Contenu"].replace("pc(s)", "")
+            else:
+                packaging = "1"
         except AttributeError:
             dict_attributes = {}
         try:
@@ -275,7 +292,8 @@ class Fournisseurs:
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             product['conrad'] = {"fournisseur": data['conrad'], "title": title, "price": price, "links": links,
-                                 "attributes": dict_attributes, "ref": ref, "image": image, "links_ref": links_ref}
+                                 "attributes": dict_attributes, "ref": ref, "image": image, "links_ref": links_ref,
+                                 "packaging": packaging}
             return product
 
     def farnell(self, ref):
@@ -298,7 +316,6 @@ class Fournisseurs:
 
         try:
             price = parsed_html.body.find('span', attrs={'class': 'price vatExcl'}).text
-            price = price.replace('€', ',')
         except AttributeError:
             price = ""
 
@@ -337,16 +354,21 @@ class Fournisseurs:
         except TypeError:
             dict_attributes = {}
 
+        try:
+            packaging = parsed_html.body.find('div', attrs={'class': 'multqty'}).find('strong').text
+        except AttributeError:
+            packaging = ""
+
         if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
             return
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
             product['farnell'] = {"fournisseur": data['farnell'], "title": title, "price": price, "links": links,
                                   "attributes": dict_attributes, "ref": ref, "image": image,
-                                  "links_ref": self.url_farnell + ref}
+                                  "links_ref": self.url_farnell + ref, "packaging": packaging}
             return product
 
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    print(four.rs('707-7745'))
+    print(four.conrad('1585883'))
