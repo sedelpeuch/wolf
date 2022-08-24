@@ -94,11 +94,11 @@
     {% for composant in recherche_composant %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#select" role="button">
+           data-toggle="collapse" href="#{{recherche_composant[composant].fournisseur.name }}" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche {{
                 recherche_composant[composant].fournisseur.name }}</h6>
         </a>
-        <div class="col m-2">
+        <div class="collapse show card-body mb-4" id="{{recherche_composant[composant].fournisseur.name }}">
             <div class="row">
                 <div class="col m-2">
                     <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant[composant].title }}</h5>
@@ -107,11 +107,13 @@
                             href="{{ recherche_composant[composant].links_ref }}" target="_blank">Lien {{
                         recherche_composant[composant].fournisseur.name }}</a></h5>
                     <div class="text-center">
-                        <img alt="Imprimante"
+                        <img alt="{{ recherche_composant[composant].title }}"
                              class="img-fluid mt-2"
                              src="{{ recherche_composant[composant].fournisseur.image }}" width="100px">
                     </div>
                     <p class="text-secondary font-weight-bold mt-2">{{ recherche_composant[composant].price }}</p>
+                    <p class="text-secondary font-weight-bold mt-2"> Conditionnement - {{
+                        recherche_composant[composant].packaging }} </p>
                     <a class="mt-2" href="{{ recherche_composant[composant].links }}">{{
                         recherche_composant[composant].links }}</a>
                     <!--                    display recherche_composant[composant].attributes with key and value -->
@@ -122,13 +124,46 @@
                         Community</h4>
                     <p class="text-secondary font-weight-bold mt-2"> {{
                         recherche_composant[composant].warehouse.lieu }}</p>
+                    {% else %}
+                    <h4 class="text-danger font-weight-bold mt-2">Le composant n'est pas disponible à
+                        EirLab Community</h4>
+                    {% endif %}
                     <div class="text-center">
                         <img alt="{{ recherche_composant[composant].title}}"
                              class="img-fluid mt-2"
                              src="{{ recherche_composant[composant].image }}" width="200px">
                     </div>
+
+                    <button aria-controls="recherche_add" aria-expanded="false" class="btn btn-outline-success"
+                            data-target="#recherche_add" data-toggle="collapse" type="button">
+                        Ajouter à l'inventaire
+                    </button>
+                    <div class="collapse" id="recherche_add">
+                        <div class="card card-body">
+                            <form action="/stock/recherche/add" method="POST">
+                                <div class="form-group">
+                                    <input name="add_fournisseur" type="hidden"
+                                           value="{{ recherche_composant[composant].fournisseur.ref }}">
+                                    <select class="form-control" id="add_warehouse" name="warehouse">
+                                        {% for w in warehouses %}
+                                        <option>{{ w.lieu }} - {{ w.label }} - {{ w.id }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="mt-2" for="add_qte">Quantité</label>
+                                    <input class="form-control" id="add_qte" name="add_qte"
+                                           placeholder="Quantité (défaut : 1"
+                                           type="number">
+                                </div>
+                                <button class="btn btn-outline-success" onsubmit="document.getElementById('container-svg-card-reader')
+            .style.visibility = 'visible';return true;" type="submit">Confirmer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if recherche_composant[composant].eirlab %}
                     <button aria-controls="rupture" aria-expanded="false" class="btn btn-outline-warning mt-2"
-                            data-target="#rupture" data-toggle="collapse" disabled type="button">
+                            data-target="#rupture" data-toggle="collapse" type="button">
                         Signaler une rupture de stock et demander l'achat
                     </button>
                     <div class="collapse" id="rupture">
@@ -155,10 +190,8 @@
                             </form>
                         </div>
                         {% else %}
-                        <h4 class="text-danger font-weight-bold mt-2">Le composant n'est pas disponible à
-                            EirLab Community</h4>
                         <button aria-controls="achat" aria-expanded="false" class="btn btn-outline-danger"
-                                data-target="#achat" data-toggle="collapse" disabled type="button">
+                                data-target="#achat" data-toggle="collapse" type="button">
                             Faire une demande d'achat
                         </button>
                         <div class="collapse" id="achat">
@@ -327,6 +360,7 @@
                         <th scope="col">Statut</th>
                         <th scope="col">Référence</th>
                         <th scope="col">Quantité</th>
+                        <th scope="col">Conditionnement</th>
                         <th scope="col">Nom</th>
                         <th scope="col">Prix</th>
                         <th scope="col">Image</th>
@@ -341,6 +375,7 @@
                         <td>Succès</td>
                         <td>{{ products_add[composant].ref }}</td>
                         <td>{{ products_add[composant].quantite }}</td>
+                        <td> {{ products_add[composant].product.packaging }}</td>
                         <td>{{ products_add[composant].product.title }}</td>
                         <td>{{ products_add[composant].product.price }}</td>
                         <td><img alt="Imprimante"
@@ -360,6 +395,7 @@
                         <td>{{ products_error[composant].status }}</td>
                         <td>{{ products_error[composant].ref }}</td>
                         <td>{{ products_error[composant].quantite }}</td>
+                        <td> {{ products_error[composant].product.packaging }}</td>
                         <td>{{ products_error[composant].product.title }}</td>
                         <td>{{ products_error[composant].product.price }}</td>
                         <td><img alt="Imprimante"
