@@ -19,6 +19,7 @@ class Stock:
         self.bp.route('/recherche', methods=['POST', 'GET'])(self.recherche)
         self.bp.route('/recherche/rupture', methods=['POST'])(self.recherche_rupture)
         self.bp.route('/recherche/achat', methods=['POST'])(self.recherche_achat)
+        self.bp.route('/recherche/add', methods=['POST'])(self.recherche_add)
 
         self.bp.route('/arrivage', methods=['GET'])(self.arrivage)
         self.bp.route('/arrivage/fournisseur', methods=['POST'])(self.arrivage_fournisseur)
@@ -38,24 +39,30 @@ class Stock:
         self.list_add = {}
         self.actual_n_serie = ""
         self.warehouse = None
+        self.recherche_reference = ""
 
     def recherche(self):
         recherche_composant = {}
         composant_eirlab = None
         item = None
         if request.method == 'POST':
-            composant_eirlab, recherche_composant, item = self.fournisseurs.find(request.form['ref'])
+            self.recherche_reference = request.form['ref']
+            composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
         elif request.method == 'GET':
-            ref = self.fournisseurs.barcode.read_barcode()
-            composant_eirlab, recherche_composant, item = self.fournisseurs.find(ref)
+            self.recherche_reference = self.fournisseurs.barcode.read_barcode()
+            composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
             self.fournisseurs.barcode.close()
         self.recherche_composant = recherche_composant
         self.composant_eirlab = composant_eirlab
+
+        warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
+        warehouses = json.loads(warehouses)
+
         if recherche_composant == {}:
             return render_template('stock.html', unknow_composant=True)
         else:
             return render_template('stock.html', recherche_composant=recherche_composant, recherche=True,
-                                   composant_eirlab=composant_eirlab)
+                                   composant_eirlab=composant_eirlab, warehouses=warehouses)
 
     def recherche_rupture(self):
         fournisseur = request.form['rupture_fournisseur']
@@ -79,6 +86,67 @@ class Stock:
     def recherche_achat(self):
         return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
                                composant_eirlab=self.composant_eirlab)
+
+    def recherche_add(self):
+        self.list_add = {}
+
+        status = self.fournisseurs.rfid.initialize()
+        if status is False:
+            return render_template(template_name_or_list='stock.html',
+                                   arrivage_error='Connectez le lecteur RFID et réessayez')
+        self.fournisseur = request.form['add_fournisseur']
+        self.warehouse = request.form['warehouse']
+        self.warehouse = self.warehouse.split('-')[2]
+        self.actual_n_serie = self.fournisseurs.rfid.read_serie()
+
+        users = requests.get(config.url + config.url_user, headers=config.headers).text
+        users = json.loads(users)
+
+        member = requests.get(config.url + config.url_member, headers=config.headers).text
+        member = json.loads(member)
+        lock = True
+        job = ""
+        for member in member:
+            if member["array_options"] is not None and member["array_options"] != []:
+                if member["array_options"]["options_nserie"] == self.actual_n_serie:
+                    member = common.process_member(member)
+                    break
+        for user in users:
+            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
+                groups = requests.get(
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
+                groups = json.loads(groups)
+                for group in groups:
+                    if group["name"] == "Fabmanagers":
+                        lock = False
+                        break
+                break
+        if not lock:
+            quantite = ""
+            if request.method == 'POST':
+                try:
+                    quantite = request.form['add_qte']  # get current quantity of this reference
+                except KeyError:
+                    pass
+                ref = self.recherche_reference  # get current ref with form
+            if quantite == "":
+                quantite = "1"
+            try:
+                if self.list_add[ref] != {}:
+                    quantite = int(self.list_add[ref]['quantite']) + int(quantite)
+                    if quantite <= 0:
+                        try:
+                            del self.list_add[ref]
+                        except KeyError:
+                            pass
+                    else:
+                        self.list_add[ref]['quantite'] = quantite
+            except KeyError:
+                self.list_add[ref] = {"ref": ref, "quantite": quantite}
+            return self.arrivage_confirm()
+
+
 
     def arrivage(self):
         status = self.fournisseurs.rfid.initialize()
