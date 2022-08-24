@@ -7,6 +7,8 @@ Gestion du stock
 
 .. versionadded:: 2.2 Ajout du fournisseur Farnell
 
+.. versionadded:: 2.3 Gestion automatique du conditionnement
+
 Fonctionnalités en cours de développement :
 
 - Recherche par noms
@@ -18,7 +20,7 @@ Recherche d'un produit
 La recherche de produit s'effectue via la **référence** du produit. Il est possible de la saisir à la main ou via un
 lecteur de code barre. Pour débuter la recherche :
 
-- Saississez la référence du produit puis appuyez sur le bouton "Débuter une recherche"
+- Saisissez la référence du produit puis appuyez sur le bouton "Débuter une recherche"
 - Ou cliquez sur "Scanner un code barre", allumez le lecteur de code barre, attendez le signal sonore de connexion
   (deux bips courts) puis scannez votre référence.
 
@@ -101,6 +103,10 @@ en scannant
   les références.
 
 La liste des références et la quantités sont affichées au fur et à mesure
+
+.. danger:: Les quantités prennent comptent du **conditionnement** de la référence. Par exemple la référence 707-7745
+            chez RS est vendu par multiple de 10, rajouter la référence 707-7745 l'ajoutera x10 dans le stock
+            automatiquement. Il n'est donc pas nécessaire de scanner la référence 10 fois.
 
 .. figure::
     ../img/arrivage_add.png

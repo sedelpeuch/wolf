@@ -42,11 +42,12 @@ class Stock:
     def recherche(self):
         recherche_composant = {}
         composant_eirlab = None
+        item = None
         if request.method == 'POST':
-            composant_eirlab, recherche_composant = self.fournisseurs.find(request.form['ref'])
+            composant_eirlab, recherche_composant, item = self.fournisseurs.find(request.form['ref'])
         elif request.method == 'GET':
             ref = self.fournisseurs.barcode.read_barcode()
-            composant_eirlab, recherche_composant = self.fournisseurs.find(ref)
+            composant_eirlab, recherche_composant, item = self.fournisseurs.find(ref)
             self.fournisseurs.barcode.close()
         self.recherche_composant = recherche_composant
         self.composant_eirlab = composant_eirlab
@@ -69,11 +70,8 @@ class Stock:
         status = requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
 
         # Update notes with identity and description
-        print(description, identity)
         product = {"note_public": description, "note_private": identity}
         status = requests.put(config.url + "products/" + str(id), json=product, headers=config.headers)
-        print(product)
-        print(status.status_code, status.reason)
 
         return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
                                composant_eirlab=self.composant_eirlab)
@@ -124,7 +122,6 @@ class Stock:
                 data = json.load(f)
                 warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
                 warehouses = json.loads(warehouses)
-                print(warehouses)
                 return render_template('stock.html', arrivage=True, fournisseurs=data, warehouses=warehouses)
         else:
             return render_template('stock.html', arrivage_error="Vous n'êtes pas autorisé à accéder à cette page")
@@ -141,14 +138,13 @@ class Stock:
             return render_template('stock.html', fournisseur=data[self.fournisseur], arrivage_recherche=True)
 
     def arrivage_add(self):
+        quantite = ""
         if request.method == 'POST':
             try:
-                quantite = request.form['arrivage_qte']
+                quantite = request.form['arrivage_qte']  # get current quantity of this reference
             except KeyError:
                 pass
-            ref = request.form['arrivage_ref']
-        # if request.method == 'GET':
-        #     ref = self.barcode.read_multiple()
+            ref = request.form['arrivage_ref']  # get current ref with form
         if quantite == "":
             quantite = "1"
         try:
@@ -217,35 +213,36 @@ class Stock:
                 if products[composant]["product"] is not None:
                     ref = products[composant]["product"]["ref"]
                     status, item, warehouse = self.fournisseurs.find_dolibarr(ref)
+                    packaging = int(products[composant]["product"]["packaging"])
+                    qty = str(int(products[composant]["quantite"]) * packaging)
+
+                    # format price of product
+                    try:
+                        price = float(
+                                products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(" ",
+                                        ""))
+                    except ValueError:
+                        if type(products[composant]["product"]["price"]) == float:
+                            price = products[composant]["product"]["price"]
+                        else:
+                            price = 0.0
+                    except AttributeError:
+                        price = products[composant]["product"]["price"]
+
                     if item is not None:
                         id = item['id']
                         four = item['accountancy_code_buy_intra']
+
                     if status:
-                        # update dolibarr with stockmovement
-                        try:
-                            price = float(
-                                    products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(
-                                            " ", ""))
-                        except ValueError:
-                            price = 0.0
-                        except AttributeError:
-                            price = products[composant]["product"]["price"]
-                        stockmovement = {"product_id": id, "warehouse_id": 1, "qty": products[composant]["quantite"],
-                                         "price": price}
+                        # the product already exist in dolibarr, just update dolibarr with stockmovement
+                        stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse),
+                                         "qty": qty, "price": price}
                         if common.PUB:
                             status = requests.post(config.url + "stockmovements", json=stockmovement,
                                                    headers=config.headers)
                             products_add[composant] = products[composant]
                     else:
-                        try:
-                            price = float(
-                                    products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(
-                                            " ", ""))
-                        except ValueError:
-                            price = 0.0
-                        except AttributeError:
-                            price = products[composant]["product"]["price"]
-                        # create dolibarr product and stockmovement
+                        # the product doesn't exist in dolibarr, create it and update dolibarr with stockmovement
                         content = {'label': products[composant]["product"]["title"],
                                    'description': products[composant]["product"]["attributes"], 'other': None,
                                    'type': '0', 'cost_price': price, 'status_buy': '1',
@@ -285,7 +282,7 @@ class Stock:
                             if status.status_code == 200:
                                 id = status.json()
                                 stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse),
-                                                 "qty": products[composant]["quantite"], "price": price}
+                                                 "qty": qty, "price": price}
                                 status = requests.post(config.url + "stockmovements", json=stockmovement,
                                                        headers=config.headers)
                                 products_add[composant] = products[composant]
@@ -300,10 +297,9 @@ class Stock:
                 products[composant]["product"]["image"] = ""
                 products[composant]["product"]["links_ref"] = ""
                 products[composant]["product"]["links"] = ""
-
+                products[composant]["product"]["packaging"] = ""
                 products_error[composant] = products[composant]
-        print("products_add", products_add)
-        print("products_error", products_error)
+
         return render_template('stock.html', arrivage_confirm=True, products_add=products_add,
                                products_error=products_error)
 
