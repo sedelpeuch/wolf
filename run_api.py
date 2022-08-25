@@ -71,6 +71,9 @@ class RunAPI:
         import stock
         self.app.register_blueprint(stock.Stock().bp)
 
+        import emprunt
+        self.app.register_blueprint(emprunt.Emprunt().bp)
+
         CORS(self.app)
 
 
