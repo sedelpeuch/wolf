@@ -237,10 +237,16 @@ class Emprunt:
                 element["status"] = 'warning'
             else:
                 element["status"] = 'success'
-
+        if len(self.list_emprunt) == 0:
+            return render_template('emprunt.html', no_emprunt=True, identity=self.identity)
         return render_template('emprunt.html', identity=self.identity, list_emprunt=self.list_emprunt)
 
     def return_product(self, id):
+        list_all = False
+        if not self.identity:
+            list_all = True
+            self.identity = {"lastname": request.form['lastname'], "firstname": request.form['firstname'],
+                "email": request.form['email'], }
         for element in range(len(self.list_emprunt)):
             if self.list_emprunt[element]["id"] == id:
                 stockmovement_from_emp = {"product_id": self.list_emprunt[element]["id"], "warehouse_id": 2,
@@ -268,10 +274,13 @@ class Emprunt:
                                            headers=config.headers)
                     status = requests.put(config.url + "products/" + str(id), json=emprunt, headers=config.headers)
                 self.list_emprunt[element]["returned"] = True
+        if list_all:
+            return render_template('emprunt.html', list_complete=self.list_emprunt)
         return render_template('emprunt.html', identity=self.identity, list_emprunt=self.list_emprunt)
 
     def see_all(self):
         # create stockmovement to EMP (emprunt) and put object with json in emprunt
+        self.identity = False
         self.rfid.initialize()
         n_serie = self.rfid.read_serie()
 
@@ -319,4 +328,6 @@ class Emprunt:
                     elt["status"] = 'warning'
                 else:
                     elt["status"] = 'success'
+            if len(self.list_emprunt) == 0:
+                return render_template('emprunt.html', no_emprunt_all=True)
             return render_template('emprunt.html', list_complete=self.list_emprunt)
