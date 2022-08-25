@@ -292,6 +292,12 @@
                         <form action="/emprunt/see/identity" method="GET">
                             <button class="form-control btn btn-secondary mt-2" type="submit">Scanner</button>
                         </form>
+                        {% if no_emprunt %}
+                        <div class="alert alert-danger mt-2" role="alert">
+                            <p class="font-italic">{{identity.lastname}} {{identity.firstname}} n'a pas
+                                d'emprunt</p>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="form-check collapse mb-4" id="identity-no-adherent-2">
                         <form action="/emprunt/see/identity" method="POST"
@@ -333,6 +339,11 @@
                     {% if error %}
                     <div class="alert alert-danger mt-2">
                         {{ error }}
+                    </div>
+                    {% endif %}
+                    {% if no_emprunt_all %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        <p class="font-italic">Aucun emprunt</p>
                     </div>
                     {% endif %}
                 </div>
@@ -383,6 +394,9 @@
                     <td>
                         {% if not product.returned %}
                         <form action="/emprunt/return/{{ product.id }}" method="POST">
+                            <input name="lastname" type="hidden" value="{{product.emprunt.identity.lastname}}">
+                            <input name="firstname" type="hidden" value="{{product.emprunt.identity.firstname}}">
+                            <input name="email" type="hidden" value="{{product.emprunt.identity.email}}">
                             <button class="form-control btn btn-secondary" type="submit">Retourner</button>
                         </form>
                         {% endif %}
