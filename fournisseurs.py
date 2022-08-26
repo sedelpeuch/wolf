@@ -81,7 +81,7 @@ class Fournisseurs:
                 product['eirlab']['dolibarr'] = item
                 name_product[item['ref']] = product
                 return result, product, item
-            return result, product
+            return result, product, None
     def find_dolibarr(self, ref):
         # remove '-' from ref
         ref = ref.replace('-', '')
