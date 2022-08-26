@@ -1,14 +1,18 @@
 import json
 import threading
+import time
 
 import requests
+import torch
 from bs4 import BeautifulSoup
+from sentence_transformers import SentenceTransformer, util
 
 import barcode
 import config
 import rfid
 
 product = {}
+name_product = {}
 
 
 class Fournisseurs:
@@ -24,6 +28,7 @@ class Fournisseurs:
 
     def find(self, ref=None):
         global product
+        global name_product
         product = {}
         fournisseur = None
         id = None
@@ -56,7 +61,6 @@ class Fournisseurs:
             thread_farnell.join()
 
             for prod in product:
-                print(prod)
                 try:
                     if product[prod]['fournisseur']['ref'] == fournisseur:
                         product[prod]['eirlab'] = True
@@ -75,9 +79,9 @@ class Fournisseurs:
                     'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '', 'eirlab': True}
                 product['eirlab']['warehouse'] = warehouse
                 product['eirlab']['dolibarr'] = item
+                name_product[item['ref']] = product
                 return result, product, item
-            return result, product, None
-
+            return result, product
     def find_dolibarr(self, ref):
         # remove '-' from ref
         ref = ref.replace('-', '')
@@ -98,14 +102,31 @@ class Fournisseurs:
     def find_dolibarr_name(self, name):
         products = requests.get(config.url + config.url_product, headers=config.headers).text
         products = json.loads(products)
-        warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
-        warehouses = json.loads(warehouses)
+        embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        corpus = []
+        corpus_item_ref = []
+        thread_pool = []
+        for item in products:
+            if item["type"] == '0':
+                corpus.append(item["label"])
+                corpus_item_ref.append(item["accountancy_code_buy"])
+        corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
+        query_embedding = embedder.encode([name], convert_to_tensor=True)
+        cos_scores = util.semantic_search(query_embedding, corpus_embeddings)[0]
+        for elt in cos_scores:
+            thread_pool.append(threading.Thread(target=self.find_dolibarr, args=(corpus_item_ref[elt['corpus_id']],)))
+
 
     def rs(self, ref):
         global product
         headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                 'Chrome/51.0.2704.103 Safari/537.36'}
-        html = requests.get(self.url_rs + ref).text
+                                 'Chrome/51.0.2704.103 Safari/537.36', 'Upgrade-Insecure-Requests': '1',
+                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,'
+                             '*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Encoding': 'gzip, deflate, br',
+                   'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7'}
+
+        begin = time.time()
+        html = requests.get(self.url_rs + ref, headers=headers).text
         try:
             parsed_html = BeautifulSoup(html, "html.parser")
         except AttributeError:
@@ -213,12 +234,6 @@ class Fournisseurs:
             price = price.replace('€', ',')
         except AttributeError:
             try:
-                # <div class="our_price_display" itemprop="offers" itemscope=""
-                # itemtype="http://schema.org/Offer"><link itemprop="availability"
-                # href="http://schema.org/InStock"><meta itemprop="priceCurrency" content="EUR"><meta
-                # itemprop="gtin13" content="8718836379383"><meta itemprop="price" content="6350.02"> <span
-                # class="our_price_display">6 350€<sup>02 HT <span class="price-without-taxes"> / <span
-                # class="without-taxes-value">7 620€<sup>02 TTC</sup></span></span> </sup></span></div>
                 price = parsed_html.body.find('span', attrs={'class': 'our_price_display'}).text
                 price = price.replace('TTC', '')
                 price = price.replace('HT', '')
@@ -371,4 +386,4 @@ class Fournisseurs:
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    print(four.conrad('1585883'))
+    print(four.find_dolibarr_name("Boite à décade"))
