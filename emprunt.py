@@ -1,3 +1,4 @@
+import copy
 import json
 import time
 from datetime import timedelta
@@ -66,9 +67,10 @@ class Emprunt:
                 product["eirlab"] = True
                 self.product = {self.item["id"]: product}
             except AttributeError:
-                return render_template('emprunt.html', product=item, warehouse=warehouse,
-                                       recherche_composant=self.product, confirmed_identity=self.identity,
-                                       date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
+                pass
+            return render_template('emprunt.html', product=item, warehouse=warehouse,
+                                   recherche_composant=self.product, confirmed_identity=self.identity,
+                                   date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
         elif recherche_composant is not None:
             self.product = recherche_composant
             return render_template('emprunt.html', recherche_composant=self.product, confirmed_identity=self.identity,
@@ -88,6 +90,7 @@ class Emprunt:
             return render_template('emprunt.html', status="Oups ! Quelque chose s'est mal passé, veuillez réessayer")
         self.product = self.product[id]
         self.item = self.product["dolibarr"]
+        self.warehouse = self.product["warehouse"]
         return render_template('emprunt.html', confirmed_product=self.product, confirmed_identity=self.identity,
                                date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
 
@@ -159,7 +162,10 @@ class Emprunt:
             stockmovement_from_origin = {"product_id": self.item["id"], "warehouse_id": str(self.warehouse["id"]),
                                          "qty": str(-int(self.quantity))}
 
-            description = json.loads(self.item["description"].replace("'", '"'))
+            try:
+                description = json.loads(self.item["description"].replace("'", '"'))
+            except json.decoder.JSONDecodeError:
+                description = []
             new_description = {"date": time.strftime("%Y-%m-%d"), "return_date": self.date, "quantity": self.quantity,
                                "identity": self.identity, "origin_warehouse": self.warehouse["id"]}
             statut = False
@@ -201,7 +207,7 @@ class Emprunt:
         self.date = request.form['date']
         self.identity = {"lastname": lastname, "firstname": firstname, "email": email}
         return render_template('emprunt.html', confirmed_product=self.product, date=self.date,
-                               today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
+                               today=time.strftime("%Y-%m-%d"), quantity=self.quantity, member=self.identity)
 
     def see_identity(self):
         self.list_emprunt = []
@@ -345,8 +351,9 @@ class Emprunt:
                     try:
                         description = json.loads(product["description"].replace("'", '"'))
                         for element in description:
-                            product["emprunt"] = element
-                            self.list_emprunt.append(product)
+                            prod = copy.deepcopy(product)
+                            prod["emprunt"] = element
+                            self.list_emprunt.append(prod)
                     except json.decoder.JSONDecodeError:
                         pass
             for elt in self.list_emprunt:
