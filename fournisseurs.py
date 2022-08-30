@@ -3,7 +3,6 @@ import threading
 import time
 
 import requests
-import torch
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer, util
 
@@ -28,7 +27,6 @@ class Fournisseurs:
 
     def find(self, ref=None):
         global product
-        global name_product
         product = {}
         fournisseur = None
         id = None
@@ -70,7 +68,6 @@ class Fournisseurs:
                         product[prod]['eirlab'] = False
                 except KeyError:
                     product[prod]['eirlab'] = False
-
             # if all product[prod]['eirlab'] are False, return result, product, item else return result, product, None
             if all(product[prod]['eirlab'] == False for prod in product) and item is not None:
                 product['eirlab'] = {
@@ -79,9 +76,10 @@ class Fournisseurs:
                     'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '', 'eirlab': True}
                 product['eirlab']['warehouse'] = warehouse
                 product['eirlab']['dolibarr'] = item
-                name_product[item['ref']] = product
                 return result, product, item
-            return result, product, None
+            print(product)
+            return result, product, item
+
     def find_dolibarr(self, ref):
         # remove '-' from ref
         ref = ref.replace('-', '')
@@ -99,23 +97,46 @@ class Fournisseurs:
                 pass
         return False, None, None
 
+    def find_id(self, id):
+        global name_product
+        products = requests.get(config.url + config.url_product, headers=config.headers).text
+        products = json.loads(products)
+        for item in products:
+            if item["id"] == id:
+                fournisseur = item["accountancy_code_buy_intra"]
+                ref = item["accountancy_code_buy"]
+                product = getattr(self, fournisseur)(ref)[fournisseur]
+                status, item, warehouse = self.find_dolibarr(ref)
+                product['eirlab'] = True
+                product['warehouse'] = warehouse
+                product['dolibarr'] = item
+                name_product[id] = product
+
     def find_dolibarr_name(self, name):
+        global name_product
+        name_product = {}
         products = requests.get(config.url + config.url_product, headers=config.headers).text
         products = json.loads(products)
         embedder = SentenceTransformer('all-MiniLM-L6-v2')
         corpus = []
-        corpus_item_ref = []
+        corpus_item_id = []
         thread_pool = []
         for item in products:
             if item["type"] == '0':
                 corpus.append(item["label"])
-                corpus_item_ref.append(item["accountancy_code_buy"])
+                corpus_item_id.append(item["id"])
         corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
         query_embedding = embedder.encode([name], convert_to_tensor=True)
         cos_scores = util.semantic_search(query_embedding, corpus_embeddings)[0]
+        print(cos_scores)
         for elt in cos_scores:
-            thread_pool.append(threading.Thread(target=self.find_dolibarr, args=(corpus_item_ref[elt['corpus_id']],)))
-
+            if elt['score'] > 0.3:
+                thread_pool.append(threading.Thread(target=self.find_id, args=(corpus_item_id[elt['corpus_id']],)))
+        for thread in thread_pool:
+            thread.start()
+        for thread in thread_pool:
+            thread.join()
+        return name_product
 
     def rs(self, ref):
         global product
@@ -283,6 +304,8 @@ class Fournisseurs:
             links = json_product['productMedia'][0]['url']
         except AttributeError:
             links = ""
+        except IndexError:
+            links = ""
         try:
             image = json_product['image']['url']
         except AttributeError:
@@ -386,4 +409,4 @@ class Fournisseurs:
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    print(four.find_dolibarr_name("Boite à décade"))
+    print(four.find_dolibarr_name("Résistance"))

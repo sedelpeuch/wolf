@@ -16,7 +16,7 @@ class Emprunt:
         self.bp = Blueprint('Emprunt', __name__, url_prefix='/emprunt')
         self.bp.route("/materiel", methods=['POST'])(self.materiel)
         self.bp.route("/confirm", methods=['GET'])(self.confirm)
-        self.bp.route("/materiel/confirm", methods=['POST'])(self.materiel_confirm)
+        self.bp.route("/materiel/confirm/<id>", methods=['POST'])(self.materiel_confirm)
         self.bp.route("/identity/confirm", methods=['GET'])(self.identity_confirm)
         self.bp.route("/identity/adherent", methods=['POST'])(self.identity_adherent)
         self.bp.route("/identity/notadherent", methods=['POST'])(self.identity_notadherent)
@@ -40,19 +40,43 @@ class Emprunt:
 
     def materiel(self):
         self.ref = request.form['ref']
-        statut, item, warehouse = self.four.find_dolibarr(self.ref)
-        self.fournisseur = item["accountancy_code_buy_intra"]
-        self.warehouse = warehouse
-        if not statut:
-            return render_template('emprunt.html', error=True)
+        self.name = request.form['name']
+        statut = None
+        recherche_composant = None
+        if self.ref != '' and self.name == '':
+            statut, item, warehouse = self.four.find_dolibarr(self.ref)
+        elif self.ref == '' and self.name != '':
+            recherche_composant = self.four.find_dolibarr_name(self.name)
         else:
-            self.product = getattr(self.four, self.fournisseur)(self.ref)[self.fournisseur]
-            self.item = item
-            return render_template('emprunt.html', product=item, warehouse=warehouse, recherche_composant=self.product,
-                                   confirmed_identity=self.identity, date=self.date, today=time.strftime("%Y-%m-%d"),
-                                   quantity=self.quantity)
+            return render_template(template_name_or_list='emprunt.html', status='Veuillez entrer une référence ou un '
+                                                                                'nom de composant',
+                                   confirmed_identity=self.identity, date=self.date, today=time.strftime("%Y-%m-%d"))
 
-    def materiel_confirm(self):
+        if statut is None and recherche_composant is None:
+            return render_template('emprunt.html', error=True)
+
+        if statut is not None and statut:
+            self.fournisseur = item["accountancy_code_buy_intra"]
+            self.warehouse = warehouse
+            self.item = item
+            try:
+                product = getattr(self.four, self.fournisseur)(self.ref)[self.fournisseur]
+                product["dolibarr"] = self.item
+                product["warehouse"] = self.warehouse
+                product["eirlab"] = True
+                self.product = {self.item["id"]: product}
+            except AttributeError:
+                return render_template('emprunt.html', product=item, warehouse=warehouse,
+                                       recherche_composant=self.product, confirmed_identity=self.identity,
+                                       date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
+        elif recherche_composant is not None:
+            self.product = recherche_composant
+            return render_template('emprunt.html', recherche_composant=self.product, confirmed_identity=self.identity,
+                                   date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
+        else:
+            return render_template('emprunt.html', error=True)
+
+    def materiel_confirm(self, id):
         if request.method == 'POST':
             try:
                 self.quantity = request.form['quantity']  # get current quantity of this reference
@@ -60,6 +84,9 @@ class Emprunt:
                 pass
         if self.quantity == "":
             self.quantity = "1"
+        if self.product is False:
+            return render_template('emprunt.html', status="Oups ! Quelque chose s'est mal passé, veuillez réessayer")
+        self.product = self.product[id]
         return render_template('emprunt.html', confirmed_product=self.product, confirmed_identity=self.identity,
                                date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
 
@@ -246,7 +273,7 @@ class Emprunt:
         if not self.identity:
             list_all = True
             self.identity = {"lastname": request.form['lastname'], "firstname": request.form['firstname'],
-                "email": request.form['email'], }
+                             "email": request.form['email'], }
         for element in range(len(self.list_emprunt)):
             if self.list_emprunt[element]["id"] == id:
                 stockmovement_from_emp = {"product_id": self.list_emprunt[element]["id"], "warehouse_id": 2,

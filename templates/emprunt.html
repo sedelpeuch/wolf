@@ -17,16 +17,21 @@
                     .style.visibility = 'visible';return true;">
                 <div class="form-group">
                     <label class="mt-2" for="ref">Référence</label>
-                    <input class="form-control" id="ref" name="ref" placeholder="Référence" required
+                    <input class="form-control" id="ref" name="ref" placeholder="Référence"
                            type="text">
                 </div>
                 <div class="form-group">
                     <label for="name">Nom</label>
-                    <input class="form-control" disabled id="name" name="name" placeholder="Nom"
+                    <input class="form-control" id="name" name="name" placeholder="Nom"
                            type="text">
                 </div>
                 <button class="form-control btn btn-secondary" type="submit">Rechercher le matériel</button>
             </form>
+            {% if status %}
+            <div class="alert alert-danger mt-2" role="alert">
+                {{ status }}
+            </div>
+            {% endif %}
             {% if error %}
             <div class="alert alert-danger mt-2" role="alert">
                 La référence n'existe pas.
@@ -38,35 +43,75 @@
     {% if recherche_composant %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#{{recherche_composant.fournisseur.name }}" role="button">
-            <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche {{
-                recherche_composant.fournisseur.name }}</h6>
+           data-toggle="collapse" href="#resume" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche - Résumé </h6>
         </a>
-        <div class="collapse show card-body mb-4" id="{{recherche_composant.fournisseur.name }}">
+        <div class="collapse show card-body mb-4" id="resume">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">En stock</th>
+                    <th scope="col">Référence</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prix</th>
+                    <th scope="col">Image</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for composant in recherche_composant %}
+                <tr>
+                    <td>{% if recherche_composant[composant].eirlab %}
+                        <i class="fas fa-check" style="color: green"></i>
+                        {% else %}
+                        <i class="fas fa-times" style="color: red"></i>
+                        {% endif %
+                    </td>
+                    <td><a data-toggle="collapse" href="#id-{{ composant }}">{{
+                        recherche_composant[composant].ref
+                        }}</a></td>
+                    <td>{{ recherche_composant[composant].title }}</td>
+                    <td>{{ recherche_composant[composant].price }}</td>
+                    <td><img alt="Imprimante"
+                             class="img-fluid mt-2"
+                             src="{{ recherche_composant[composant].image }}" width="50px"></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% for composant in recherche_composant %}
+    <div class="card shadow mb-4">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#id-{{composant}}" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche - identifiant {{ composant
+                }}</h6>
+        </a>
+        <div class="collapse card-body mb-4" id="id-{{composant}}">
             <div class="row">
                 <div class="col m-2">
-                    <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant.title }}</h5>
-                    <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant.ref }}</h5>
+                    <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant[composant].title }}</h5>
+                    <h5 class="font-weight-bold text-secondary mt-2">{{ recherche_composant[composant].ref }}</h5>
                     <h5 class="font-weight-bold text-secondary mt-2"><a
-                            href="{{ recherche_composant.links_ref }}" target="_blank">Lien {{
-                        recherche_composant.fournisseur.name }}</a></h5>
+                            href="{{ recherche_composant[composant].links_ref }}" target="_blank">Lien {{
+                        recherche_composant[composant].fournisseur.name }}</a></h5>
                     <div class="text-center">
-                        <img alt="{{ recherche_composant.title }}"
+                        <img alt="{{ recherche_composant[composant].title }}"
                              class="img-fluid mt-2"
-                             src="{{ recherche_composant.fournisseur.image }}" width="100px">
+                             src="{{ recherche_composant[composant].fournisseur.image }}" width="100px">
                     </div>
-                    <p class="text-secondary font-weight-bold mt-2">{{ recherche_composant.price }}</p>
+                    <p class="text-secondary font-weight-bold mt-2">{{ recherche_composant[composant].price }}</p>
                     <p class="text-secondary font-weight-bold mt-2"> Conditionnement - {{
-                        recherche_composant.packaging }} </p>
-                    <a class="mt-2" href="{{ recherche_composant.links }}">{{
-                        recherche_composant.links }}</a>
-                    <!--                    display recherche_composant.attributes with key and value -->
+                        recherche_composant[composant].packaging }} </p>
+                    <a class="mt-2" href="{{ recherche_composant[composant].links }}">{{
+                        recherche_composant[composant].links }}</a>
+                    <!--                    display recherche_composant[composant].attributes with key and value -->
                 </div>
                 <div class="col m-2">
                     <div class="text-center">
-                        <img alt="{{ recherche_composant.title}}"
+                        <img alt="{{ recherche_composant[composant].title}}"
                              class="img-fluid mt-2"
-                             src="{{ recherche_composant.image }}" width="200px">
+                             src="{{ recherche_composant[composant].image }}" width="200px">
                     </div>
                 </div>
                 <table class="table table-striped">
@@ -77,24 +122,27 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for key in recherche_composant.attributes %}
+                    {% for key in recherche_composant[composant].attributes %}
                     <tr>
                         <td>{{ key }}</td>
-                        <td>{{ recherche_composant.attributes[key] }}</td>
+                        <td>{{ recherche_composant[composant].attributes[key] }}</td>
                     </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
             <!--            Confirm button -->
-            <form action="/emprunt/materiel/confirm" method="POST">
+            <form action="/emprunt/materiel/confirm/{{composant}}" method="POST">
                 <label class="mt-2" for="date">Quantité</label>
                 <input class="form-control" id="quantity" name="quantity" placeholder="Quantité (1 par défaut)"
                        type="number">
-                <button class="form-control btn btn-secondary mt-2" type="submit">Confirmer le matériel</button>
+                <button class="form-control btn btn-secondary mt-2" type="submit">Confirmer le matériel id
+                    {{composant}}
+                </button>
             </form>
         </div>
     </div>
+    {% endfor %}
     {% endif %}
 
     <div class="card shadow mb-4">
