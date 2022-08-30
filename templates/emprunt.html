@@ -427,8 +427,8 @@
                     <th scope="col">Envoyer un rappel</th>
                 </tr>
                 </thead>
-                {% for product in list_complete %}
                 <tbody>
+                {% for product in list_complete %}
                 <tr class="table-{{ product.status}}">
                     <td>{{ product.accountancy_code_buy }}</td>
                     <td>{{ product.emprunt.date }}</td>
@@ -458,8 +458,9 @@
                         </form>
                     </td>
                 </tr>
-                </tbody>
                 {% endfor %}
+                </tbody>
+
             </table>
         </div>
     </div>
