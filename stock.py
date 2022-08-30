@@ -45,9 +45,16 @@ class Stock:
         recherche_composant = {}
         composant_eirlab = None
         item = None
+        multiproducts = False
         if request.method == 'POST':
-            self.recherche_reference = request.form['ref']
-            composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
+            if request.form['ref'] != "" and request.form['name'] == "":
+                self.recherche_reference = request.form['ref']
+                composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
+            elif request.form['name'] != "" and request.form['ref'] == "":
+                self.recherche_reference = request.form['name']
+                recherche_composant = self.fournisseurs.find_dolibarr_name(self.recherche_reference)
+            else:
+                return render_template('stock.html', unknow_composant=True, error="Remplissez nom ou référence")
         elif request.method == 'GET':
             self.recherche_reference = self.fournisseurs.barcode.read_barcode()
             composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
@@ -57,7 +64,6 @@ class Stock:
 
         warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
         warehouses = json.loads(warehouses)
-
         if recherche_composant == {}:
             return render_template('stock.html', unknow_composant=True)
         else:
@@ -145,8 +151,6 @@ class Stock:
             except KeyError:
                 self.list_add[ref] = {"ref": ref, "quantite": quantite}
             return self.arrivage_confirm()
-
-
 
     def arrivage(self):
         status = self.fournisseurs.rfid.initialize()
@@ -281,14 +285,17 @@ class Stock:
                 if products[composant]["product"] is not None:
                     ref = products[composant]["product"]["ref"]
                     status, item, warehouse = self.fournisseurs.find_dolibarr(ref)
-                    packaging = int(products[composant]["product"]["packaging"])
+                    try:
+                        packaging = int(products[composant]["product"]["packaging"])
+                    except ValueError:
+                        packaging = 1
                     qty = str(int(products[composant]["quantite"]) * packaging)
 
                     # format price of product
                     try:
                         price = float(
                                 products[composant]["product"]["price"].replace("€", "").replace(",", ".").replace(" ",
-                                        ""))
+                                                                                                                   ""))
                     except ValueError:
                         if type(products[composant]["product"]["price"]) == float:
                             price = products[composant]["product"]["price"]
@@ -303,8 +310,8 @@ class Stock:
 
                     if status:
                         # the product already exist in dolibarr, just update dolibarr with stockmovement
-                        stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse),
-                                         "qty": qty, "price": price}
+                        stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse), "qty": qty,
+                                         "price": price}
                         if common.PUB:
                             status = requests.post(config.url + "stockmovements", json=stockmovement,
                                                    headers=config.headers)
@@ -349,8 +356,8 @@ class Stock:
                             status = requests.post(config.url + "products", json=content, headers=config.headers)
                             if status.status_code == 200:
                                 id = status.json()
-                                stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse),
-                                                 "qty": qty, "price": price}
+                                stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse), "qty": qty,
+                                                 "price": price}
                                 status = requests.post(config.url + "stockmovements", json=stockmovement,
                                                        headers=config.headers)
                                 products_add[composant] = products[composant]
