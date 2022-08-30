@@ -1,7 +1,10 @@
 """
 This file is the entry point of flask api. Launch python3 ronoco_vm/run.py to run flask server
 """
+import logging
 import os
+import time
+from logging import FileHandler
 
 from flask import Flask
 from flask_cors import CORS
@@ -23,7 +26,7 @@ class RunAPI:
         socketio = SocketIO(self.app, logger=False, cors_allowed_origins='*')
         self.setup_app()
         # self.socketio.run(host='0.0.0.0', port=8000, debug=True)
-        socketio.run(self.app, host="0.0.0.0")
+        socketio.run(self.app, host="0.0.0.0", debug=False)
 
     def create_app(self, test_config=None):
         """
