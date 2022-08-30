@@ -87,6 +87,7 @@ class Emprunt:
         if self.product is False:
             return render_template('emprunt.html', status="Oups ! Quelque chose s'est mal passé, veuillez réessayer")
         self.product = self.product[id]
+        self.item = self.product["dolibarr"]
         return render_template('emprunt.html', confirmed_product=self.product, confirmed_identity=self.identity,
                                date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
 
