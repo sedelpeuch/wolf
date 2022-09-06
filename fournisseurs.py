@@ -35,7 +35,6 @@ class Fournisseurs:
         else:
             result, item, warehouse = self.find_dolibarr(ref)
             if item is not None:
-                id = item["id"]
                 fournisseur = item["accountancy_code_buy_intra"]
             thread_rs = threading.Thread(target=self.rs, args=(ref,))
             thread_rs.start()
@@ -57,11 +56,20 @@ class Fournisseurs:
             thread_makershop.join()
             thread_conrad.join()
             thread_farnell.join()
-
+            emp = False
             for prod in product:
                 try:
                     if product[prod]['fournisseur']['ref'] == fournisseur:
-                        product[prod]['eirlab'] = True
+                        in_stock = requests.get(config.url + "products/" + item["id"] + "/stock",
+                                                headers=config.headers).text
+                        in_stock = json.loads(in_stock)
+                        print(in_stock)
+                        for stock in in_stock['stock_warehouses']:
+                            if int(in_stock['stock_warehouses'][stock]['real']) > 0 and stock != '2':
+                                product[prod]['eirlab'] = True
+                            else:
+                                emp = True
+                                product[prod]['eirlab'] = False
                         product[prod]['warehouse'] = warehouse
                         product[prod]['dolibarr'] = item
                     else:
@@ -69,7 +77,7 @@ class Fournisseurs:
                 except KeyError:
                     product[prod]['eirlab'] = False
             # if all product[prod]['eirlab'] are False, return result, product, item else return result, product, None
-            if all(product[prod]['eirlab'] == False for prod in product) and item is not None:
+            if all(product[prod]['eirlab'] == False for prod in product) and item is not None and not emp:
                 product['eirlab'] = {
                     'fournisseur': {'name': 'EirLab', 'image': '/static/img/eirlab.png', 'id': '6', 'ref': 'eirlab'},
                     'title': item['label'], 'price': item['cost_price'], 'links': item['url'], 'attributes': {},
@@ -77,7 +85,6 @@ class Fournisseurs:
                 product['eirlab']['warehouse'] = warehouse
                 product['eirlab']['dolibarr'] = item
                 return result, product, item
-            print(product)
             return result, product, item
 
     def find_dolibarr(self, ref):
@@ -107,7 +114,14 @@ class Fournisseurs:
                 ref = item["accountancy_code_buy"]
                 product = getattr(self, fournisseur)(ref)[fournisseur]
                 status, item, warehouse = self.find_dolibarr(ref)
-                product['eirlab'] = True
+
+                in_stock = requests.get(config.url + "products/" + item["id"] + "/stock", headers=config.headers).text
+                in_stock = json.loads(in_stock)
+                for stock in in_stock['stock_warehouses']:
+                    if int(in_stock['stock_warehouses'][stock]['real']) > 0 and stock != '2':
+                        product['eirlab'] = True
+                    else:
+                        product['eirlab'] = False
                 product['warehouse'] = warehouse
                 product['dolibarr'] = item
                 name_product[id] = product
@@ -128,10 +142,8 @@ class Fournisseurs:
         corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
         query_embedding = embedder.encode([name], convert_to_tensor=True)
         cos_scores = util.semantic_search(query_embedding, corpus_embeddings)[0]
-        print(cos_scores)
         for elt in cos_scores:
-            if elt['score'] > 0.3:
-                thread_pool.append(threading.Thread(target=self.find_id, args=(corpus_item_id[elt['corpus_id']],)))
+            thread_pool.append(threading.Thread(target=self.find_id, args=(corpus_item_id[elt['corpus_id']],)))
         for thread in thread_pool:
             thread.start()
         for thread in thread_pool:
