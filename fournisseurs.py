@@ -29,7 +29,6 @@ class Fournisseurs:
         global product
         product = {}
         fournisseur = None
-        id = None
         if ref is None:
             return None, None
         else:
