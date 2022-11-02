@@ -2,6 +2,7 @@ import csv
 import datetime
 import json
 import time
+import traceback
 
 import requests
 import unidecode as unidecode
@@ -60,12 +61,12 @@ class Member:
         except requests.ConnectionError:
             return render_template(template_name_or_list='index.html', status='Connectez le PC à internet')
         self.data = json.loads(r.text)
-        print(self.data[0])
         for member in self.data:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == n_serie:
                     member = common.process_member(member)
                     return render_template(template_name_or_list='index.html', status="Adhérent trouvé", member=member)
+
         return render_template(template_name_or_list='index.html', status='Adhérent inconnu', new=True)
 
     def new_link(self):
@@ -138,7 +139,6 @@ class Member:
                 groups = requests.get(
                         config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
                         headers=config.headers).text
-                print(groups)
                 groups = json.loads(groups)
                 for group in groups:
                     if group["name"] == "ConseilAdministration":
@@ -182,7 +182,6 @@ class Member:
                 groups = requests.get(
                         config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
                         headers=config.headers).text
-                print(groups)
                 groups = json.loads(groups)
                 for group in groups:
                     if group["name"] == "ConseilAdministration":
@@ -256,8 +255,8 @@ class Member:
 
                 with open('helloasso.csv', 'r') as csv_file:
                     input = csv.reader(csv_file, delimiter=';')
-                    print(next(input))
                     adherents = []
+                    next(input)
                     for row in input:
                         adherent = Adherent()
                         adherent.fill_basic(row)
@@ -283,7 +282,11 @@ class Member:
                             try:
                                 write = True
                                 for member in members:
-                                    if member['login'].lower() == adherent.login.lower():
+                                    try:
+                                        login = member["login"].lower()
+                                    except AttributeError:
+                                        login = ""
+                                    if login == adherent.login.lower():
                                         write = False
                                         # transform 2022-10-04 to timestamp
                                         adherent.datec = time.mktime(
@@ -298,7 +301,28 @@ class Member:
                                         member_renew.append(adherent)
                                 if write:
                                     member_new.append(adherent)
-                                    member
+                                    member = {'login': adherent.login, 'address': adherent.address, 'zip': adherent.zip,
+                                              'town': adherent.town, 'email': adherent.email,
+                                              'phone_perso': adherent.phone, 'morphy': 'phy', 'public': '0',
+                                              'datec': time.mktime(
+                                                  datetime.datetime.strptime(adherent.datec, "%Y-%m-%d").timetuple()),
+                                              'datem': time.mktime(
+                                                  datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple()),
+                                              'typeid': str(adherent.fk_adherent_type),
+                                              'type': 'Plein tarif' if adherent.fk_adherent_type == 3 else 'Plein '
+                                                                                                           'tarif ('
+                                                                                                           'sur '
+                                                                                                           'facture)'
+                                              if adherent.fk_adherent_type == 4 else "Etudiants en dehors de Bordeaux"
+                                                                                     " INP et demandeurs d'emploi" if
+                                              adherent.fk_adherent_type == 2 else "Etudiant ou personnel de Bordeaux "
+                                                                                  "INP",
+                                              'need_subscription': '1', 'datefin': time.mktime(
+                                                datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple()),
+                                              'entity': '1', 'country_id': '1', 'country_code': 'FR',
+                                              'lastname': adherent.lastname, 'firstname': adherent.firstname,
+                                              'statut': '1', 'status': '1',}
+                                    result = requests.post(config.url + "members", headers=config.headers, json=member)
                                     adherent.write_csv(output)
                             except AttributeError:
                                 pass
@@ -356,3 +380,4 @@ class Adherent:
                 [self.ref, "", self.lastname, self.firstname, "", self.login, "", self.fk_adherent_type, self.morphy,
                  "", self.address, self.zip, self.town, "", self.country, "", self.phone, "", self.email, "",
                  self.statut, "", "", "", self.datec, self.datefin, "", ""])
+
