@@ -1,4 +1,7 @@
+import csv
+import datetime
 import json
+import time
 
 import requests
 import unidecode as unidecode
@@ -27,6 +30,7 @@ class Member:
         self.bp.route('/new_link', methods=['POST'])(self.new_link)
         self.bp.route('/confirm_link')(self.confirm_link)
         self.bp.route('/list', methods=['POST'])(self.list_member)
+        self.bp.route('/helloasso', methods=['POST'])(self.add_helloasso)
 
         self.data = None  # Données provenant des requêtes dolibarr sur les adhérents
         self.actual_n_serie = None  # Numéro de série de la dernière carte RFID lue
@@ -56,6 +60,7 @@ class Member:
         except requests.ConnectionError:
             return render_template(template_name_or_list='index.html', status='Connectez le PC à internet')
         self.data = json.loads(r.text)
+        print(self.data[0])
         for member in self.data:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == n_serie:
@@ -119,11 +124,11 @@ class Member:
         users = requests.get(config.url + config.url_user, headers=config.headers).text
         users = json.loads(users)
 
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
+        members = requests.get(config.url + config.url_member, headers=config.headers).text
+        members = json.loads(members)
         lock = True
 
-        for member in member:
+        for member in members:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == n_serie:
                     member = common.process_member(member)
@@ -157,25 +162,197 @@ class Member:
 
         :return: index.html avec la liste des adhérents
         """
-        try:
-            r = requests.get(config.url + config.url_member, headers=config.headers)
-        except requests.ConnectionError:
-            return render_template(template_name_or_list='index.html', status='Connectez le PC à internet')
-        self.data = json.loads(r.text)
-        for member in self.data:
-            member = common.process_member(member)
+        self.rfid.initialize()
+        n_serie = self.rfid.read_serie()
 
-        result_search = []
+        users = requests.get(config.url + config.url_user, headers=config.headers).text
+        users = json.loads(users)
 
-        if request.form['lastname'] != "" or request.form['firstname'] != "":
+        members = requests.get(config.url + config.url_member, headers=config.headers).text
+        members = json.loads(members)
+        lock = True
+
+        for member in members:
+            if member["array_options"] is not None and member["array_options"] != []:
+                if member["array_options"]["options_nserie"] == n_serie:
+                    member = common.process_member(member)
+                    break
+        for user in users:
+            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
+                groups = requests.get(
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
+                print(groups)
+                groups = json.loads(groups)
+                for group in groups:
+                    if group["name"] == "ConseilAdministration":
+                        lock = False
+                        break
+                break
+
+        if not lock:
+            try:
+                r = requests.get(config.url + config.url_member, headers=config.headers)
+            except requests.ConnectionError:
+                return render_template(template_name_or_list='index.html', status='Connectez le PC à internet')
+            self.data = json.loads(r.text)
             for member in self.data:
-                if member['lastname'].lower() == request.form['lastname'].lower():
-                    result_search.append(member)
-                elif member['firstname'].lower() == request.form['firstname'].lower():
-                    result_search.append(member)
-            result_search = sorted(result_search, key=lambda k: k['lastname'])
-            return render_template(template_name_or_list='index.html', list_member=result_search)
+                member = common.process_member(member)
 
-        # sort self.data by firstname
-        self.data = sorted(self.data, key=lambda k: k['lastname'])
-        return render_template(template_name_or_list='index.html', list_member=self.data)
+            result_search = []
+
+            if request.form['lastname'] != "" or request.form['firstname'] != "":
+                for member in self.data:
+                    if member['lastname'].lower() == request.form['lastname'].lower():
+                        result_search.append(member)
+                    elif member['firstname'].lower() == request.form['firstname'].lower():
+                        result_search.append(member)
+                result_search = sorted(result_search, key=lambda k: k['lastname'])
+                return render_template(template_name_or_list='index.html', status="Liste des adhérents",
+                                       list_member=result_search)
+
+            # sort self.data by firstname
+            self.data = sorted(self.data, key=lambda k: k['lastname'])
+            return render_template(template_name_or_list='index.html', status="Liste des adhérents",
+                                   list_member=self.data)
+
+    def add_helloasso(self):
+
+        self.rfid.initialize()
+        n_serie = self.rfid.read_serie()
+
+        users = requests.get(config.url + config.url_user, headers=config.headers).text
+        users = json.loads(users)
+
+        members = requests.get(config.url + config.url_member, headers=config.headers).text
+        members = json.loads(members)
+        lock = True
+
+        for member in members:
+            if member["array_options"] is not None and member["array_options"] != []:
+                if member["array_options"]["options_nserie"] == n_serie:
+                    member = common.process_member(member)
+                    break
+        for user in users:
+            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
+                groups = requests.get(
+                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                        headers=config.headers).text
+                groups = json.loads(groups)
+                for group in groups:
+                    if group["name"] == "ConseilAdministration":
+                        lock = False
+                        break
+                break
+
+        if not lock:
+            if request.files['file'] != "":
+                f = request.files['file']
+                # save in static/helloasso with name helloasso.csv
+                f.save("helloasso.csv")
+
+                member_renew = []
+                member_new = []
+
+                with open('helloasso.csv', 'r') as csv_file:
+                    input = csv.reader(csv_file, delimiter=';')
+                    print(next(input))
+                    adherents = []
+                    for row in input:
+                        adherent = Adherent()
+                        adherent.fill_basic(row)
+                        adherent.fill_fk_adherent_type(row)
+                        adherent.fill_date(row)
+                        adherents.append(adherent)
+                    with open('helloasso_after.csv', 'w') as csv_file:
+                        output = csv.writer(csv_file, delimiter=';')
+                        output.writerow(["Réf adhérent* (a.ref)", "Titre civilité (a.civility)", "Nom* (a.lastname)",
+                                         "Prénom (a.firstname)", "Genre (a.gender)", "Identifiant* (a.login)",
+                                         "Mot de passe (a.pass)", "Id type adhérent* (a.fk_adherent_type)",
+                                         "Nature de l'adhérent* (a.morphy)", "Société (a.societe)",
+                                         "Adresse (a.address)", "Code postal (a.zip)", "Ville (a.town)",
+                                         "StateId|StateCode (a.state_id)", "CountryId|CountryCode (a.country)",
+                                         "Tél pro. (a.phone)", "Tél perso. (a.phone_perso)",
+                                         "Tél portable (a.phone_mobile)", "Email (a.email)", "Birthday (a.birth)",
+                                         "État* (a.statut)", "Photo (a.photo)", "Note (publique) (a.note_public)",
+                                         "Note (privée) (a.note_private)", "Date création (a.datec)",
+                                         "Date fin adhésion (a.datefin)", "Tiers (a.fk_soc)", "N° Série (extra.nserie)",
+                                         "Formations (extra.impression3d)"])
+                        # adherents = delete_double(adherents)
+                        for adherent in adherents:
+                            try:
+                                write = True
+                                for member in members:
+                                    if member['login'].lower() == adherent.login.lower():
+                                        write = False
+                                        # transform 2022-10-04 to timestamp
+                                        adherent.datec = time.mktime(
+                                                datetime.datetime.strptime(adherent.datec, "%Y-%m-%d").timetuple())
+                                        adherent.datefin = time.mktime(
+                                                datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple())
+                                        subscription = {'start_date': adherent.datec, 'end_date': adherent.datefin,
+                                                        'amount': 0 if adherent.fk_adherent_type == 1 else 50 if
+                                                        adherent.fk_adherent_type == 2 else 100}
+                                        # requests.post(config.url + "members/" + member['id'] + "/subscriptions",
+                                        #         headers=config.headers, json=subscription)
+                                        member_renew.append(adherent)
+                                if write:
+                                    member_new.append(adherent)
+                                    member
+                                    adherent.write_csv(output)
+                            except AttributeError:
+                                pass
+        return render_template(template_name_or_list='index.html', member_renew=member_renew, member_new=member_new)
+
+
+class Adherent:
+    def __init__(self):
+        self.ref = "auto"  # auto-generated
+        self.lastname = ""  #
+        self.firstname = ""  #
+        self.login = ""  #
+        self.fk_adherent_type = 1  #
+        self.morphy = "phy"  #
+        self.phone = ""  #
+        self.address = ""  #
+        self.zip = ""  #
+        self.town = ""  #
+        self.country = "FR"  #
+        self.email = "sebastien40200.delpeuch@gmail.com"  #
+        self.statut = 1  #
+        self.datec = ""  #
+        self.datefin = ""  #
+        self.to_delete = False  #
+
+    def fill_basic(self, row):
+        self.lastname = row[2]
+        self.firstname = row[3]
+        self.login = self.firstname[0].lower() + self.lastname.lower()
+        self.phone = row[9]
+        self.email = row[10]
+        self.address = row[11]
+        self.zip = row[12]
+        self.town = row[13]
+
+    def fill_fk_adherent_type(self, row):
+        if row[5] == "Etudiant ou personnel de Bordeaux INP":
+            self.fk_adherent_type = 1
+        elif row[5] == "Etudiants en dehors de Bordeaux INP et demandeurs d'emploi":
+            self.fk_adherent_type = 2
+        elif row[5] == "Plein tarif":
+            self.fk_adherent_type = 3
+        elif row[5] == "Plein tarif (sur facture)":
+            self.fk_adherent_type = 4
+
+    def fill_date(self, row):
+        # datec is the date of row[0] without hour and replace '/' by '-' and reverse the order
+        datec = row[0].split(' ')[0].replace('/', '-').split('-')[::-1]
+        self.datec = '-'.join(datec)
+        datec[0] = str(int(datec[0]) + 1)
+        self.datefin = '-'.join(datec)
+
+    def write_csv(self, csv_file):
+        csv_file.writerow(
+                [self.ref, "", self.lastname, self.firstname, "", self.login, "", self.fk_adherent_type, self.morphy,
+                 "", self.address, self.zip, self.town, "", self.country, "", self.phone, "", self.email, "",
+                 self.statut, "", "", "", self.datec, self.datefin, "", ""])

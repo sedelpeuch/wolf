@@ -6,7 +6,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <!--        <h1 class="h1 mt-3 mb-0 text-gray-800">Caméléon</h1>-->
     </div>
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4" id="accueil">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#scan" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Stocks</h6>
@@ -73,8 +73,8 @@
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
 
-                    <form action="/stock/arrivage" method="GET">
-                        <button class="form-control btn btn-secondary" disabled type="submit">Débuter un inventaire
+                    <form action="/inventory/" method="GET">
+                        <button class="form-control btn btn-secondary" type="submit">Débuter un inventaire
                         </button>
 
                         <p class="mt-2 text-danger">Un <a
@@ -87,12 +87,15 @@
                             d'EirLab
                             Community</p>
                     </form>
+                    {% if inventory_error %}
+                    <h4 class="font-weight-bold mt-2 text-danger"> Vous n'êtes pas autorisé à accéder à cette page </h4>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
     {% if recherche_composant %}
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4" id="résultat de recherche">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#resume" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche - Résumé </h6>
@@ -133,7 +136,7 @@
     </div>
 
     {% for composant in recherche_composant %}
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4" id="détails recherche">
         <a aria-controls="select" aria-expanded="false" class="d-block card-header py-3"
            data-toggle="collapse" href="#id-{{ composant }}" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Résultats de la recherche {{
@@ -295,7 +298,7 @@
     {% endif %}
 
     {% if arrivage %}
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4" id="paramètres arrivage">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#choix" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Paramètres d'arrivage</h6>
@@ -337,7 +340,7 @@
     {% endif %}
 
     {% if fournisseur %}
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4" id="prise des références">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#prise" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Prise des références - {{ fournisseur.name }}</h6>
@@ -396,7 +399,7 @@
     {% endif %}
 
     {% if arrivage_confirm %}
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4" id="fin arrivage">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#add" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Confirmation de l'arrivage</h6>
@@ -462,8 +465,35 @@
                 {% endfor %}
             </table>
         </div>
-        {% endif %}
     </div>
+    {% endif %}
+
+    {% if inventory %}
+    <div class="card shadow mb-4" id="paramètres inventaire">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#inventory" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Choix du stockage</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="inventory">
+            <div class="row">
+                <div class="col m-2">
+                    <div class="form-group">
+                        <form action="/inventory/warehouse" method="POST">
+                            <select class="form-control" id="warehouse" name="warehouse">
+                                {% for w in warehouses %}
+                                <option>{{ w.lieu }} - {{ w.label }} - {{ w.id }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="form-control btn btn-secondary mt-2" type="submit">Valider</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
 </div>
 
 <div class="container-animation-scanning">
@@ -588,4 +618,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

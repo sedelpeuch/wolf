@@ -5,6 +5,7 @@
     <!-- Page Heading -->
     {% if not new %}
     {% if not member %}
+    {% if not list_member %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#welcome" role="button">
@@ -35,6 +36,7 @@
                 page associée et de ne pas exploiter les potentielles failles. </p>
         </div>
     </div>
+    {% endif %}
     {% endif %}
     {% endif %}
 
@@ -79,7 +81,7 @@
                     bouton scanner et posez la
                     carte
                     d'un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
                     d'EirLab
                     Community</p>
                 <div class="form-group">
@@ -102,6 +104,86 @@
             {% endif %}
 
             <!--            </div>-->
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#add_helloasso" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Ajout des nouveaux adhérents HelloAsso</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="add_helloasso">
+            <!--            <div class="row">-->
+            <form action="/member/helloasso" enctype="multipart/form-data"
+                  method="POST" onsubmit="document.getElementById('container-svg-card-reader')
+            .style.visibility = 'visible';return true;">
+                <p class="mt-2 text-danger">Un <a
+                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
+                    d'EirLab Community est nécessaire pour débuter
+                    l'opération</p>
+
+                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
+                    d'EirLab Community</p>
+                <div class="form-group">
+                    <label for="file">Fichier csv</label>
+                    <input class="form-control" id="file" name="file" placeholder="export d'helloasso"
+                           type="file">
+                </div>
+                <button class="form-control btn btn-secondary" type="submit">Ajouter le fichier</button>
+            </form>
+            {% if status %}
+            <form action="/" method="GET">
+                <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
+            </form>
+            <p class="font-weight-bold mt-2">{{ status }}</p>
+            {% endif %}
+            {% if member_new or member_renew %}
+            <h5 class="mt-2">Liste des nouveaux adhérents</h5>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Identifiant</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prénom</th>
+                    <th scope="col">Date de fin d'adhésion</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for member in member_new %}
+                <tr>
+                    <td>{{ member.login }}</td>
+                    <td>{{ member.lastname }}</td>
+                    <td>{{ member.firstname }}</td>
+                    <td>
+                        {{ member.datefin }}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <h5 class="mt-2">Liste des adhérents renouvelés</h5>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Identifiant</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prénom</th>
+                    <th scope="col">Date de fin d'adhésion</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for member in member_renew %}
+                <tr>
+                    <td>{{ member.login }}</td>
+                    <td>{{ member.lastname }}</td>
+                    <td>{{ member.firstname }}</td>
+                    <td> {{ member.datefin }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
         </div>
     </div>
 
