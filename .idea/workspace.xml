@@ -1,46 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="🐛 fix(arrivage): fix otelo / makershop links">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022,_17_45_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022,_20_09_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022,_20_10_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022,_20_12_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022,_20_12_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022,_20_12_[Changes]2/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022__17_45__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022__20_09__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022__20_10__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022__20_12__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022__20_12__Changes_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_21_07_2022__20_12__Changes_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21_07_2022,_20_08_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21_07_2022__20_08__Changes_.xml" beforeDir="false" />
+    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="feat(member): add renew for members and process for new member">
+      <change afterPath="$PROJECT_DIR$/inventory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/wolf.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wolf.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/barcode.py" beforeDir="false" afterPath="$PROJECT_DIR$/barcode.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fournisseurs.json" beforeDir="false" afterPath="$PROJECT_DIR$/fournisseurs.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fournisseurs.py" beforeDir="false" afterPath="$PROJECT_DIR$/fournisseurs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/stock.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/member.py" beforeDir="false" afterPath="$PROJECT_DIR$/member.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rfid.py" beforeDir="false" afterPath="$PROJECT_DIR$/rfid.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="EndpointsView">
+    <option name="showFromLibraries" value="true" />
+    <option name="showFromTests" value="true" />
+    <option name="showModules" value="false" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="UML Activity" />
+        <option value="HTML File" />
         <option value="Python Script" />
       </list>
     </option>
   </component>
-  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" module-name="wolf" is-module-sdk="true">
     <envs>
       <env key="FLASK_APP" value="app" />
     </envs>
     <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myUseModuleSdk" value="true" />
+    <option name="myModuleName" value="wolf" />
     <option name="myEnvs">
       <map>
         <entry key="FLASK_APP" value="app" />
@@ -50,7 +49,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
   </component>
@@ -72,34 +71,47 @@
     <option name="showExcludedFiles" value="false" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Project.color&quot;: &quot;154c20&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/opt/wolf/doc/source&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "DefaultPlantUmlFileTemplate": "UML Activity",
+    "Project.color": "154c20",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ToolWindowRun.ShowToolbar": "false",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/sedelpeuch/.config/JetBrains/PyCharm2022.2/scratches/scratch_3.json",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "two.files.diff.last.used.file": "/home/sedelpeuch/.config/JetBrains/PyCharm2022.2/scratches/scratch_3.json"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JSON"
+    ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs/img" />
       <recent name="$PROJECT_DIR$/doc/source" />
       <recent name="$PROJECT_DIR$/doc/source/img" />
       <recent name="$PROJECT_DIR$/doc" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs/img" />
       <recent name="$PROJECT_DIR$/doc" />
     </key>
   </component>
   <component name="RunManager" selected="Python.run_api">
     <configuration name="make.sh" type="BashProRunConfiguration" temporary="true">
-      <option name="scriptPath" value="$PROJECT_DIR$/doc/make.sh" />
+      <option name="defaultInterpreter" value="zsh" />
+      <option name="scriptPath" value="$PROJECT_DIR$/docs/make.sh" />
       <RunnerSettings bashdbVersion="Automatic" bashPathMapper="Automatic" RunnerId="pro.bashsupport.shDebugRunner" />
       <method v="2" />
     </configuration>
@@ -147,28 +159,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="wolf" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="run_api" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="wolf" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -191,19 +181,42 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="wolf" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="BashSupport Pro.make.sh" />
       <item itemvalue="Python.barcode" />
+      <item itemvalue="Python.test" />
       <item itemvalue="Python.fournisseurs" />
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.run_api" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.run_api" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.fournisseurs" />
         <item itemvalue="Python.barcode" />
-        <item itemvalue="Python.main" />
+        <item itemvalue="BashSupport Pro.make.sh" />
       </list>
     </recent_temporary>
   </component>
@@ -235,7 +248,38 @@
       <workItem from="1659368570428" duration="56000" />
       <workItem from="1659368647886" duration="4187000" />
       <workItem from="1659455094254" duration="3793000" />
-      <workItem from="1659523410853" duration="2894000" />
+      <workItem from="1659523410853" duration="10715000" />
+      <workItem from="1659628452247" duration="4137000" />
+      <workItem from="1659638712476" duration="3666000" />
+      <workItem from="1659642461073" duration="5005000" />
+      <workItem from="1659694312650" duration="6269000" />
+      <workItem from="1659787787581" duration="8696000" />
+      <workItem from="1660059957963" duration="5265000" />
+      <workItem from="1660127477412" duration="1042000" />
+      <workItem from="1660133238429" duration="185000" />
+      <workItem from="1660139374847" duration="108000" />
+      <workItem from="1660148065127" duration="3976000" />
+      <workItem from="1660808660890" duration="103000" />
+      <workItem from="1660824969026" duration="19000" />
+      <workItem from="1661168025242" duration="19281000" />
+      <workItem from="1661263338600" duration="6913000" />
+      <workItem from="1661331203036" duration="67645000" />
+      <workItem from="1661847206607" duration="19974000" />
+      <workItem from="1661876275380" duration="274000" />
+      <workItem from="1661876571516" duration="1375000" />
+      <workItem from="1661936975375" duration="321000" />
+      <workItem from="1661937363730" duration="7603000" />
+      <workItem from="1662377752786" duration="19835000" />
+      <workItem from="1662736811616" duration="76000" />
+      <workItem from="1663079856561" duration="655000" />
+      <workItem from="1664440752209" duration="82000" />
+      <workItem from="1664441017893" duration="694000" />
+      <workItem from="1666286491839" duration="640000" />
+      <workItem from="1667057056776" duration="1988000" />
+      <workItem from="1667296821840" duration="1255000" />
+      <workItem from="1667298565609" duration="663000" />
+      <workItem from="1667299247225" duration="14926000" />
+      <workItem from="1667411487060" duration="6124000" />
     </task>
     <task id="LOCAL-00001" summary="✨feat(esp32): add serializer json">
       <created>1657961977289</created>
@@ -244,14 +288,231 @@
       <option name="project" value="LOCAL" />
       <updated>1657961977289</updated>
     </task>
-    <task id="LOCAL-00002" summary="✨feat(stock): add exit button">
-      <created>1658593959658</created>
+    <task id="LOCAL-00002" summary="🔥 remove(idea)">
+      <created>1659526379036</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1658593959658</updated>
+      <updated>1659526379036</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00003" summary="✨ feat(fournisseur): add conrad">
+      <created>1659526467153</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1659526467153</updated>
+    </task>
+    <task id="LOCAL-00004" summary="✨ feat(fournisseur): add multi warehouse and low level component">
+      <created>1659547785517</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1659547785517</updated>
+    </task>
+    <task id="LOCAL-00005" summary="📝 documentation(adherent): documentation update">
+      <created>1659644544833</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1659644544833</updated>
+    </task>
+    <task id="LOCAL-00006" summary="📝 documentation(adherent): documentation update">
+      <created>1659644560543</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1659644560543</updated>
+    </task>
+    <task id="LOCAL-00007" summary="📝 documentation(adherent): static files for formation module">
+      <created>1659645567479</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1659645567479</updated>
+    </task>
+    <task id="LOCAL-00008" summary="📝 documentation(formation): add documentation of module formation">
+      <created>1659793761016</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1659793761016</updated>
+    </task>
+    <task id="LOCAL-00009" summary="📝 documentation(formation): add documentation of module formation">
+      <created>1659793768719</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1659793768719</updated>
+    </task>
+    <task id="LOCAL-00010" summary="📝 documentation(formation): add documentation of module stock">
+      <created>1660065344239</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1660065344239</updated>
+    </task>
+    <task id="LOCAL-00011" summary="✨ feat(fournissseur): add farnell">
+      <created>1661246359906</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1661246359906</updated>
+    </task>
+    <task id="LOCAL-00012" summary="✨ feat(stock): ajout des ruptures et demandes d'achats">
+      <created>1661246428113</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1661246428113</updated>
+    </task>
+    <task id="LOCAL-00013" summary="🐛 fix(navigation): fix collapse buttons">
+      <created>1661246992251</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1661246992251</updated>
+    </task>
+    <task id="LOCAL-00014" summary="📝 documentation(stock): add stock documentation">
+      <created>1661258413433</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1661258413433</updated>
+    </task>
+    <task id="LOCAL-00015" summary="📝 documentation(stock): add stock documentation">
+      <created>1661268352084</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1661268352084</updated>
+    </task>
+    <task id="LOCAL-00016" summary="📝 documentation(stock): add stock documentation">
+      <created>1661268361144</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1661268361144</updated>
+    </task>
+    <task id="LOCAL-00017" summary="✨ feat(fournisseur): ajout du faux fournisseur &quot;eirlab&quot; pour gérer les éléments ajoutés manuellement">
+      <created>1661334125066</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1661334125066</updated>
+    </task>
+    <task id="LOCAL-00018" summary="✨ feat(fournisseur): ajout du faux fournisseur &quot;eirlab&quot; pour gérer les éléments ajoutés manuellement">
+      <created>1661343331395</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1661343331395</updated>
+    </task>
+    <task id="LOCAL-00019" summary="✨ feat(fournisseur): ajout de la gestion du conditionnement">
+      <created>1661343394979</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1661343394979</updated>
+    </task>
+    <task id="LOCAL-00020" summary="✨ feat(fournisseur): ajout rapide à l'inventaire">
+      <created>1661349004150</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1661349004150</updated>
+    </task>
+    <task id="LOCAL-00021" summary="✨ feat(emprunt): ajout des la fonctionnalité d'emprunt">
+      <created>1661446143583</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1661446143583</updated>
+    </task>
+    <task id="LOCAL-00022" summary="🐛 fix(emprunt): fix du bouton retourné lors du listing général">
+      <created>1661447744923</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1661447744923</updated>
+    </task>
+    <task id="LOCAL-00023" summary="✨ feat(fournisseur): ajout de headers pour les requetes rs">
+      <created>1661516732347</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1661516732347</updated>
+    </task>
+    <task id="LOCAL-00024" summary="🐛 fix(stock): fix d'une suppression d'un retour None">
+      <created>1661517969318</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1661517969318</updated>
+    </task>
+    <task id="LOCAL-00025" summary="✨ feat(composant): ajout de la recherche par nom et modification de la visualisation des résultats de recherche">
+      <created>1661863575156</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1661863575156</updated>
+    </task>
+    <task id="LOCAL-00026" summary="🐛 fix(emprunt): rajout d'une accolade manquante mb">
+      <created>1661863779379</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1661863779379</updated>
+    </task>
+    <task id="LOCAL-00027" summary="🐛 fix(emprunt): mise à jour de self.item après confirmation du matériel">
+      <created>1661863934231</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1661863934232</updated>
+    </task>
+    <task id="LOCAL-00028" summary="🐛 fix(emprunt): fix multiemprunt sur un même produit">
+      <created>1661866078667</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1661866078668</updated>
+    </task>
+    <task id="LOCAL-00029" summary="✨ feat(500): ajout du management des erreurs 500 (création automatique de ticket lors d'une erreur)">
+      <created>1661872471199</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1661872471199</updated>
+    </task>
+    <task id="LOCAL-00030" summary="♻ refactor(stock): traduction du module en anglais">
+      <created>1662468668384</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1662468668385</updated>
+    </task>
+    <task id="LOCAL-00031" summary="🐛 fix(fournisseur): add initialization of id">
+      <created>1667297054349</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1667297054349</updated>
+    </task>
+    <task id="LOCAL-00032" summary="feat(member): Add list all member">
+      <created>1667310533484</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1667310533484</updated>
+    </task>
+    <task id="LOCAL-00033" summary="feat(member): add renew for members and process for new member">
+      <created>1667416055237</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1667416055237</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -269,8 +530,35 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="✨feat(esp32): add serializer json" />
-    <option name="LAST_COMMIT_MESSAGE" value="✨feat(esp32): add serializer json" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/.." />
+    </ignored-roots>
+    <MESSAGE value=" documentation(adherent): documentation update" />
+    <MESSAGE value=" documentation(adherent): static files for formation module" />
+    <MESSAGE value=" documentation(formation): add documentation of module formation" />
+    <MESSAGE value=" documentation(formation): add documentation of module stock" />
+    <MESSAGE value="✨ feat(fournissseur): add farnell" />
+    <MESSAGE value="✨ feat(stock): ajout des ruptures et demandes d'achats" />
+    <MESSAGE value=" fix(navigation): fix collapse buttons" />
+    <MESSAGE value=" documentation(stock): add stock documentation" />
+    <MESSAGE value=" documentation(stock): add stock documentation" />
+    <MESSAGE value="✨ feat(fournisseur): ajout du faux fournisseur &quot;eirlab&quot; pour gérer les éléments ajoutés manuellement" />
+    <MESSAGE value="✨ feat(fournisseur): ajout de la gestion du conditionnement" />
+    <MESSAGE value="✨ feat(fournisseur): ajout rapide à l'inventaire" />
+    <MESSAGE value="✨ feat(emprunt): ajout des la fonctionnalité d'emprunt" />
+    <MESSAGE value=" fix(emprunt): fix du bouton retourné lors du listing général" />
+    <MESSAGE value="✨ feat(fournisseur): ajout de headers pour les requetes rs" />
+    <MESSAGE value=" fix(stock): fix d'une suppression d'un retour None" />
+    <MESSAGE value="✨ feat(composant): ajout de la recherche par nom et modification de la visualisation des résultats de recherche" />
+    <MESSAGE value=" fix(emprunt): rajout d'une accolade manquante mb" />
+    <MESSAGE value=" fix(emprunt): mise à jour de self.item après confirmation du matériel" />
+    <MESSAGE value=" fix(emprunt): fix multiemprunt sur un même produit" />
+    <MESSAGE value="✨ feat(500): ajout du management des erreurs 500 (création automatique de ticket lors d'une erreur)" />
+    <MESSAGE value="♻ refactor(stock): traduction du module en anglais" />
+    <MESSAGE value=" fix(fournisseur): add initialization of id" />
+    <MESSAGE value="feat(member): Add list all member" />
+    <MESSAGE value="feat(member): add renew for members and process for new member" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(member): add renew for members and process for new member" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -282,12 +570,18 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="traceback" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/wolf$main.coverage" NAME="main Coverage Results" MODIFIED="1657460230445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/wolf$barcode.coverage" NAME="barcode Coverage Results" MODIFIED="1658851996839" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$rs_parser_test.coverage" NAME="rs_parser_test Coverage Results" MODIFIED="1658170548305" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1659525688130" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/wolf$fournisseurs.coverage" NAME="fournisseurs Coverage Results" MODIFIED="1659370826032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$barcode.coverage" NAME="barcode Coverage Results" MODIFIED="1662472727688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1667417437959" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$fournisseurs.coverage" NAME="fournisseurs Coverage Results" MODIFIED="1661529415404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$test.coverage" NAME="test Coverage Results" MODIFIED="1662384011859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

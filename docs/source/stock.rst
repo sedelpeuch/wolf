@@ -17,10 +17,10 @@ Fonctionnalités en cours de développement :
 Recherche d'un produit
 -----------------------
 
-La recherche de produit s'effectue via la **référence** du produit. Il est possible de la saisir à la main ou via un
-lecteur de code barre. Pour débuter la recherche :
+La search de produit s'effectue via la **référence** du produit. Il est possible de la saisir à la main ou via un
+lecteur de code barre. Pour débuter la search :
 
-- Saisissez la référence du produit puis appuyez sur le bouton "Débuter une recherche"
+- Saisissez la référence du produit puis appuyez sur le bouton "Débuter une search"
 - Ou cliquez sur "Scanner un code barre", allumez le lecteur de code barre, attendez le signal sonore de connexion
   (deux bips courts) puis scannez votre référence.
 
@@ -29,13 +29,13 @@ lecteur de code barre. Pour débuter la recherche :
     :class: with-shadow
     :align: center
     :width: 50%
-    :alt: recherche produit
+    :alt: search produit
     :target: ../images/wolf_search.png
 
-    Débuter la recherche d'un produit
+    Débuter la search d'un produit
 
-La recherche d'un produit chez tous les fournisseurs prend environ 10 secondes, une animation de chargement apparaît
-le temps de la recherche. Lorsque la recherche est terminée la fiche du produit est affichées pour chaque fournisseur
+La search d'un produit chez tous les fournisseurs prend environ 10 secondes, une animation de chargement apparaît
+le temps de la search. Lorsque la search est terminée la fiche du produit est affichées pour chaque fournisseur
 possédant cette référence.
 
 Si le composant n'est pas disponible dans le stock d'EirLab Community la fiche s'affiche avec la possibilité de faire
@@ -45,7 +45,7 @@ une demande de ce composant en remplissant un formulaire :
     ../img/recherche_not_found.png
     :class: with-shadow
     :align: center
-    :alt: recherche produit
+    :alt: search produit
     :target: ../images/wolf_search.png
 
     Produit non disponible dans le stock
@@ -57,7 +57,7 @@ rupture en remplissant un formulaire :
     ../img/recherche_found.png
     :class: with-shadow
     :align: center
-    :alt: recherche produit
+    :alt: search produit
     :target: ../images/wolf_search.png
 
     Produit disponible dans le stock
@@ -69,7 +69,7 @@ rupture en remplissant un formulaire :
 Arrivages
 ----------
 
-Le module d'arrivage s'initialise en cliquant sur le bouton "Débuter un arrivage", une fois cliqué il faut scanner la
+Le module d'arrival s'initialise en cliquant sur le bouton "Débuter un arrival", une fois cliqué il faut scanner la
 carte d'un **fabmanager**.
 
 .. figure::
@@ -77,20 +77,20 @@ carte d'un **fabmanager**.
     :class: with-shadow
     :align: center
     :width: 50%
-    :alt: arrivage
+    :alt: arrival
 
-    Débuter un arrivage
+    Débuter un arrival
 
-Une fois débuté il faut régler les paramètres de l'arrivage : choisir le **fournisseur** et le **lieu de stockage**.
+Une fois débuté il faut régler les paramètres de l'arrival : choisir le **fournisseur** et le **lieu de stockage**.
 
 .. figure::
     ../img/arrivage_parametres.png
     :class: with-shadow
     :align: center
     :width: 100%
-    :alt: arrivage
+    :alt: arrival
 
-    Paramètres de l'arrivage
+    Paramètres de l'arrival
 
 Une fois les paramètres réglés la prise de référence peut commencer :
 
@@ -109,26 +109,26 @@ La liste des références et la quantités sont affichées au fur et à mesure
             automatiquement. Il n'est donc pas nécessaire de scanner la référence 10 fois.
 
 .. figure::
-    ../img/arrivage_add.png
+    ../img/arrival_add.png
     :class: with-shadow
     :align: center
     :width: 100%
-    :alt: arrivage
+    :alt: arrival
 
     Références à ajouter
 
-Lorsque toutes les références sont ajoutées, cliquez sur le bouton "Confirmer" pour valider l'arrivage. Le système va
+Lorsque toutes les références sont ajoutées, cliquez sur le bouton "Confirmer" pour valider l'arrival. Le système va
 chercher les références chez le fournisseur et mettre à jour le stock. Une fois terminé (environ 10 secondes) une
-fiche résumée de l'arrivage est affichée.
+fiche résumée de l'arrival est affichée.
 
 .. figure::
     ../img/arrivage_sum.png
     :class: with-shadow
     :align: center
     :width: 100%
-    :alt: arrivage
+    :alt: arrival
 
-    Confirmation de l'arrivage
+    Confirmation de l'arrival
 
 SDK
 ----
@@ -140,7 +140,7 @@ SDK
     :width: 100%
     :alt: sdk
 
-    Diagramme d'activité de la recherche d'un produit
+    Diagramme d'activité de la search d'un produit
 
 .. figure::
     ../img/sdk_arrivage.png
@@ -149,7 +149,7 @@ SDK
     :width: 70%
     :alt: sdk
 
-    Diagramme d'activité de l'arrivage de produits
+    Diagramme d'activité de l'arrival de produits
 
 .. automodule:: stock
     :members:

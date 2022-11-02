@@ -1,5 +1,7 @@
+import copy
 import datetime
 import json
+import traceback
 
 import requests
 from flask import Blueprint, render_template
@@ -17,7 +19,6 @@ def update_member(member, formation, actual_n_serie):
     :param actual_n_serie: le numéro de série de la carte RFID lue
     :return: le membre mis à jour
     """
-    print(formation)
     try:
         formations = member["array_options"]["options_impression3d"]
     except (TypeError, KeyError):
@@ -32,13 +33,7 @@ def update_member(member, formation, actual_n_serie):
                 formations = formations + ',' + json_formations[formation]['id']
                 member["array_options"]["options_impression3d"] = formations
     url = "https://gestion.eirlab.net/api/index.php/members/" + str(id)
-    content = {
-        "array_options": {
-            "options_impression3d": formations,
-            "options_nserie": actual_n_serie
-        }
-    }
-    print(content)
+    content = {"array_options": {"options_impression3d": formations, "options_nserie": actual_n_serie}}
     if PUB:
         r = requests.put(url, json=content, headers=config.headers)
     return member
@@ -101,7 +96,16 @@ class Common:
         return render_template(template_name_or_list='404.html'), 404
 
     def error_500(self, e=None):
-        return render_template(template_name_or_list='500.html'), 500
+        trace = traceback.format_exc()
+        lastline = trace.split('\n')[-2]
+        firstword = lastline.split(':')[0]
+        ticket = {'fk_soc': None, 'fk_project': None,
+                  'origin_email': 'gestion@eirlab.net', 'fk_user_create': None,
+                  'fk_user_assign': '4', 'subject': '[WOLF] - '+ firstword,
+                  'message': trace}
+        if PUB:
+            r = requests.post(config.url + "tickets", json=ticket, headers=config.headers)
+        return render_template(template_name_or_list='500.html', error=firstword, trace=trace), 500
 
     def formations(self):
         return render_template(template_name_or_list='formations.html')

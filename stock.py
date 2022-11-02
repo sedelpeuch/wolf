@@ -10,100 +10,109 @@ import common
 import config
 import fournisseurs
 
-product = {}
+products = {}
+
+
+def arrival_end():
+    """
+
+    :return:
+    """
+    barcode.running_virtual_keyboard = False
+    return render_template('stock.html')
 
 
 class Stock:
     def __init__(self):
         self.bp = Blueprint('fournisseur', __name__, url_prefix='/stock')
-        self.bp.route('/recherche', methods=['POST', 'GET'])(self.recherche)
-        self.bp.route('/recherche/rupture', methods=['POST'])(self.recherche_rupture)
-        self.bp.route('/recherche/achat', methods=['POST'])(self.recherche_achat)
-        self.bp.route('/recherche/add', methods=['POST'])(self.recherche_add)
+        self.bp.route('/recherche', methods=['POST', 'GET'])(self.search)
+        self.bp.route('/recherche/rupture', methods=['POST'])(self.search_breakage)
+        self.bp.route('/recherche/achat', methods=['POST'])(self.search_buy)
+        self.bp.route('/recherche/add', methods=['POST'])(self.search_add)
 
-        self.bp.route('/arrivage', methods=['GET'])(self.arrivage)
-        self.bp.route('/arrivage/fournisseur', methods=['POST'])(self.arrivage_fournisseur)
-        self.bp.route('/arrivage/add', methods=['POST', 'GET'])(self.arrivage_add)
-        self.bp.route('/arrivage/remove', methods=['POST', 'GET'])(self.arrivage_remove)
-        self.bp.route('/arrivage/confirm', methods=['GET'])(self.arrivage_confirm)
-        self.bp.route('/arrivage/end', methods=['GET'])(self.arrivage_end)
+        self.bp.route('/arrivage', methods=['GET'])(self.arrival)
+        self.bp.route('/arrivage/fournisseur', methods=['POST'])(self.arrival_supplier)
+        self.bp.route('/arrivage/add', methods=['POST', 'GET'])(self.arrival_add)
+        self.bp.route('/arrivage/remove', methods=['POST', 'GET'])(self.arrival_remove)
+        self.bp.route('/arrivage/confirm', methods=['GET'])(self.arrival_confirm)
+        self.bp.route('/arrivage/end', methods=['GET'])(arrival_end)
 
-        self.url_rs = "http://fr.rs-online.com/web/search/searchBrowseAction.html?method=searchProducts&searchTerm="
+        self.url_rs = "https://fr.rs-online.com/web/search/searchBrowseAction.html?method=searchProducts&searchTerm="
         self.url_otelo = "https://www.otelo.fr/is-bin/INTERSHOP.enfinity/WFS/Otelo-France-Site/fr_FR/-/EUR/Navigation" \
                          "-Dispatch?Ntk=Default_OTFR&Ntt="
         self.url_makershop = "https://www.makershop.fr/recherche?search_query="
-        self.fournisseurs = fournisseurs.Fournisseurs()
-        self.fournisseur = None
+        self.suppliers = fournisseurs.Fournisseurs()
+        self.supplier = None
         self.fabmanager = None
         self.job = ""
         self.list_add = {}
         self.actual_n_serie = ""
         self.warehouse = None
-        self.recherche_reference = ""
+        self.search_reference = ""
+        self.search_component = None
+        self.component_eirlab = None
 
-    def recherche(self):
-        recherche_composant = {}
-        composant_eirlab = None
-        item = None
-        multiproducts = False
+    def search(self):
+        search_component = {}
+        component_eirlab = None
         if request.method == 'POST':
             if request.form['ref'] != "" and request.form['name'] == "":
-                self.recherche_reference = request.form['ref']
-                composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
+                self.search_reference = request.form['ref']
+                component_eirlab, search_component, item = self.suppliers.find(self.search_reference)
             elif request.form['name'] != "" and request.form['ref'] == "":
-                self.recherche_reference = request.form['name']
-                recherche_composant = self.fournisseurs.find_dolibarr_name(self.recherche_reference)
+                self.search_reference = request.form['name']
+                search_component = self.suppliers.find_dolibarr_name(self.search_reference)
             else:
                 return render_template('stock.html', unknow_composant=True, error="Remplissez nom ou référence")
         elif request.method == 'GET':
-            self.recherche_reference = self.fournisseurs.barcode.read_barcode()
-            composant_eirlab, recherche_composant, item = self.fournisseurs.find(self.recherche_reference)
-            self.fournisseurs.barcode.close()
-        self.recherche_composant = recherche_composant
-        self.composant_eirlab = composant_eirlab
+            self.search_reference = self.suppliers.barcode.read_barcode()
+            component_eirlab, search_component, item = self.suppliers.find(self.search_reference)
+            self.suppliers.barcode.close()
+        self.search_component = search_component
+        self.component_eirlab = component_eirlab
 
         warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
         warehouses = json.loads(warehouses)
-        if recherche_composant == {}:
+        if search_component == {}:
             return render_template('stock.html', unknow_composant=True)
         else:
-            return render_template('stock.html', recherche_composant=recherche_composant, recherche=True,
-                                   composant_eirlab=composant_eirlab, warehouses=warehouses)
+            return render_template('stock.html', recherche_composant=search_component, recherche=True,
+                                   composant_eirlab=component_eirlab, warehouses=warehouses)
 
-    def recherche_rupture(self):
+    def search_breakage(self):
         fournisseur = request.form['rupture_fournisseur']
         identity = request.form['rupture_identity']
         description = request.form['rupture_description']
 
         # Add stockmovement
-        id = self.recherche_composant[fournisseur]["dolibarr"]["id"]
-        warehouse = self.recherche_composant[fournisseur]["warehouse"]
-        quantite = self.recherche_composant[fournisseur]["dolibarr"]["stock_reel"]
-        stockmovement = {"product_id": id, "warehouse_id": warehouse["id"], "qty": -int(quantite)}
-        status = requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
+        identifier = self.search_component[fournisseur]["dolibarr"]["identifier"]
+        warehouse = self.search_component[fournisseur]["warehouse"]
+        quantity = self.search_component[fournisseur]["dolibarr"]["stock_reel"]
+        stockmovement = {"product_id": identifier, "warehouse_id": warehouse["identifier"], "qty": -int(quantity)}
+        requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
 
         # Update notes with identity and description
         product = {"note_public": description, "note_private": identity}
-        status = requests.put(config.url + "products/" + str(id), json=product, headers=config.headers)
+        requests.put(config.url + "products/" + str(identifier), json=product, headers=config.headers)
 
-        return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
-                               composant_eirlab=self.composant_eirlab)
+        return render_template('stock.html', recherche_composant=self.search_component, recherche=True,
+                               composant_eirlab=self.component_eirlab)
 
-    def recherche_achat(self):
-        return render_template('stock.html', recherche_composant=self.recherche_composant, recherche=True,
-                               composant_eirlab=self.composant_eirlab)
+    def search_buy(self):
+        return render_template('stock.html', recherche_composant=self.search_component, recherche=True,
+                               composant_eirlab=self.component_eirlab)
 
-    def recherche_add(self):
+    def search_add(self):
         self.list_add = {}
 
-        status = self.fournisseurs.rfid.initialize()
+        status = self.suppliers.rfid.initialize()
         if status is False:
             return render_template(template_name_or_list='stock.html',
                                    arrivage_error='Connectez le lecteur RFID et réessayez')
-        self.fournisseur = request.form['add_fournisseur']
+        self.supplier = request.form['add_fournisseur']
         self.warehouse = request.form['warehouse']
         self.warehouse = self.warehouse.split('-')[2]
-        self.actual_n_serie = self.fournisseurs.rfid.read_serie()
+        self.actual_n_serie = self.suppliers.rfid.read_serie()
 
         users = requests.get(config.url + config.url_user, headers=config.headers).text
         users = json.loads(users)
@@ -111,7 +120,6 @@ class Stock:
         member = requests.get(config.url + config.url_member, headers=config.headers).text
         member = json.loads(member)
         lock = True
-        job = ""
         for member in member:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == self.actual_n_serie:
@@ -129,13 +137,14 @@ class Stock:
                         break
                 break
         if not lock:
+            ref = ""
             quantite = ""
             if request.method == 'POST':
                 try:
                     quantite = request.form['add_qte']  # get current quantity of this reference
                 except KeyError:
                     pass
-                ref = self.recherche_reference  # get current ref with form
+                ref = self.search_reference  # get current ref with form
             if quantite == "":
                 quantite = "1"
             try:
@@ -150,19 +159,19 @@ class Stock:
                         self.list_add[ref]['quantite'] = quantite
             except KeyError:
                 self.list_add[ref] = {"ref": ref, "quantite": quantite}
-            return self.arrivage_confirm()
+            return self.arrival_confirm()
 
-    def arrivage(self):
-        status = self.fournisseurs.rfid.initialize()
+    def arrival(self):
+        status = self.suppliers.rfid.initialize()
         if status is False:
             return render_template(template_name_or_list='stock.html',
                                    arrivage_error='Connectez le lecteur RFID et réessayez')
-        self.fournisseur = None
+        self.supplier = None
         self.fabmanager = None
         self.job = ""
         self.list_add = {}
         self.actual_n_serie = ""
-        self.actual_n_serie = self.fournisseurs.rfid.read_serie()
+        self.actual_n_serie = self.suppliers.rfid.read_serie()
 
         users = requests.get(config.url + config.url_user, headers=config.headers).text
         users = json.loads(users)
@@ -170,7 +179,6 @@ class Stock:
         member = requests.get(config.url + config.url_member, headers=config.headers).text
         member = json.loads(member)
         lock = True
-        job = ""
         for member in member:
             if member["array_options"] is not None and member["array_options"] != []:
                 if member["array_options"]["options_nserie"] == self.actual_n_serie:
@@ -198,8 +206,8 @@ class Stock:
         else:
             return render_template('stock.html', arrivage_error="Vous n'êtes pas autorisé à accéder à cette page")
 
-    def arrivage_fournisseur(self):
-        self.fournisseur = request.form['fournisseur']
+    def arrival_supplier(self):
+        self.supplier = request.form['fournisseur']
         self.warehouse = request.form['warehouse']
         self.warehouse = self.warehouse.split('-')[2]
         barcode.running_virtual_keyboard = True
@@ -207,10 +215,11 @@ class Stock:
         threading.Thread(target=barcode.read_virtual_barcode).start()
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
-            return render_template('stock.html', fournisseur=data[self.fournisseur], arrivage_recherche=True)
+            return render_template('stock.html', fournisseur=data[self.supplier], arrivage_recherche=True)
 
-    def arrivage_add(self):
+    def arrival_add(self):
         quantite = ""
+        ref = ""
         if request.method == 'POST':
             try:
                 quantite = request.form['arrivage_qte']  # get current quantity of this reference
@@ -233,39 +242,33 @@ class Stock:
             if int(quantite) <= 0:
                 with open('/opt/wolf/fournisseurs.json', 'r') as f:
                     data = json.load(f)
-                    return render_template('stock.html', fournisseur=data[self.fournisseur],
+                    return render_template('stock.html', fournisseur=data[self.supplier],
                                            arrivage_composants=self.list_add, arrivage_error="Quantité invalide",
                                            arrivage_recherche=True)
             self.list_add[ref] = {"ref": ref, "quantite": quantite}
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
-            return render_template('stock.html', fournisseur=data[self.fournisseur], arrivage_composants=self.list_add,
+            return render_template('stock.html', fournisseur=data[self.supplier], arrivage_composants=self.list_add,
                                    arrivage_recherche=True)
 
-    def arrivage_remove(self):
-        ref = None
-        print("list_add", self.list_add)
+    def arrival_remove(self):
         if request.method == 'POST':
-            # try:
             ref = request.form['composant']
-            # except KeyError:
-            #     pass
             if ref is not None:
                 del self.list_add[ref]
         with open('/opt/wolf/fournisseurs.json', 'r') as f:
             data = json.load(f)
-            print("list_add", self.list_add)
-            return render_template('stock.html', fournisseur=data[self.fournisseur], arrivage_composants=self.list_add,
+            return render_template('stock.html', fournisseur=data[self.supplier], arrivage_composants=self.list_add,
                                    arrivage_recherche=True)
 
     def thread_search(self, ref):
         global products
         try:
-            products[ref]["product"] = getattr(self.fournisseurs, self.fournisseur)(ref)[self.fournisseur]
+            products[ref]["product"] = getattr(self.suppliers, self.supplier)(ref)[self.supplier]
         except TypeError:
             pass
 
-    def arrivage_confirm(self):
+    def arrival_confirm(self):
         global products
         barcode.running_virtual_keyboard = False
         products = self.list_add
@@ -284,7 +287,7 @@ class Stock:
             try:
                 if products[composant]["product"] is not None:
                     ref = products[composant]["product"]["ref"]
-                    status, item, warehouse = self.fournisseurs.find_dolibarr(ref)
+                    status, item, warehouse = self.suppliers.find_dolibarr(ref)
                     try:
                         packaging = int(products[composant]["product"]["packaging"])
                     except ValueError:
@@ -304,17 +307,16 @@ class Stock:
                     except AttributeError:
                         price = products[composant]["product"]["price"]
 
+                    identifier = 0
                     if item is not None:
-                        id = item['id']
-                        four = item['accountancy_code_buy_intra']
+                        identifier = item['id']
 
                     if status:
                         # the product already exist in dolibarr, just update dolibarr with stockmovement
-                        stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse), "qty": qty,
+                        stockmovement = {"product_id": identifier, "warehouse_id": str(self.warehouse), "qty": qty,
                                          "price": price}
                         if common.PUB:
-                            status = requests.post(config.url + "stockmovements", json=stockmovement,
-                                                   headers=config.headers)
+                            requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
                             products_add[composant] = products[composant]
                     else:
                         # the product doesn't exist in dolibarr, create it and update dolibarr with stockmovement
@@ -340,7 +342,7 @@ class Stock:
                                    'height_units': '-3', 'surface': None, 'surface_units': '-6', 'volume': None,
                                    'volume_units': '-9', 'net_measure': None, 'net_measure_units': None,
                                    'accountancy_code_sell': '', 'accountancy_code_sell_intra': '',
-                                   'accountancy_code_sell_export': '', 'accountancy_code_buy_intra': self.fournisseur,
+                                   'accountancy_code_sell_export': '', 'accountancy_code_buy_intra': self.supplier,
                                    'accountancy_code_buy_export': '', 'date_creation': None, 'date_modification': None,
                                    'stock_warehouse': [], 'fk_default_warehouse': str(self.warehouse),
                                    'fk_price_expression': None, 'fk_unit': None, 'price_autogen': '0',
@@ -355,11 +357,10 @@ class Stock:
                         if common.PUB:
                             status = requests.post(config.url + "products", json=content, headers=config.headers)
                             if status.status_code == 200:
-                                id = status.json()
-                                stockmovement = {"product_id": id, "warehouse_id": str(self.warehouse), "qty": qty,
-                                                 "price": price}
-                                status = requests.post(config.url + "stockmovements", json=stockmovement,
-                                                       headers=config.headers)
+                                identifier = status.json()
+                                stockmovement = {"product_id": identifier, "warehouse_id": str(self.warehouse),
+                                                 "qty": qty, "price": price}
+                                requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
                                 products_add[composant] = products[composant]
                             else:
                                 products[composant]["status"] = "Erreur Dolibarr"
@@ -377,7 +378,3 @@ class Stock:
 
         return render_template('stock.html', arrivage_confirm=True, products_add=products_add,
                                products_error=products_error)
-
-    def arrivage_end(self):
-        barcode.running_virtual_keyboard = False
-        return render_template('stock.html')
