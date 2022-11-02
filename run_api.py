@@ -1,10 +1,7 @@
 """
 This file is the entry point of flask api. Launch python3 ronoco_vm/run.py to run flask server
 """
-import logging
 import os
-import time
-from logging import FileHandler
 
 from flask import Flask
 from flask_cors import CORS
@@ -26,7 +23,7 @@ class RunAPI:
         socketio = SocketIO(self.app, logger=False, cors_allowed_origins='*')
         self.setup_app()
         # self.socketio.run(host='0.0.0.0', port=8000, debug=True)
-        socketio.run(self.app, host="0.0.0.0", debug=False)
+        socketio.run(self.app, host="0.0.0.0", debug=True)
 
     def create_app(self, test_config=None):
         """
@@ -36,11 +33,10 @@ class RunAPI:
         """
         # create and configure the app
         self.app = Flask(__name__, instance_relative_config=True)
-        self.app.config.from_mapping(
-            SECRET_KEY='dev',
-        )
+        self.app.config.from_mapping(SECRET_KEY='dev', )
         self.app.debug = True
         self.app.wsgi_app = DebuggedApplication(self.app.wsgi_app, evalex=True)
+        self.app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static')
 
         if test_config is None:
             # load the instance config, if it exists, when not testing
@@ -76,6 +72,9 @@ class RunAPI:
 
         import emprunt
         self.app.register_blueprint(emprunt.Emprunt().bp)
+
+        import inventory
+        self.app.register_blueprint(inventory.Inventory().bp)
 
         CORS(self.app)
 

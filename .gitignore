@@ -132,3 +132,4 @@ dmypy.json
 config.py
 token.txt
 .idea/
+!/helloasso.csv
