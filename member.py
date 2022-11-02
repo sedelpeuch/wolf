@@ -2,7 +2,6 @@ import csv
 import datetime
 import json
 import time
-import traceback
 
 import requests
 import unidecode as unidecode
@@ -207,12 +206,12 @@ class Member:
                     elif member['firstname'].lower() == request.form['firstname'].lower():
                         result_search.append(member)
                 result_search = sorted(result_search, key=lambda k: k['lastname'])
-                return render_template(template_name_or_list='index.html', status="Liste des adhérents",
+                return render_template(template_name_or_list='index.html', status_list="Liste des adhérents",
                                        list_member=result_search)
 
             # sort self.data by firstname
             self.data = sorted(self.data, key=lambda k: k['lastname'])
-            return render_template(template_name_or_list='index.html', status="Liste des adhérents",
+            return render_template(template_name_or_list='index.html', status_list="Liste des adhérents",
                                    list_member=self.data)
 
     def add_helloasso(self):
@@ -256,7 +255,16 @@ class Member:
                 with open('helloasso.csv', 'r') as csv_file:
                     input = csv.reader(csv_file, delimiter=';')
                     adherents = []
-                    next(input)
+                    header = next(input)
+                    expected_header = ['Date', 'Email acheteur', 'Nom', 'Prénom', 'Status', 'Tarif', 'Montant (€)',
+                                       'Code Promo', "Url carte d'adhérent",
+                                       'Champ complémentaire 1\nNuméro de téléphone', 'Champ complémentaire 2\nEmail',
+                                       'Champ complémentaire 3\nAdresse', 'Champ complémentaire 4\nCode Postal',
+                                       'Champ complémentaire 5\nVille',
+                                       'Champ complémentaire 6\nJustificatif de tarif réduit (carte étudiant avec '
+                                       'année, certificat de scolarité, etc)']
+                    if header != expected_header:
+                        return render_template(template_name_or_list='index.html', status_file='Fichier invalide')
                     for row in input:
                         adherent = Adherent()
                         adherent.fill_basic(row)
@@ -304,29 +312,29 @@ class Member:
                                     member = {'login': adherent.login, 'address': adherent.address, 'zip': adherent.zip,
                                               'town': adherent.town, 'email': adherent.email,
                                               'phone_perso': adherent.phone, 'morphy': 'phy', 'public': '0',
-                                              'datec': time.mktime(
-                                                  datetime.datetime.strptime(adherent.datec, "%Y-%m-%d").timetuple()),
-                                              'datem': time.mktime(
-                                                  datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple()),
+                                              'datec': time.mktime(datetime.datetime.strptime(adherent.datec,
+                                                                                              "%Y-%m-%d").timetuple()),
+                                              'datem': time.mktime(datetime.datetime.strptime(adherent.datefin,
+                                                                                              "%Y-%m-%d").timetuple()),
                                               'typeid': str(adherent.fk_adherent_type),
                                               'type': 'Plein tarif' if adherent.fk_adherent_type == 3 else 'Plein '
                                                                                                            'tarif ('
                                                                                                            'sur '
                                                                                                            'facture)'
                                               if adherent.fk_adherent_type == 4 else "Etudiants en dehors de Bordeaux"
-                                                                                     " INP et demandeurs d'emploi" if
-                                              adherent.fk_adherent_type == 2 else "Etudiant ou personnel de Bordeaux "
-                                                                                  "INP",
+                                                                                                                                                             " INP et demandeurs d'emploi" if adherent.fk_adherent_type == 2 else "Etudiant ou personnel de Bordeaux "
+                                                                                                                                                                                                                                  "INP",
                                               'need_subscription': '1', 'datefin': time.mktime(
                                                 datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple()),
                                               'entity': '1', 'country_id': '1', 'country_code': 'FR',
                                               'lastname': adherent.lastname, 'firstname': adherent.firstname,
-                                              'statut': '1', 'status': '1',}
+                                              'statut': '1', 'status': '1', }
                                     result = requests.post(config.url + "members", headers=config.headers, json=member)
                                     adherent.write_csv(output)
                             except AttributeError:
                                 pass
-        return render_template(template_name_or_list='index.html', member_renew=member_renew, member_new=member_new)
+        return render_template(template_name_or_list='index.html', member_renew=member_renew, member_new=member_new,
+                               status_file='Fichier valide')
 
 
 class Adherent:
@@ -380,4 +388,3 @@ class Adherent:
                 [self.ref, "", self.lastname, self.firstname, "", self.login, "", self.fk_adherent_type, self.morphy,
                  "", self.address, self.zip, self.town, "", self.country, "", self.phone, "", self.email, "",
                  self.statut, "", "", "", self.datec, self.datefin, "", ""])
-

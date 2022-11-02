@@ -96,11 +96,11 @@
                 </div>
                 <button class="form-control btn btn-secondary" type="submit">Scanner</button>
             </form>
-            {% if status %}
+            {% if status_list %}
             <form action="/" method="GET">
                 <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
             </form>
-            <p class="font-weight-bold mt-2">{{ status }}</p>
+            <p class="font-weight-bold mt-2">{{ status_list }}</p>
             {% endif %}
 
             <!--            </div>-->
@@ -132,11 +132,11 @@
                 </div>
                 <button class="form-control btn btn-secondary" type="submit">Ajouter le fichier</button>
             </form>
-            {% if status %}
+            {% if status_file %}
             <form action="/" method="GET">
                 <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
             </form>
-            <p class="font-weight-bold mt-2">{{ status }}</p>
+            <p class="font-weight-bold mt-2">{{ status_file }}</p>
             {% endif %}
             {% if member_new or member_renew %}
             <h5 class="mt-2">Liste des nouveaux adhérents</h5>
