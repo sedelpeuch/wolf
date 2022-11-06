@@ -263,8 +263,6 @@ class Member:
                                        'Champ complémentaire 5\nVille',
                                        'Champ complémentaire 6\nJustificatif de tarif réduit (carte étudiant avec '
                                        'année, certificat de scolarité, etc)']
-                    if header != expected_header:
-                        return render_template(template_name_or_list='index.html', status_file='Fichier invalide')
                     for row in input:
                         adherent = Adherent()
                         adherent.fill_basic(row)
