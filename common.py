@@ -1,14 +1,18 @@
 import datetime
 import json
+import multiprocessing
+import time
 import traceback
 
 import requests
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 import config
 import rfid
 
 PUB = True
+LOGIN_IP = {}
+LOGIN_PROCESS = False
 
 
 def update_member(member, formation, actual_n_serie):
@@ -71,10 +75,7 @@ def process_formations(member):
     return member
 
 
-def unlock(member_type: str, rfid: rfid.Serial):
-    rfid.initialize()
-    n_serie = rfid.read_serie()
-
+def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
     users = requests.get(config.url + config.url_user, headers=config.headers).text
     users = json.loads(users)
     # remove all user with user['statut'] != 1
@@ -86,10 +87,45 @@ def unlock(member_type: str, rfid: rfid.Serial):
     member = None
     user = None
 
-    for member in members:
-        if member["array_options"] is not None and member["array_options"] != []:
-            if member["array_options"]["options_nserie"] == n_serie:
-                member = process_member(member)
+    if ip_adress is not None:
+        login = None
+        for timestamp in LOGIN_IP:
+            if LOGIN_IP[timestamp]['ip'] == ip_adress:
+                if timestamp + 15*60 > time.time():
+                    login = LOGIN_IP[timestamp]['login']
+                    break
+                else:
+                    del LOGIN_IP[timestamp]
+                    break
+        if login is not None:
+            for us in users:
+                if us['login'] == login:
+                    user = us
+                    break
+            for memb in members:
+                if user["lastname"] == memb["lastname"] and user["firstname"] == memb["firstname"]:
+                    groups = requests.get(
+                            config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                            headers=config.headers).text
+                    groups = json.loads(groups)
+                    for group in groups:
+                        if group["name"] == member_type:
+                            lock = False
+                            break
+                    member = process_member(memb)
+                    break
+            return lock, member, user, "Connecté"
+    try:
+        rfid.initialize()
+        n_serie = rfid.read_serie()
+    except AttributeError:
+        return True, None, None, "Déconnecté"
+
+
+    for memb in members:
+        if memb["array_options"] is not None and memb["array_options"] != []:
+            if memb["array_options"]["options_nserie"] == n_serie:
+                member = process_member(memb)
                 break
     for user in users:
         if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
@@ -102,7 +138,7 @@ def unlock(member_type: str, rfid: rfid.Serial):
                     lock = False
                     break
             break
-    return lock, member, user
+    return lock, member, user, "Reconnu"
 
 
 class Common:
@@ -118,6 +154,9 @@ class Common:
         self.bp.route('/formations')(self.formations)
         self.bp.route('/stock')(self.stock)
         self.bp.route('/emprunt')(self.emprunt)
+        self.bp.route('/login', methods=['POST'])(self.connexion)
+        self.bp.route('/logout')(self.deconnexion)
+
 
     def index(self):
         """
@@ -147,3 +186,23 @@ class Common:
 
     def emprunt(self):
         return render_template(template_name_or_list='emprunt.html')
+
+    def connexion(self):
+        global LOGIN_IP, LOGIN_PROCESS
+        ip_address = request.remote_addr
+        name = request.form['login']
+        password = request.form['password']
+        result = requests.get(config.url + "login?login=" + name + "&password=" + password)
+        if result.status_code == 200:
+            LOGIN_IP[time.time()] = {"ip": ip_address, "login": name}
+
+        return render_template(template_name_or_list='index.html', err="Connecté")
+
+    def deconnexion(self):
+        global LOGIN_IP, LOGIN_PROCESS
+        ip_address = request.remote_addr
+        for timestamp in LOGIN_IP:
+            if LOGIN_IP[timestamp]['ip'] == ip_address:
+                del LOGIN_IP[timestamp]
+                break
+        return render_template(template_name_or_list='index.html', err="Déconnecté")

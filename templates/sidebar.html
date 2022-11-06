@@ -68,6 +68,35 @@
             <span>Signaler un bug</span></a>
     </li>
 
+    <hr class="sidebar-divider m-0">
+
+    <li class="nav-item active">
+        <div class="nav-link">
+            <i class="fas fa-arrow-right"></i>
+            <span>Connexion à dolibarr</span>
+        </div>
+        <div class="sidebar-brand-text mx-3">
+            {% if err != "Connecté" %}
+            <form action="/login" method="POST">
+                <div class="form-group sidebar-brand-text mt-3">
+                    <label>
+                        <input class="form-control" id="login" name="login" placeholder="login" type="text">
+                    </label>
+                    <label>
+                        <input class="form-control" id="password" name="password" placeholder="password"
+                               type="password">
+                    </label>
+                    <button class="btn btn-primary btn-block" type="submit">Connexion</button>
+                </div>
+            </form>
+            {% elif err == "Connecté"%}
+            <form action="/logout" method="GET">
+                <button class="btn btn-primary btn-block" type="submit">Déconnexion</button>
+            </form>
+            {% endif %}
+        </div>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider m-0">
 

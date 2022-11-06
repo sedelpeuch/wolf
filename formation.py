@@ -55,14 +55,14 @@ class Formations:
         self.list_add = []
         self.actual_n_serie = ""
 
-        lock, member, user = common.unlock("Fabmanagers", self.rfid)
-        self.job = user["job"]
+        lock, member, user, status = common.unlock("Fabmanagers", self.rfid, request.remote_addr)
 
         if not lock:
+            self.job = user["job"]
             self.fabmanager = member
-            return render_template('formations.html', member=member, job=self.job)
+            return render_template('formations.html', member=member, job=self.job, err=status)
         else:
-            return render_template('formations.html', error="Vous n'êtes pas autorisé à accéder à cette page")
+            return render_template('formations.html', error="Vous n'êtes pas autorisé à accéder à cette page", err=status)
 
     def confirm(self):
         """
@@ -162,7 +162,7 @@ class Formations:
         fabmanager si la liaison a été effectuée, la fiche de l'adhérent est mise à jour avec la formation qu'il 
         vient d'aquérir
         """
-        lock, member, user = common.unlock("ConseilAdministration", self.rfid)
+        lock, member, user, status = common.unlock("ConseilAdministration", self.rfid, request.remote_addr)
         self.job = user["job"]
 
         if not lock:
@@ -175,7 +175,8 @@ class Formations:
         else:
             return render_template(template_name_or_list='formations.html', status='Adhérent non lié', new=True,
                                    student=self.actual_member, not_linked=True, job=self.job,
-                                   fabmanager=self.fabmanager, formation=self.formation, list_add=self.list_add)
+                                   fabmanager=self.fabmanager, formation=self.formation, list_add=self.list_add,
+                                   err=status)
 
     def list_formations(self, to_unlock=True):
 
@@ -185,7 +186,7 @@ class Formations:
         :return: formation.html avec la liste des formations disponibles
         """
         if to_unlock:
-            lock, member, user = common.unlock("Fabmanagers", self.rfid)
+            lock, member, user = common.unlock("Fabmanagers", self.rfid, request.remote_addr)
         else:
             lock = False
         if not lock:
