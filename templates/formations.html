@@ -208,6 +208,149 @@
     </div>
     {% endif %}
 
+    <div class="card shadow mb-4">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#list_formations" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Liste des formations</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="list_formations">
+            <!--            <div class="row">-->
+            <form action="/formations/list_formations" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
+            .style.visibility = 'visible';return true;">
+                <p class="mt-2 text-danger">Un <a
+                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                    d'EirLab Community est nécessaire pour débuter
+                    l'opération</p>
+
+                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                    d'EirLab
+                    Community</p>
+
+                <button class="form-control btn btn-secondary" type="submit">Scanner</button>
+            </form>
+            {% if list_formations %}
+            <form action="/formations" method="GET">
+                <h4 class="font-weight-bold mt-2 text-danger">{{ list_formations }}</h4>
+                <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
+            </form>
+            {% endif %}
+            <!--            </div>-->
+        </div>
+    </div>
+
+    {% if agenda %}
+    <div class="card shadow mb-4">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#choix" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Formations à venir </h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="choix">
+            <table cellspacing="0" class="table" id="dataTable" width="100%">
+                <thead>
+                <tr>
+                    <th>Formation</th>
+                    <th>Date - Heure</th>
+                    <th>Durée</th>
+                    <th>Formateurs</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for event in agenda %}
+                <tr>
+                    <td>
+                        {% if event.formation %}
+                        <img alt="Formation"
+                             class="img-fluid rounded-circle mt-2"
+                             src="{{ event.formation.image }}">
+                        {% else %}
+                        {{ event.label }}
+                        {% endif %}
+                    </td>
+                    <td>{{ event.datep }}</td>
+                    <td>{{ event.datef }}</td>
+                    <td>
+                        <table cellspacing="0" class="table table-borderless" id="dataTable" width="100%">
+                            {% for formateur in event.user_information %}
+                            <tr>
+                                <td>
+                                    <img alt="picture"
+                                         class="img-fluid rounded-circle"
+                                         src="{{event.user_information[formateur].image}}"
+                                         width="10%">
+                                    {{event.user_information[formateur].lastname}}
+                                    {{event.user_information[formateur].firstname}}
+                                    {% if event.userownerid == event.user_information[formateur].id %}
+                                    <i class="fas fa-hammer"></i>
+                                    {% endif %}
+                                </td>
+                                <td><p class="mt-0"
+                                       style="color: #{{event.user_information[formateur].color}}">{{event
+                                    .user_information[formateur].job}}</p></td>
+                                <td>
+                                    <form action="/formations/owner/{{event.id}}/{{formateur}}"
+                                          method="GET">
+                                        {% if event.userownerid != event.user_information[formateur].id %}
+                                        <button class="form-control btn btn-secondary" type="submit"><i
+                                                class="fas fa-hammer"></i></button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                                <td>
+                                    <form action="/formations/remove/{{event.id}}/{{formateur}}"
+                                          method="GET">
+                                        <button class="form-control btn btn-danger" type="submit"><i
+                                                class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td>
+                                    <form action="/formations/add/{{event.id}}" method="POST">
+                                        <div class="form-group">
+                                            <select class="form-control" id="formateur" name="formateur">
+                                                <option disabled selected value="">Ajouter un formateur</option>
+                                                {% for user in event.list_addable %}
+                                                <option>
+                                                    {{event.list_addable[user].id}} : {{
+                                                    event.list_addable[user].firstname }}
+                                                    {{
+                                                    event.list_addable[user].lastname
+                                                    }} - {{ event.list_addable[user].job}}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <button class="form-control btn btn-success" type="submit"><i
+                                            class="fas fa-plus"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        {% if event.ended %}
+                        <p class="mt-2 text-secondary">Formation terminée</p>
+                        {% else %}
+                        <form action="/formations/end/{{event.id}}" method="GET">
+                            <button class="form-control btn btn-secondary" type="submit">Terminer</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 <div class="container-animation-scanning">
     <div class="container-svg" id="container-svg-card-reader">
