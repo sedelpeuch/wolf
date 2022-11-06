@@ -1,4 +1,3 @@
-import copy
 import datetime
 import json
 import traceback
@@ -7,6 +6,7 @@ import requests
 from flask import Blueprint, render_template
 
 import config
+import rfid
 
 PUB = True
 
@@ -71,6 +71,40 @@ def process_formations(member):
     return member
 
 
+def unlock(member_type: str, rfid: rfid.Serial):
+    rfid.initialize()
+    n_serie = rfid.read_serie()
+
+    users = requests.get(config.url + config.url_user, headers=config.headers).text
+    users = json.loads(users)
+    # remove all user with user['statut'] != 1
+    users = [user for user in users if user['statut'] == '1']
+
+    members = requests.get(config.url + config.url_member, headers=config.headers).text
+    members = json.loads(members)
+    lock = True
+    member = None
+    user = None
+
+    for member in members:
+        if member["array_options"] is not None and member["array_options"] != []:
+            if member["array_options"]["options_nserie"] == n_serie:
+                member = process_member(member)
+                break
+    for user in users:
+        if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
+            groups = requests.get(
+                    config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
+                    headers=config.headers).text
+            groups = json.loads(groups)
+            for group in groups:
+                if group["name"] == member_type:
+                    lock = False
+                    break
+            break
+    return lock, member, user
+
+
 class Common:
     def __init__(self):
         self.bp = Blueprint('common', __name__, url_prefix='')
@@ -99,10 +133,8 @@ class Common:
         trace = traceback.format_exc()
         lastline = trace.split('\n')[-2]
         firstword = lastline.split(':')[0]
-        ticket = {'fk_soc': None, 'fk_project': None,
-                  'origin_email': 'gestion@eirlab.net', 'fk_user_create': None,
-                  'fk_user_assign': '4', 'subject': '[WOLF] - '+ firstword,
-                  'message': trace}
+        ticket = {'fk_soc': None, 'fk_project': None, 'origin_email': 'gestion@eirlab.net', 'fk_user_create': None,
+                  'fk_user_assign': '4', 'subject': '[WOLF] - ' + firstword, 'message': trace}
         if PUB:
             r = requests.post(config.url + "tickets", json=ticket, headers=config.headers)
         return render_template(template_name_or_list='500.html', error=firstword, trace=trace), 500

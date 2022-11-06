@@ -1,4 +1,8 @@
+import collections
+import datetime
 import json
+import os
+import time
 
 import requests
 import unidecode
@@ -23,6 +27,13 @@ class Formations:
         self.bp.route('/add', methods=['GET'])(self.add)
         self.bp.route('/new_link', methods=['POST'])(self.new_link)
         self.bp.route('/confirm_link', methods=['GET'])(self.confirm_link)
+
+        self.bp.route('/list_formations', methods=['GET'])(self.list_formations)
+        self.bp.route('/remove/<event_id>/<user_id>', methods=['GET'])(self.remove_user)
+        self.bp.route('/add/<event_id>', methods=['POST'])(self.add_user)
+        self.bp.route('/end/<event_id>', methods=['GET'])(self.end_formation)
+        self.bp.route('/owner/<event_id>/<user_id>', methods=['GET'])(self.owner_formation)
+
         self.formation = None
         self.fabmanager = None
         self.job = ""
@@ -34,42 +45,19 @@ class Formations:
         Débute le processus d'ajout de formations aux adhérents. Initialise le lecteur RFID et attend qu'une carte
         soit posée. Lorsqu'elle est posée la fonciton vérifie qu'il fait bien parti du groupe "Fabmanager" sur dolibarr
 
-        :return: formation.html avec les informations du fabmanager et la liste des formations qu'il peut donner si la carte est celle d'un fabmanager
+        :return: formation.html avec les informations du fabmanager et la liste des formations qu'il peut donner si 
+        la carte est celle d'un fabmanager
         :return: formation.html avec un message d'erreur sinon
         """
-        self.rfid.initialize()
         self.formation = None
         self.fabmanager = None
         self.job = ""
         self.list_add = []
         self.actual_n_serie = ""
-        n_serie = self.rfid.read_serie()
 
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
+        lock, member, user = common.unlock("Fabmanagers", self.rfid)
+        self.job = user["job"]
 
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
-        lock = True
-        job = ""
-
-        for member in member:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                self.job = user["job"]
-                for group in groups:
-                    if group["name"] == "Fabmanagers":
-                        lock = False
-                        break
-                break
         if not lock:
             self.fabmanager = member
             return render_template('formations.html', member=member, job=self.job)
@@ -95,8 +83,10 @@ class Formations:
         Initialise le lecteur RFID et attends la lecture d'une carte puis lui ajoute la formation choisie par le
         fabmanager
 
-        :return: formation.html avec la liste des adhérents ajoutés à la formation et la fiche de la dernière personne ajoutée
-        :return: formation.html avec la liste des adhérents ajoutés à la formation et un formulaire pour remplir un nom et prénom si la carte n'a pas été reconnue
+        :return: formation.html avec la liste des adhérents ajoutés à la formation et la fiche de la dernière 
+        personne ajoutée
+        :return: formation.html avec la liste des adhérents ajoutés à la formation et un formulaire pour remplir un 
+        nom et prénom si la carte n'a pas été reconnue
         """
         self.rfid.initialize()
         self.actual_n_serie = self.rfid.read_serie()
@@ -126,8 +116,10 @@ class Formations:
         """
         Récupère le nom et le prénom transmis via le formulaire et vérifie s'il est adhérent dans dolibarr
 
-        :return: formation.html avec la liste des personnes formées, la formation en cours, le fabmanager et un bouton permettant de confirmer le lien en scannant la carte d'un administrateur.
-        :return: formation.html avec la liste des personnes formées, la formation en cours, le fabmanager et un message d'erreur si le nom et le prénom ne sont pas valides.
+        :return: formation.html avec la liste des personnes formées, la formation en cours, le fabmanager et un 
+        bouton permettant de confirmer le lien en scannant la carte d'un administrateur.
+        :return: formation.html avec la liste des personnes formées, la formation en cours, le fabmanager et un 
+        message d'erreur si le nom et le prénom ne sont pas valides.
         """
         lastname = request.form['lastname']
         lastname = unidecode.unidecode(lastname)
@@ -164,37 +156,15 @@ class Formations:
         confirmation n'est accessible que si l'adhérent a été trouvé par la fonction new_link mais qu'il n'est pas
         lié à une carte RFID. Un membre du conseil d'administration est nécessaire pour confirmer la liaison.
 
-        :return: formation.html, la liste des personnes formées, la formation en cours et le fabmanager avec le message d'erreur "Adhérent non lié" si l'administrateur n'est pas trouvé
-        :return: formation.html avec "Adhérent lié", la liste des personnes formées, la formation en cours et le fabmanager si la liaison a été effectuée, la fiche de l'adhérent est mise à jour avec la formation qu'il vient d'aquérir
+        :return: formation.html, la liste des personnes formées, la formation en cours et le fabmanager avec le 
+        message d'erreur "Adhérent non lié" si l'administrateur n'est pas trouvé
+        :return: formation.html avec "Adhérent lié", la liste des personnes formées, la formation en cours et le 
+        fabmanager si la liaison a été effectuée, la fiche de l'adhérent est mise à jour avec la formation qu'il 
+        vient d'aquérir
         """
-        self.rfid.initialize()
-        n_serie = self.rfid.read_serie()
+        lock, member, user = common.unlock("ConseilAdministration", self.rfid)
+        self.job = user["job"]
 
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
-
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
-        lock = True
-
-        for member in member:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                print(groups)
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "ConseilAdministration":
-                        lock = False
-                        break
-                break
-        # put modifications
         if not lock:
             self.list_add.append(self.actual_member)
             self.actual_member = common.update_member(self.actual_member, self.formation, self.actual_n_serie)
@@ -206,3 +176,149 @@ class Formations:
             return render_template(template_name_or_list='formations.html', status='Adhérent non lié', new=True,
                                    student=self.actual_member, not_linked=True, job=self.job,
                                    fabmanager=self.fabmanager, formation=self.formation, list_add=self.list_add)
+
+    def list_formations(self, to_unlock=True):
+
+        """
+        Récupère la liste des formations disponibles dans dolibarr et les affiche dans un menu déroulant
+
+        :return: formation.html avec la liste des formations disponibles
+        """
+        if to_unlock:
+            lock, member, user = common.unlock("Fabmanagers", self.rfid)
+        else:
+            lock = False
+        if not lock:
+            agenda = requests.get(config.url + config.url_agenda, headers=config.headers)
+            agenda = json.loads(agenda.text)
+            agenda = [event for event in agenda if event["type_code"] == "FORMA"]
+            agenda = [event for event in agenda if
+                      int(event["percentage"]) < 100 or event["datep"] >= time.time() - 86400 * 7]
+
+            users = requests.get(config.url + config.url_user, headers=config.headers)
+            users = json.loads(users.text)
+            agenda = sorted(agenda, key=lambda k: k['datep'])
+            for event in agenda:
+                event["user_information"] = {}
+                duration = event["datef"] - event["datep"]
+                duration = str(datetime.timedelta(seconds=duration))
+                event["ended"] = False if int(event["percentage"]) < 100 else True
+                event['datef'] = duration[:-3]
+                event["datep"] = datetime.datetime.fromtimestamp(int(event["datep"])).strftime('%d/%m/%Y %H:%M')
+                for user_assigned in event["userassigned"]:
+                    for user in users:
+                        if user_assigned == user["id"]:
+                            event["user_information"][str(user_assigned)] = user
+                            # check if user["id"].jpg in /static/img/users
+                            if os.path.isfile("static/img/users/" + str(user["id"]) + ".jpg"):
+                                event["user_information"][str(user_assigned)]["image"] = "/static/img/users/" + user[
+                                    "id"] + ".jpg"
+                            else:
+                                event["user_information"][str(user_assigned)][
+                                    "image"] = "/static/img/users/user_anonymous.png"
+                            break
+                # sort user_information by lastname
+                event["user_information"] = collections.OrderedDict(
+                        sorted(event["user_information"].items(), key=lambda t: t[1]["lastname"]))
+
+                # put the event["user_information"] user with the same id as the event["userownerid"] first
+                if str(event["userownerid"]) in event["user_information"]:
+                    event["user_information"] = collections.OrderedDict(
+                            [(str(event["userownerid"]), event["user_information"][str(event["userownerid"])])] +
+                            sorted(event["user_information"].items(), key=lambda t: t[0] != str(event["userownerid"])))
+
+                event['formation'] = {}
+                if event["note_private"] != '':
+                    with open('/opt/wolf/formations.json') as data_file:
+                        data = json.load(data_file)
+                        try:
+                            event['formation'] = data[event["note_private"]]
+                        except KeyError:
+                            pass
+
+                list_addable = {}
+                for user in users:
+                    if user["id"] not in event["user_information"] and user['statut'] == '1':
+                        list_addable[user["id"]] = user
+                # sort list_addable by lastname
+                list_addable = collections.OrderedDict(sorted(list_addable.items(), key=lambda t: t[1]["lastname"]))
+                event["list_addable"] = list_addable
+
+            return render_template(template_name_or_list='formations.html', list_formations="", agenda=agenda)
+        else:
+            return render_template(template_name_or_list='formations.html', list_formations="Vous n'êtes pas autorisé à"
+                                                                                            " accéder à cette page")
+
+    def remove_user(self, event_id, user_id):
+        """
+        Supprime un utilisateur d'une formation
+
+        :param id_user: id de l'utilisateur à supprimer
+        :param id_event: id de la formation
+        :return: formation.html avec la liste des formations disponibles
+        """
+        event = requests.get(config.url + "agendaevents/" + event_id, headers=config.headers)
+        event = json.loads(event.text)
+        if event["userownerid"] == user_id:
+            # choose another userownerid
+            if len(event["userassigned"]) > 1:
+                for user in event["userassigned"]:
+                    if user != user_id:
+                        event["userownerid"] = user
+                        break
+        content = {"userownerid" : event["userownerid"]}
+        result = requests.put(config.url + "agendaevents/" + event_id, headers=config.headers, json=content)
+        event["userassigned"] = [user for user in event["userassigned"] if user != user_id]
+        content = {"userassigned": event["userassigned"]}
+        result = requests.put(config.url + "agendaevents/" + event_id, headers=config.headers, json=content)
+        return self.list_formations(to_unlock=False)
+
+    def add_user(self, event_id):
+        """
+        Ajoute un utilisateur à une formation
+
+        :param id_user: id de l'utilisateur à ajouter
+        :param id_event: id de la formation
+        :return: formation.html avec la liste des formations disponibles
+        """
+        event = requests.get(config.url + "agendaevents/" + event_id, headers=config.headers)
+        event = json.loads(event.text)
+        id_user = request.form["formateur"].split(":")[0]
+        user_content = {"id": id_user, "mandatory": '0', 'answer_status': '0', 'transparency': '0'}
+        event["userassigned"][str(id_user)] = user_content
+        content = {"userassigned": event["userassigned"]}
+        result = requests.put(config.url + "agendaevents/" + event_id, headers=config.headers, json=content)
+        return self.list_formations(to_unlock=False)
+
+    def end_formation(self, event_id):
+        """
+        Termine une formation
+
+        :param id_event: id de la formation
+        :return: formation.html avec la liste des formations disponibles
+        """
+        event = requests.get(config.url + "agendaevents/" + event_id, headers=config.headers)
+        event = json.loads(event.text)
+        task = requests.get(config.url + "tasks/" + event["elementid"], headers=config.headers)
+        for user in event["userassigned"]:
+            date = datetime.datetime.fromtimestamp(time.time()).strftime('%y-%m-%d %H:%M:%S')
+            spenttime = {'date': date, 'duration': event["datef"] - event["datep"], 'user_id': user}
+            result = requests.post(config.url + "tasks/" + event["elementid"] + "/addtimespent", headers=config.headers,
+                                   json=spenttime)
+        content = {"percentage": 100}
+        result = requests.put(config.url + "agendaevents/" + event_id, headers=config.headers, json=content)
+        return self.list_formations(to_unlock=False)
+
+    def owner_formation(self, event_id, user_id):
+        """
+        Retourne la liste des formations dont l'utilisateur est propriétaire
+
+        :param id_user: id de l'utilisateur
+        :return: liste des formations dont l'utilisateur est propriétaire
+        """
+        event = requests.get(config.url + "agendaevents/" + event_id, headers=config.headers)
+        event = json.loads(event.text)
+        event["userownerid"] = user_id
+        content = {"userownerid": event["userownerid"]}
+        result = requests.put(config.url + "agendaevents/" + event_id, headers=config.headers, json=content)
+        return self.list_formations(to_unlock=False)

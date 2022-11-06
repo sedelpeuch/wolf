@@ -26,5 +26,12 @@
     "image_black": "/static/img/sla_black.jpg",
     "id": "4",
     "ref": "sla"
+  },
+  "wazer": {
+    "name": "Découpeuse à jet d'eau",
+    "image": "/static/img/wazer.png",
+    "image_black": "/static/img/wazer_black.png",
+    "id": "5",
+    "ref": "wazer"
   }
 }
