@@ -118,32 +118,7 @@ class Member:
         :return: index.html avec "Adhérent lié" si la liaison a été effectuée
         """
 
-        self.rfid.initialize()
-        n_serie = self.rfid.read_serie()
-
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
-
-        members = requests.get(config.url + config.url_member, headers=config.headers).text
-        members = json.loads(members)
-        lock = True
-
-        for member in members:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "ConseilAdministration":
-                        lock = False
-                        break
-                break
+        lock, member, user, status = common.unlock("ConseilAdministration", self.rfid, request.remote_addr)
 
         if not lock:
             self.actual_member = common.update_member(self.actual_member, None, self.actual_n_serie)
@@ -161,32 +136,7 @@ class Member:
 
         :return: index.html avec la liste des adhérents
         """
-        self.rfid.initialize()
-        n_serie = self.rfid.read_serie()
-
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
-
-        members = requests.get(config.url + config.url_member, headers=config.headers).text
-        members = json.loads(members)
-        lock = True
-
-        for member in members:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "ConseilAdministration":
-                        lock = False
-                        break
-                break
+        lock, member, user, status = common.unlock("ConseilAdministration", self.rfid, request.remote_addr)
 
         if not lock:
             try:
@@ -213,35 +163,15 @@ class Member:
             self.data = sorted(self.data, key=lambda k: k['lastname'])
             return render_template(template_name_or_list='index.html', status_list="Liste des adhérents",
                                    list_member=self.data)
+        else:
+            return render_template(template_name_or_list='index.html', status_list="Non autorisé")
 
     def add_helloasso(self):
 
-        self.rfid.initialize()
-        n_serie = self.rfid.read_serie()
-
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
+        lock, member, user, status = common.unlock("ConseilAdministration", self.rfid, request.remote_addr)
 
         members = requests.get(config.url + config.url_member, headers=config.headers).text
         members = json.loads(members)
-        lock = True
-
-        for member in members:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "ConseilAdministration":
-                        lock = False
-                        break
-                break
 
         if not lock:
             if request.files['file'] != "":
@@ -302,18 +232,18 @@ class Member:
                                         subscription = {'start_date': adherent.datec, 'end_date': adherent.datefin,
                                                         'amount': 0 if adherent.fk_adherent_type == 1 else 50 if
                                                         adherent.fk_adherent_type == 2 else 100}
-                                        # requests.post(config.url + "members/" + member['id'] + "/subscriptions",
-                                        #         headers=config.headers, json=subscription)
+                                        requests.post(config.url + "members/" + member['id'] + "/subscriptions",
+                                                headers=config.headers, json=subscription)
                                         member_renew.append(adherent)
                                 if write:
                                     member_new.append(adherent)
                                     member = {'login': adherent.login, 'address': adherent.address, 'zip': adherent.zip,
                                               'town': adherent.town, 'email': adherent.email,
                                               'phone_perso': adherent.phone, 'morphy': 'phy', 'public': '0',
-                                              'datec': time.mktime(datetime.datetime.strptime(adherent.datec,
-                                                                                              "%Y-%m-%d").timetuple()),
-                                              'datem': time.mktime(datetime.datetime.strptime(adherent.datefin,
-                                                                                              "%Y-%m-%d").timetuple()),
+                                              'datec': time.mktime(
+                                                  datetime.datetime.strptime(adherent.datec, "%Y-%m-%d").timetuple()),
+                                              'datem': time.mktime(
+                                                  datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple()),
                                               'typeid': str(adherent.fk_adherent_type),
                                               'type': 'Plein tarif' if adherent.fk_adherent_type == 3 else 'Plein '
                                                                                                            'tarif ('
