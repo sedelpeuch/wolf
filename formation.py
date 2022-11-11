@@ -186,7 +186,7 @@ class Formations:
         :return: formation.html avec la liste des formations disponibles
         """
         if to_unlock:
-            lock, member, user = common.unlock("Fabmanagers", self.rfid, request.remote_addr)
+            lock, member, user, status = common.unlock("Fabmanagers", self.rfid, request.remote_addr)
         else:
             lock = False
         if not lock:
@@ -211,7 +211,7 @@ class Formations:
                         if user_assigned == user["id"]:
                             event["user_information"][str(user_assigned)] = user
                             # check if user["id"].jpg in /static/img/users
-                            if os.path.isfile("static/img/users/" + str(user["id"]) + ".jpg"):
+                            if os.path.isfile("/opt/wolf/static/img/users/" + str(user["id"]) + ".jpg"):
                                 event["user_information"][str(user_assigned)]["image"] = "/static/img/users/" + user[
                                     "id"] + ".jpg"
                             else:

@@ -23,7 +23,8 @@ def read_virtual_barcode():
             barcode_len = len(barcode)
             if barcode_len > 0:
                 for char in barcode:
-                    pyautogui.press(char, interval=0.01)
+                    with pyautogui.hold('shift'):
+                        pyautogui.press(char, interval=0.01)
                 pyautogui.press("enter")
         except serial.SerialException as error:
             logging.error("Barcode reader error: {}".format(error))
