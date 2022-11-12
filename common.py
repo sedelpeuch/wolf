@@ -1,6 +1,5 @@
 import datetime
 import json
-import socket
 import threading
 import time
 import traceback
@@ -191,20 +190,11 @@ class Common:
 
     def thread_websockect(self):
         while True:
-            ip = socket.gethostbyname(socket.gethostname())
-            someone_connected = False
-            if ip != config.IP_PUBLIC_WOLF:
-                for timestamp in LOGIN_IP:
-                    if LOGIN_IP[timestamp]['ip'] == ip:
-                        someone_connected = True
-                        self.socketio.emit('login',
-                                           {'login': LOGIN_IP[timestamp]['login'], 'ip': LOGIN_IP[timestamp]['ip']},
-                                           namespace='/login')
-                        break
-                if not someone_connected:
-                    self.socketio.emit('login', {'login': None, 'ip': None}, namespace='/login')
-            else:
-                self.socketio.emit('login', {'login': "PCMEGABOT", 'ip': ip}, namespace='/login')
+            if len(LOGIN_IP) == 0:
+                self.socketio.emit('login', {'login': None, 'ip': None}, namespace='/login')
+            for timestamp in LOGIN_IP:
+                self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'ip': LOGIN_IP[timestamp]['ip']},
+                                   namespace='/login')
             time.sleep(1)
 
     def connexion(self):
