@@ -1,6 +1,5 @@
 import datetime
 import json
-import multiprocessing
 import socket
 import threading
 import time
@@ -198,12 +197,14 @@ class Common:
                 for timestamp in LOGIN_IP:
                     if LOGIN_IP[timestamp]['ip'] == ip:
                         someone_connected = True
-                        self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login']}, namespace='/login')
+                        self.socketio.emit('login',
+                                           {'login': LOGIN_IP[timestamp]['login'], 'ip': LOGIN_IP[timestamp]['ip']},
+                                           namespace='/login')
                         break
                 if not someone_connected:
-                    self.socketio.emit('login', {'login': None}, namespace='/login')
+                    self.socketio.emit('login', {'login': None, 'ip': None}, namespace='/login')
             else:
-                self.socketio.emit('login', {'login': "PCMEGABOT"}, namespace='/login')
+                self.socketio.emit('login', {'login': "PCMEGABOT", 'ip': ip}, namespace='/login')
             time.sleep(1)
 
     def connexion(self):
