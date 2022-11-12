@@ -117,8 +117,6 @@ def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
     try:
         rfid.initialize()
         n_serie = rfid.read_serie()
-        if request.remote_addr != config.IP_PUBLIC_WOLF:
-            return True, None, None, "Déconnecté"
     except AttributeError:
         return True, None, None, "Déconnecté"
 
