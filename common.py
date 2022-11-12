@@ -197,27 +197,27 @@ class Common:
 
     def thread_websockect(self):
         while True:
-            time.sleep(2)
-            find = False
-            print("Clients")
-            print(self.client)
-            print("----------------")
-            print("Login")
-            print(LOGIN_IP)
-            print("----------------")
-            for c in self.client:
-                for timestamp in LOGIN_IP:
-                    if LOGIN_IP[timestamp]['ip'] == c:
+            time.sleep(1)
+            if self.client != {}:
+                find = False
+                print("Clients")
+                print(self.client)
+                print("----------------")
+                print("Login")
+                print(LOGIN_IP)
+                print("----------------")
+                for c in self.client:
+                    if c == '192.168.0.117':
                         find = True
-                        if c == '192.168.0.117':
-                            self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': self.client[c]},
-                                               namespace='/login')
-                        else:
+                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': self.client[c]}, namespace='/login')
+                    for timestamp in LOGIN_IP:
+                        if LOGIN_IP[timestamp]['ip'] == c:
+                            find = True
                             self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': self.client[c]},
                                                namespace='/login')
-                        break
-                if not find:
-                    self.socketio.emit('login', {'login': None, 'sid': self.client[c]}, namespace='/login')
+                            break
+                    if not find:
+                        self.socketio.emit('login', {'login': None, 'sid': self.client[c]}, namespace='/login')
 
     def connexion(self):
         ip_address = request.remote_addr
