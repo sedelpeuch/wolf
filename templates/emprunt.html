@@ -157,11 +157,11 @@
             </div>
             {% endif %}
             <div class="form-check">
-                <input checked class="form-check-input"
+                <input checked class="form-check-input scan-button"
                        data-target="#identity-adherent:not(.show), #identity-no-adherent.show"
                        data-toggle="collapse"
-                       id="adherent" name="statut-adherent" type="radio"
-                       value="adherent">
+                       disabled id="adherent" name="statut-adherent"
+                       type="radio" value="adherent">
                 <label class="form-check-label" for="adherent">
                     Je suis adhérent d'EirLab Community
                 </label>
@@ -183,8 +183,9 @@
                         lecteur</p>
                     <label class="mt-2" for="date">Date de retour</label>
                     <input class="form-control" id="date" name="date" placeholder="Date de retour"
-                           required type="date" >
-                    <button class="form-control btn btn-secondary mt-2" type="submit">Scanner</button>
+                           required type="date">
+                    <button class="form-control btn btn-secondary mt-2 scan-button" disabled type="submit">Scanner
+                    </button>
                 </form>
             </div>
             <div class="form-check collapse mb-4" id="identity-no-adherent">
@@ -276,12 +277,14 @@
             <div class="form-check mb-4">
                 {% if confirmed_product and confirmed_identity %}
                 <form action="/emprunt/confirm" method="GET">
-                    <p class="mt-2 text-danger">Un <a
-                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
-                    </a>d'EirLab Community est nécessaire pour débuter l'opération</p>
-                    <p class="mt-2"> Appuyez sur le bouton débuter un inventaire et posez la carte d'un <a
-                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
-                    </a> d'EirLab Community</p>
+                    <div class="fabmanager">
+                        <p class="mt-2 text-danger">Un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
+                        </a>d'EirLab Community est nécessaire pour débuter l'opération</p>
+                        <p class="mt-2"> Appuyez sur le bouton débuter un inventaire et posez la carte d'un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
+                        </a> d'EirLab Community</p>
+                    </div>
                     <button class="form-control btn btn-secondary mt-2" type="submit">Confirmer l'emprunt</button>
                 </form>
                 {% if error %}
@@ -315,11 +318,11 @@
                 <div class="col m-2">
                     <h4 class="font-weight-bold text-secondary mt-2">Retourner ses emprunts</h4>
                     <div class="form-check">
-                        <input checked class="form-check-input"
+                        <input checked class="form-check-input scan-button"
                                data-target="#identity-adherent-2:not(.show), #identity-no-adherent-2.show"
                                data-toggle="collapse"
-                               id="adherent-2" name="statut-adherent" type="radio"
-                               value="adherent">
+                               disabled id="adherent-2" name="statut-adherent"
+                               type="radio" value="adherent">
                         <label class="form-check-label" for="adherent-2">
                             Je suis adhérent d'EirLab Community
                         </label>
@@ -338,7 +341,9 @@
                             carte sur le
                             lecteur</p>
                         <form action="/emprunt/see/identity" method="GET">
-                            <button class="form-control btn btn-secondary mt-2" type="submit">Scanner</button>
+                            <button class="form-control btn btn-secondary mt-2 scan-button" disabled type="submit">
+                                Scanner
+                            </button>
                         </form>
                         {% if no_emprunt %}
                         <div class="alert alert-danger mt-2" role="alert">
@@ -370,18 +375,20 @@
                     <form action="/emprunt/see/all" method="GET"
                           onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                        <p class="mt-2 text-danger">Un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
-                        </a>
-                            d'EirLab Community est nécessaire pour débuter
-                            l'opération</p>
+                        <div class="fabmanager">
+                            <p class="mt-2 text-danger">Un <a
+                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
+                            </a>
+                                d'EirLab Community est nécessaire pour débuter
+                                l'opération</p>
 
-                        <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
-                        </a>
-                            d'EirLab
-                            Community</p>
-                        <button class="form-control btn btn-secondary" type="submit"> Scanner
+                            <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur
+                            </a>
+                                d'EirLab
+                                Community</p>
+                        </div>
+                        <button class="form-control btn btn-secondary" type="submit"> Lister
                         </button>
                     </form>
                     {% if error %}

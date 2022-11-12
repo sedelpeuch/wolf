@@ -15,17 +15,21 @@
             <!--            <div class="row">-->
             <form action="/formations/start" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                <p class="mt-2 text-danger">Un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                    d'EirLab Community est nécessaire pour débuter
-                    l'opération</p>
+                <p class="mt-2">
+                    Enregistrer le suivi d'une formation machine par un adhérent
+                </p>
+                <div class="fabmanager">
+                    <p class="mt-2 text-danger">Un <a
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                        d'EirLab Community est nécessaire pour débuter
+                        l'opération</p>
 
-                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                    d'EirLab
-                    Community</p>
-
-                <button class="form-control btn btn-secondary" type="submit">Scanner</button>
+                    <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                        d'EirLab
+                        Community</p>
+                </div>
+                <button class="form-control btn btn-secondary scan-button" type="submit" disabled>Scanner</button>
                 {% if error %}
                 <h4 class="font-weight-bold mt-2 text-danger">{{ error }}</h4>
                 {% endif %}
@@ -217,17 +221,20 @@
             <!--            <div class="row">-->
             <form action="/formations/list_formations" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                <p class="mt-2 text-danger">Un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                    d'EirLab Community est nécessaire pour débuter
-                    l'opération</p>
+                <p class="mt-2"> Inscription des fabmanagers en tant que formateur aux sessions de formations </p>
+                <div class="fabmanager">
+                    <p class="mt-2 text-danger">Un <a
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                        d'EirLab Community est nécessaire pour débuter
+                        l'opération</p>
 
-                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                    d'EirLab
-                    Community</p>
+                    <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                        d'EirLab
+                        Community</p>
+                </div>
 
-                <button class="form-control btn btn-secondary" type="submit">Scanner</button>
+                <button class="form-control btn btn-secondary" type="submit">Débuter</button>
             </form>
             {% if list_formations %}
             <form action="/formations" method="GET">
@@ -405,5 +412,6 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 

@@ -202,7 +202,9 @@ class Common:
                         break
                 if not someone_connected:
                     self.socketio.emit('login', {'login': None}, namespace='/login')
-                time.sleep(1)
+            else:
+                self.socketio.emit('login', {'login': "PCMEGABOT"}, namespace='/login')
+            time.sleep(1)
 
     def connexion(self):
         global LOGIN_IP, LOGIN_PROCESS

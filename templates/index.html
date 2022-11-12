@@ -23,6 +23,8 @@
                     professionnelle</a>
                 <a class="list-group-item list-group-item-action" href="/formations">Ajouter de nouvelles formations
                     à un adhérent</a>
+                <a class="list-group-item list-group-item-action" href="/formations">S'inscrire en tant que
+                    formateur à une formation</a>
                 <a class="list-group-item list-group-item-action" href="/stock">Consulter le stock d'EirLab</a>
                 <a class="list-group-item list-group-item-action" href="/stock">Signaler une rupture de composant</a>
                 <a class="list-group-item list-group-item-action" href="/stock">Faire une demande d'achat</a>
@@ -49,9 +51,9 @@
             <!--            <div class="row">-->
             <form action="/member/scan" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                <p class="font-italic mt-2" id="animate">Appuyez sur le bouton scanner puis poser votre carte sur le
+                <p class="mt-2" id="animate">Appuyez sur le bouton scanner puis poser votre carte sur le
                     lecteur</p>
-                <button class="form-control btn btn-secondary" type="submit">Scanner</button>
+                <button class="form-control btn btn-secondary scan-button" disabled type="submit">Scanner</button>
             </form>
             {% if status %}
             <form action="/" method="GET">
@@ -63,7 +65,7 @@
             <!--            </div>-->
         </div>
     </div>
-        {% if not status %}
+    {% if not status %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#list_all" role="button">
@@ -73,18 +75,21 @@
             <!--            <div class="row">-->
             <form action="/member/list" method="POST" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                <p class="mt-2 text-danger">Un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
-                    d'EirLab Community est nécessaire pour débuter
-                    l'opération</p>
-
-                <p class="mt-2"> Remplissez (ou non) le nom et/ou prénom de la personne recherché, appuyez sur le
-                    bouton scanner et posez la
-                    carte
-                    d'un <a
+                <p class="mt-2">Lister tous les adhérents ou trouver un adhérent par son nom / prénom</p>
+                <div class="fabmanager">
+                    <p class="mt-2 text-danger">Un <a
                             href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
-                    d'EirLab
-                    Community</p>
+                        d'EirLab Community est nécessaire pour débuter
+                        l'opération</p>
+
+                    <p class="mt-2"> Remplissez (ou non) le nom et/ou prénom de la personne recherché, appuyez sur le
+                        bouton scanner et posez la
+                        carte
+                        d'un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
+                        d'EirLab
+                        Community</p>
+                </div>
                 <div class="form-group">
                     <label class="mt-2" for="lastname">Nom</label>
                     <input class="form-control" id="lastname" name="lastname" placeholder="Nom"
@@ -95,7 +100,7 @@
                     <input class="form-control" id="firstname" name="firstname" placeholder="Prénom"
                            type="text">
                 </div>
-                <button class="form-control btn btn-secondary" type="submit">Scanner</button>
+                <button class="form-control btn btn-secondary" type="submit">Lister</button>
             </form>
             {% if status_list %}
             <form action="/" method="GET">
@@ -118,14 +123,16 @@
             <form action="/member/helloasso" enctype="multipart/form-data"
                   method="POST" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                <p class="mt-2 text-danger">Un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
-                    d'EirLab Community est nécessaire pour débuter
-                    l'opération</p>
+                <div class="fabmanager">
+                    <p class="mt-2 text-danger">Un <a
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
+                        d'EirLab Community est nécessaire pour débuter
+                        l'opération</p>
 
-                <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
-                        href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
-                    d'EirLab Community</p>
+                    <p class="mt-2"> Appuyez sur le bouton scanner et posez la carte d'un <a
+                            href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">administrateur</a>
+                        d'EirLab Community</p>
+                </div>
                 <div class="form-group">
                     <label for="file">Fichier csv</label>
                     <input class="form-control" id="file" name="file" placeholder="export d'helloasso"

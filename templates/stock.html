@@ -31,7 +31,10 @@
                     </form>
                     <form action="/stock/recherche" method="GET" onsubmit="document.getElementById('container-svg-scanning')
                     .style.visibility = 'visible';return true;">
-                        <button class="form-control btn btn-secondary" type="submit">Scanner un code barre</button>
+                        <button class="form-control btn btn-secondary scan-button" disabled type="submit">Scanner un
+                            code
+                            barre
+                        </button>
                     </form>
                     {% if unknow_composant %}
                     <div class="alert alert-danger" role="alert">
@@ -47,18 +50,20 @@
 
                     <form action="/stock/arrivage" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                        <button class="form-control btn btn-secondary" type="submit">Débuter un arrivage
+                        <button class="form-control btn btn-secondary scan-button" disabled type="submit">Débuter un
+                            arrivage
                         </button>
+                        <div class="fabmanager">
+                            <p class="mt-2 text-danger">Un <a
+                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                                d'EirLab Community est nécessaire pour débuter
+                                l'opération</p>
 
-                        <p class="mt-2 text-danger">Un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab Community est nécessaire pour débuter
-                            l'opération</p>
-
-                        <p class="mt-2"> Appuyez sur le bouton débuter un arrivage et posez la carte d'un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab
-                            Community</p>
+                            <p class="mt-2"> Appuyez sur le bouton débuter un arrivage et posez la carte d'un <a
+                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                                d'EirLab
+                                Community</p>
+                        </div>
                     </form>
                     {% if fournisseur %}
                     <form action="/stock/arrivage/end" method="GET">
@@ -74,18 +79,20 @@
                     <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
 
                     <form action="/inventory/" method="GET">
-                        <button class="form-control btn btn-secondary" type="submit">Débuter un inventaire
+                        <button class="form-control btn btn-secondary scan-button" disabled type="submit">Débuter un
+                            inventaire
                         </button>
+                        <div class="fabmanager">
+                            <p class="mt-2 text-danger">Un <a
+                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                                d'EirLab Community est nécessaire pour débuter
+                                l'opération</p>
 
-                        <p class="mt-2 text-danger">Un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab Community est nécessaire pour débuter
-                            l'opération</p>
-
-                        <p class="mt-2"> Appuyez sur le bouton débuter un inventaire et posez la carte d'un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab
-                            Community</p>
+                            <p class="mt-2"> Appuyez sur le bouton débuter un inventaire et posez la carte d'un <a
+                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                                d'EirLab
+                                Community</p>
+                        </div>
                     </form>
                     {% if inventory_error %}
                     <h4 class="font-weight-bold mt-2 text-danger"> Vous n'êtes pas autorisé à accéder à cette page </h4>
