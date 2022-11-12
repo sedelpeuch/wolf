@@ -63,6 +63,7 @@
             <!--            </div>-->
         </div>
     </div>
+        {% if not status %}
     <div class="card shadow mb-4">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#list_all" role="button">
@@ -186,6 +187,7 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
 
     {% if list_member %}
     <div class="card shadow mb-4">

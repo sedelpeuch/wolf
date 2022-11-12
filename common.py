@@ -1,6 +1,8 @@
 import datetime
 import json
 import multiprocessing
+import socket
+import threading
 import time
 import traceback
 
@@ -91,7 +93,7 @@ def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
         login = None
         for timestamp in LOGIN_IP:
             if LOGIN_IP[timestamp]['ip'] == ip_adress:
-                if timestamp + 15*60 > time.time():
+                if timestamp + 15 * 60 > time.time():
                     login = LOGIN_IP[timestamp]['login']
                     break
                 else:
@@ -121,7 +123,6 @@ def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
     except AttributeError:
         return True, None, None, "Déconnecté"
 
-
     for memb in members:
         if memb["array_options"] is not None and memb["array_options"] != []:
             if memb["array_options"]["options_nserie"] == n_serie:
@@ -142,7 +143,7 @@ def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
 
 
 class Common:
-    def __init__(self):
+    def __init__(self, socketio):
         self.bp = Blueprint('common', __name__, url_prefix='')
 
         self.bp.app_errorhandler(404)(self.error_404)
@@ -157,6 +158,8 @@ class Common:
         self.bp.route('/login', methods=['POST'])(self.connexion)
         self.bp.route('/logout')(self.deconnexion)
 
+        self.socketio = socketio
+        threading.Thread(target=self.thread_websockect).start()
 
     def index(self):
         """
@@ -186,6 +189,19 @@ class Common:
 
     def emprunt(self):
         return render_template(template_name_or_list='emprunt.html')
+
+    def thread_websockect(self):
+        while True:
+            someone_connected = False
+            for timestamp in LOGIN_IP:
+                ip = socket.gethostbyname(socket.gethostname())
+                if LOGIN_IP[timestamp]['ip'] == ip:
+                    someone_connected = True
+                    self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login']}, namespace='/login')
+                    break
+            if not someone_connected:
+                self.socketio.emit('login', {'login': None}, namespace='/login')
+            time.sleep(1)
 
     def connexion(self):
         global LOGIN_IP, LOGIN_PROCESS

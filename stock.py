@@ -105,37 +105,11 @@ class Stock:
     def search_add(self):
         self.list_add = {}
 
-        status = self.suppliers.rfid.initialize()
-        if status is False:
-            return render_template(template_name_or_list='stock.html',
-                                   arrivage_error='Connectez le lecteur RFID et réessayez')
         self.supplier = request.form['add_fournisseur']
         self.warehouse = request.form['warehouse']
         self.warehouse = self.warehouse.split('-')[2]
-        self.actual_n_serie = self.suppliers.rfid.read_serie()
+        lock, member, user, status = common.unlock("ConseilAdministration", self.suppliers.rfid, request.remote_addr)
 
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
-
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
-        lock = True
-        for member in member:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == self.actual_n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "Fabmanagers":
-                        lock = False
-                        break
-                break
         if not lock:
             ref = ""
             quantite = ""
@@ -170,33 +144,9 @@ class Stock:
         self.fabmanager = None
         self.job = ""
         self.list_add = {}
-        self.actual_n_serie = ""
-        self.actual_n_serie = self.suppliers.rfid.read_serie()
 
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
+        lock, member, user, status = common.unlock("ConseilAdministration", self.suppliers.rfid, request.remote_addr)
 
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
-        lock = True
-        for member in member:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == self.actual_n_serie:
-                    member = common.process_member(member)
-                    self.fabmanager = member
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                self.job = user["job"]
-                for group in groups:
-                    if group["name"] == "Fabmanagers":
-                        lock = False
-                        break
-                break
         if not lock:
             with open('/opt/wolf/fournisseurs.json', 'r') as f:
                 data = json.load(f)

@@ -129,34 +129,8 @@ class Emprunt:
                                date=self.date, today=time.strftime("%Y-%m-%d"), quantity=self.quantity)
 
     def confirm(self):
-        # create stockmovement to EMP (emprunt) and put object with json in emprunt
-        self.rfid.initialize()
-        n_serie = self.rfid.read_serie()
+        lock, member, user, status = common.unlock("ConseilAdministration", self.rfid, request.remote_addr)
 
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
-
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
-        lock = True
-
-        for member in member:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "ConseilAdministration":
-                        lock = False
-                        break
-                break
-        # put modifications
         if not lock:
             stockmovement_to_emp = {"product_id": self.item["id"], "warehouse_id": str(2), "qty": self.quantity}
             stockmovement_from_origin = {"product_id": self.item["id"], "warehouse_id": str(self.warehouse["id"]),
@@ -315,32 +289,9 @@ class Emprunt:
     def see_all(self):
         # create stockmovement to EMP (emprunt) and put object with json in emprunt
         self.identity = False
-        self.rfid.initialize()
-        n_serie = self.rfid.read_serie()
 
-        users = requests.get(config.url + config.url_user, headers=config.headers).text
-        users = json.loads(users)
+        lock, member, user, status = common.unlock("ConseilAdministration", self.rfid, request.remote_addr)
 
-        member = requests.get(config.url + config.url_member, headers=config.headers).text
-        member = json.loads(member)
-        lock = True
-
-        for member in member:
-            if member["array_options"] is not None and member["array_options"] != []:
-                if member["array_options"]["options_nserie"] == n_serie:
-                    member = common.process_member(member)
-                    break
-        for user in users:
-            if user["lastname"] == member["lastname"] and user["firstname"] == member["firstname"]:
-                groups = requests.get(
-                        config.url + "users/" + user["id"] + "/groups?sortfield=t.rowid&sortorder=ASC&limit=100",
-                        headers=config.headers).text
-                groups = json.loads(groups)
-                for group in groups:
-                    if group["name"] == "ConseilAdministration":
-                        lock = False
-                        break
-                break
         # put modifications
         if not lock:
             products = requests.get(config.url + config.url_product, headers=config.headers)

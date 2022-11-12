@@ -20,10 +20,10 @@ class RunAPI:
         """
         self.app = None
         self.create_app()
-        socketio = SocketIO(self.app, logger=False, cors_allowed_origins='*')
+        self.socketio = SocketIO(self.app, logger=False, cors_allowed_origins='*')
         self.setup_app()
         # self.socketio.run(host='0.0.0.0', port=8000, debug=True)
-        socketio.run(self.app, host="0.0.0.0", debug=True)
+        self.socketio.run(self.app, host="0.0.0.0", debug=True)
 
     def create_app(self, test_config=None):
         """
@@ -59,7 +59,7 @@ class RunAPI:
         """
 
         import common
-        self.app.register_blueprint(common.Common().bp)
+        self.app.register_blueprint(common.Common(self.socketio).bp)
 
         import member
         self.app.register_blueprint(member.Member().bp)
