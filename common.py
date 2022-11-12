@@ -192,20 +192,20 @@ class Common:
 
     def thread_websockect(self):
         while True:
+            ip = socket.gethostbyname(socket.gethostname())
             someone_connected = False
-            for timestamp in LOGIN_IP:
-                ip = socket.gethostbyname(socket.gethostname())
-                if LOGIN_IP[timestamp]['ip'] == ip:
-                    someone_connected = True
-                    self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login']}, namespace='/login')
-                    break
-            if not someone_connected:
-                self.socketio.emit('login', {'login': None}, namespace='/login')
-            time.sleep(1)
+            if ip != config.IP_PUBLIC_WOLF:
+                for timestamp in LOGIN_IP:
+                    if LOGIN_IP[timestamp]['ip'] == ip:
+                        someone_connected = True
+                        self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login']}, namespace='/login')
+                        break
+                if not someone_connected:
+                    self.socketio.emit('login', {'login': None}, namespace='/login')
+                time.sleep(1)
 
     def connexion(self):
         global LOGIN_IP, LOGIN_PROCESS
-        ip_address = request.remote_addr
         name = request.form['login']
         password = request.form['password']
         result = requests.get(config.url + "login?login=" + name + "&password=" + password)
