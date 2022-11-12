@@ -113,8 +113,7 @@
 
 <script src="/static/socket.io/socket.io.js"></script>
 <script>
-    var socket = io.connect('http://' + document.domain + ':' + location.port + "/login");
-    console.log(document.domain);
+
     if (document.domain === "127.0.1.1") {
         var fabamanager = document.getElementsByClassName("fabmanager")
         for (var i = 0; i < fabamanager.length; i++) {
@@ -124,19 +123,31 @@
         for (var i = 0; i < scanbutton.length; i++) {
             scanbutton[i].disabled = false;
         }
+    } else {
+        var connect = io.connect('http://' + document.domain + ':' + location.port)
+        var socket = io.connect('http://' + document.domain + ':' + location.port + '/login');
+        connect.on('connect', function () {
+            console.log("Connected")
+        });
+
+        socket.on('connect', function () {
+            console.log("Connected");
+            console.log(socket.id)
+            socket.emit('new_client', {data: socket.id});
+        });
+
+        socket.on('login', function (msg) {
+            console.log(msg);
+            if (msg['sid'] === socket.id) {
+                if (msg['login'] !== null) {
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("logout").style.display = "block";
+                    document.getElementById("log_name").innerHTML = "Connecté en tant que " + msg['login'];
+                } else {
+                    document.getElementById("login").style.display = "block";
+                    document.getElementById("logout").style.display = "none";
+                }
+            }
+        })
     }
-    socket.on('connect', function () {
-        console.log("Connected");
-    });
-    socket.on('login', function (msg) {
-        console.log(msg);
-        if (msg['ip'] === document.domain && document.domain !== "127.0.1.1") {
-            document.getElementById("login").style.display = "none";
-            document.getElementById("logout").style.display = "block";
-            document.getElementById("log_name").innerHTML = "Connecté en tant que " + msg['login'];
-        } else{
-            document.getElementById("login").style.display = "block";
-            document.getElementById("logout").style.display = "none";
-        }
-    });
 </script>

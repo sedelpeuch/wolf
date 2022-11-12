@@ -13,6 +13,7 @@ import rfid
 PUB = True
 LOGIN_IP = {}
 LOGIN_PROCESS = False
+client = {}
 
 
 def update_member(member, formation, actual_n_serie):
@@ -142,6 +143,7 @@ def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
 
 class Common:
     def __init__(self, socketio):
+        global socketio_instance
         self.bp = Blueprint('common', __name__, url_prefix='')
 
         self.bp.app_errorhandler(404)(self.error_404)
@@ -155,9 +157,15 @@ class Common:
         self.bp.route('/emprunt')(self.emprunt)
         self.bp.route('/login', methods=['POST'])(self.connexion)
         self.bp.route('/logout')(self.deconnexion)
+        self.login_ip = {}
 
         self.socketio = socketio
+        self.socketio.on_event('new_client', self.new_client, namespace='/login')
         threading.Thread(target=self.thread_websockect).start()
+
+    def new_client(self, msg):
+        global client
+        client[request.remote_addr] = msg['data']
 
     def index(self):
         """
@@ -189,30 +197,35 @@ class Common:
         return render_template(template_name_or_list='emprunt.html')
 
     def thread_websockect(self):
+        global client
         while True:
-            if len(LOGIN_IP) == 0:
-                self.socketio.emit('login', {'login': None, 'ip': None}, namespace='/login')
-            for timestamp in LOGIN_IP:
-                self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'ip': LOGIN_IP[timestamp]['ip']},
-                                   namespace='/login')
+            find = False
+            for c in client:
+                for timestamp in self.login_ip:
+                    if self.login_ip[timestamp]['ip'] == c:
+                        find = True
+                        self.socketio.emit('login', {'login': self.login_ip[timestamp]['login'], 'sid': client[c]},
+                                           namespace='/login')
+                        break
+                if not find:
+                    self.socketio.emit('login', {'login': None, 'sid': client[c]}, namespace='/login')
             time.sleep(1)
 
     def connexion(self):
-        global LOGIN_IP, LOGIN_PROCESS
+        global LOGIN_PROCESS
         ip_address = request.remote_addr
         name = request.form['login']
         password = request.form['password']
         result = requests.get(config.url + "login?login=" + name + "&password=" + password)
         if result.status_code == 200:
-            LOGIN_IP[time.time()] = {"ip": ip_address, "login": name}
+            self.login_ip[time.time()] = {"ip": ip_address, "login": name}
 
         return render_template(template_name_or_list='index.html', err="Connecté")
 
     def deconnexion(self):
-        global LOGIN_IP, LOGIN_PROCESS
         ip_address = request.remote_addr
-        for timestamp in LOGIN_IP:
-            if LOGIN_IP[timestamp]['ip'] == ip_address:
-                del LOGIN_IP[timestamp]
+        for timestamp in self.login_ip:
+            if self.login_ip[timestamp]['ip'] == ip_address:
+                del self.login_ip[timestamp]
                 break
         return render_template(template_name_or_list='index.html', err="Déconnecté")
