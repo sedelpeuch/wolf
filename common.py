@@ -165,6 +165,7 @@ class Common:
 
     def new_client(self, msg):
         global client
+        print(request.remote_addr)
         client[request.remote_addr] = msg['data']
 
     def index(self):
@@ -204,8 +205,11 @@ class Common:
                 for timestamp in self.login_ip:
                     if self.login_ip[timestamp]['ip'] == c:
                         find = True
-                        self.socketio.emit('login', {'login': self.login_ip[timestamp]['login'], 'sid': client[c]},
-                                           namespace='/login')
+                        if c == '192.168.0.117':
+                            self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': client[c]}, namespace='/login')
+                        else:
+                            self.socketio.emit('login', {'login': self.login_ip[timestamp]['login'], 'sid': client[c]},
+                                               namespace='/login')
                         break
                 if not find:
                     self.socketio.emit('login', {'login': None, 'sid': client[c]}, namespace='/login')
