@@ -206,6 +206,7 @@ class Common:
 
     def connexion(self):
         global LOGIN_IP, LOGIN_PROCESS
+        ip_address = request.remote_addr
         name = request.form['login']
         password = request.form['password']
         result = requests.get(config.url + "login?login=" + name + "&password=" + password)
