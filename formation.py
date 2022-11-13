@@ -302,7 +302,7 @@ class Formations:
         event = json.loads(event.text)
         task = requests.get(config.url + "tasks/" + event["elementid"], headers=config.headers)
         for user in event["userassigned"]:
-            date = datetime.datetime.fromtimestamp(time.time()).strftime('%y-%m-%d %H:%M:%S')
+            date = datetime.datetime.fromtimestamp(event["datep"]).strftime('%Y-%m-%d %H:%M:%S')
             spenttime = {'date': date, 'duration': event["datef"] - event["datep"], 'user_id': user}
             result = requests.post(config.url + "tasks/" + event["elementid"] + "/addtimespent", headers=config.headers,
                                    json=spenttime)

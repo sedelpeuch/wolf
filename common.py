@@ -198,12 +198,6 @@ class Common:
             time.sleep(1)
             if self.client != {}:
                 find = False
-                print("Clients")
-                print(self.client)
-                print("----------------")
-                print("Login")
-                print(LOGIN_IP)
-                print("----------------")
                 for c in self.client:
                     if c == '192.168.0.117':
                         find = True

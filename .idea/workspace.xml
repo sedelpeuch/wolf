@@ -4,17 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="fix(member): Correction de l'ajout des personnes dans hello asso">
+    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="fix(login): fix du multi instance">
       <change afterPath="$PROJECT_DIR$/inventory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/wolf.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wolf.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emprunt.py" beforeDir="false" afterPath="$PROJECT_DIR$/emprunt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/formation.py" beforeDir="false" afterPath="$PROJECT_DIR$/formation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sidebar.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -298,14 +293,8 @@
       <workItem from="1668204940134" duration="4234000" />
       <workItem from="1668247628150" duration="259000" />
       <workItem from="1668247913456" duration="91000" />
-      <workItem from="1668248031200" duration="62000" />
-    </task>
-    <task id="LOCAL-00001" summary="✨feat(esp32): add serializer json">
-      <created>1657961977289</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1657961977289</updated>
+      <workItem from="1668248031200" duration="19800000" />
+      <workItem from="1668342106097" duration="3215000" />
     </task>
     <task id="LOCAL-00002" summary="🔥 remove(idea)">
       <created>1659526379036</created>
@@ -559,7 +548,98 @@
       <option name="project" value="LOCAL" />
       <updated>1668186267034</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="feat(wolf): Mise à jour du système de connexion dolibarr">
+      <created>1668248187061</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1668248187061</updated>
+    </task>
+    <task id="LOCAL-00039" summary="feat(wolf): Ajout du lancement automatique pc public">
+      <created>1668249159681</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1668249159681</updated>
+    </task>
+    <task id="LOCAL-00040" summary="fix(login): Fix missing variable">
+      <created>1668249781010</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1668249781010</updated>
+    </task>
+    <task id="LOCAL-00041" summary="feat(login): Amélioration des html pour gérer la connexion / deconnexion / PC public">
+      <created>1668252158091</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1668252158091</updated>
+    </task>
+    <task id="LOCAL-00042" summary="fix(login): fix du multi instance">
+      <created>1668258441044</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1668258441044</updated>
+    </task>
+    <task id="LOCAL-00043" summary="fix(login): fix du multi instance">
+      <created>1668260014424</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1668260014424</updated>
+    </task>
+    <task id="LOCAL-00044" summary="fix(login): fix du multi instance">
+      <created>1668271013037</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1668271013037</updated>
+    </task>
+    <task id="LOCAL-00045" summary="fix(login): fix du multi instance">
+      <created>1668272530497</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1668272530497</updated>
+    </task>
+    <task id="LOCAL-00046" summary="fix(login): fix du multi instance">
+      <created>1668273180972</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1668273180972</updated>
+    </task>
+    <task id="LOCAL-00047" summary="fix(login): fix du multi instance">
+      <created>1668273848499</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1668273848499</updated>
+    </task>
+    <task id="LOCAL-00048" summary="fix(login): fix du multi instance">
+      <created>1668274012000</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1668274012000</updated>
+    </task>
+    <task id="LOCAL-00049" summary="fix(login): fix du multi instance">
+      <created>1668274136518</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1668274136518</updated>
+    </task>
+    <task id="LOCAL-00050" summary="fix(login): fix du multi instance">
+      <created>1668275787967</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1668275787968</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -580,11 +660,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/.." />
     </ignored-roots>
-    <MESSAGE value=" documentation(formation): add documentation of module stock" />
-    <MESSAGE value="✨ feat(fournissseur): add farnell" />
-    <MESSAGE value="✨ feat(stock): ajout des ruptures et demandes d'achats" />
-    <MESSAGE value=" fix(navigation): fix collapse buttons" />
-    <MESSAGE value=" documentation(stock): add stock documentation" />
     <MESSAGE value=" documentation(stock): add stock documentation" />
     <MESSAGE value="✨ feat(fournisseur): ajout du faux fournisseur &quot;eirlab&quot; pour gérer les éléments ajoutés manuellement" />
     <MESSAGE value="✨ feat(fournisseur): ajout de la gestion du conditionnement" />
@@ -605,7 +680,12 @@
     <MESSAGE value="fix(member): remove header validation" />
     <MESSAGE value="feat(formation): Ajout du listing et de l'attribution des formations" />
     <MESSAGE value="fix(member): Correction de l'ajout des personnes dans hello asso" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(member): Correction de l'ajout des personnes dans hello asso" />
+    <MESSAGE value="feat(wolf): Mise à jour du système de connexion dolibarr" />
+    <MESSAGE value="feat(wolf): Ajout du lancement automatique pc public" />
+    <MESSAGE value="fix(login): Fix missing variable" />
+    <MESSAGE value="feat(login): Amélioration des html pour gérer la connexion / deconnexion / PC public" />
+    <MESSAGE value="fix(login): fix du multi instance" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(login): fix du multi instance" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -627,7 +707,7 @@
     <SUITE FILE_PATH="coverage/wolf$main.coverage" NAME="main Coverage Results" MODIFIED="1657460230445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$rs_parser_test.coverage" NAME="rs_parser_test Coverage Results" MODIFIED="1658170548305" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$barcode.coverage" NAME="barcode Coverage Results" MODIFIED="1662472727688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1668248071856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1668343477911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$fournisseurs.coverage" NAME="fournisseurs Coverage Results" MODIFIED="1661529415404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$test.coverage" NAME="test Coverage Results" MODIFIED="1662384011859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
