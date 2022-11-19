@@ -269,6 +269,13 @@
                                               required
                                               rows="3"></textarea>
                                 </div>
+                                <div class="form-group">
+                                    <label for="rupture_description">Quantité</label>
+                                    <input class="form-control" id="rupture_qte" name="rupture_qte"
+                                           placeholder="Quantité"
+                                           required
+                                           type="number">
+                                </div>
                                 <button class="btn btn-outline-warning" type="submit">Envoyer la demande
                                 </button>
                             </form>
@@ -574,7 +581,8 @@
                             <th scope="col">Prix</th>
                             <th scope="col">Demandé par</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Quantité réel</th>
+                            <th scope="col">Quantité réelle</th>
+                            <th scope="col">Quantité à commander</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -600,19 +608,38 @@
                             <td><i class="fas fa-check text-success"></i> <span>{{ p.stock_warehouse[p.fk_default_warehouse].real}}</span>
                             </td>
                             {% endif %}
-                            {% if p.array_options.options_command.status %}
+                            {% if p.array_options.options_command.status == "pending" %}
                             <td>
                                 <form action="/command/add/{{p.id}}" method="POST">
-                                    <button class="form-control btn border-success mt-2" type="submit">Valider</button>
+                                    <label for="quantity"></label>
+                                    <input class="form-control" id="quantity" name="quantity" type="number"
+                                           value="{{ p.array_options.options_command.quantity }}">
+                            </td>
+                            <td>
+                                <button class="form-control btn border-success mt-2" type="submit">Valider</button>
                                 </form>
                             </td>
-                            {% else %}
+                            {% elif p.array_options.options_command.status == "waiting" %}
+                            <td>{{ p.array_options.options_command.quantity }}</td>
                             <td>
                                 <form action="/command/add/{{p.id}}" method="POST">
-                                    <button class="form-control btn border-secondary mt-2" type="submit">Ajouter
+                                    <button class="form-control btn border-success mt-2 disabled font-italic"
+                                            type="submit">Validé
                                     </button>
                                 </form>
                             </td>
+                            {% else %}
+                            <form action="/command/add/{{p.id}}" method="POST">
+                                <td>
+                                    <label for="quantity"></label>
+                                    <input class="form-control" name="quantity" type="number" value="1">
+                                </td>
+                                <td>
+                                    <button class="form-control btn border-secondary mt-2" type="submit">Ajouter
+                                    </button>
+                                </td>
+                            </form>
+
                             {% endif %}
                         </tr>
                         {% endfor %}
@@ -624,6 +651,59 @@
         </div>
     </div>
     {% endif %}
+    {% endif %}
+
+    {% if generate %}
+    <div class="card shadow mb-4" id="generate">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#generate" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Liste des produits à commander</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="generate">
+            <div class="row">
+                <div class="col m-2">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Référence</th>
+                            <th scope="col">Label</th>
+                            <th scope="col">Prix</th>
+                            <th scope="col">Quantité</th>
+                            <th scope="col">Fournisseur</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for p in products %}
+                        <tr>
+                            <td>{{ p.ref }}</td>
+                            <td style="max-width: 5%">{{ p.label }}</td>
+                            <td>{{ p.cost_price }}</td>
+                            <td>{{ p.array_options.options_command.quantity }}</td>
+                            {% if p.fournisseur != {} %}
+                            {% if p.fournisseur.image != "" %}
+                            <td><img alt="logo" src="{{ p.fournisseur.image }}" width="25%"></td>
+                            {% else %}
+                            <td>{{ p.fournisseur.name }}</td>
+                            {% endif %}
+                            {% else %}
+                            <td></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                        <tr class="font-weight-bold">
+                            <td></td>
+                            <td></td>
+                            <td>{{total}}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
 
