@@ -113,42 +113,50 @@
 
 <script src="/static/socket.io/socket.io.js"></script>
 <script>
+    var DEBUG = false;
+    if (!DEBUG) {
+        var connect = io.connect('http://' + document.domain + ':' + location.port)
+        var socket = io.connect('http://' + document.domain + ':' + location.port + '/login');
+        connect.on('connect', function () {
+            console.log("Connected")
+        });
 
-    var connect = io.connect('http://' + document.domain + ':' + location.port)
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/login');
-    connect.on('connect', function () {
-        console.log("Connected")
-    });
+        socket.on('connect', function () {
+            console.log("Connected");
+            console.log(socket.id)
+            socket.emit('new_client', {data: socket.id});
+        });
 
-    socket.on('connect', function () {
-        console.log("Connected");
-        console.log(socket.id)
-        socket.emit('new_client', {data: socket.id});
-    });
-
-    socket.on('login', function (msg) {
-        console.log(msg);
-        if (msg['sid'] === socket.id) {
-            if (msg['login'] !== null) {
-                document.getElementById("login").style.display = "none";
-                document.getElementById("logout").style.display = "block";
-                document.getElementById("log_name").innerHTML = "Connecté en tant que " + msg['login'];
-            } else {
-                document.getElementById("login").style.display = "block";
-                document.getElementById("logout").style.display = "none";
-            }
-            if (msg['login'] === "PCMEGABOT") {
-                var fabamanager = document.getElementsByClassName("fabmanager")
-                for (var i = 0; i < fabamanager.length; i++) {
-                    fabamanager[i].style.display = "block";
+        socket.on('login', function (msg) {
+            console.log(msg);
+            if (msg['sid'] === socket.id) {
+                if (msg['login'] !== null) {
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("logout").style.display = "block";
+                    document.getElementById("log_name").innerHTML = "Connecté en tant que " + msg['login'];
+                } else {
+                    document.getElementById("login").style.display = "block";
+                    document.getElementById("logout").style.display = "none";
                 }
-                var scanbutton = document.getElementsByClassName("scan-button")
-                for (var i = 0; i < scanbutton.length; i++) {
-                    scanbutton[i].disabled = false;
+                if (msg['login'] === "PCMEGABOT") {
+                    var fabamanager = document.getElementsByClassName("fabmanager")
+                    for (var i = 0; i < fabamanager.length; i++) {
+                        fabamanager[i].style.display = "block";
+                    }
+                    var scanbutton = document.getElementsByClassName("scan-button")
+                    for (var i = 0; i < scanbutton.length; i++) {
+                        scanbutton[i].disabled = false;
+                    }
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("logout").style.display = "none";
                 }
-                document.getElementById("login").style.display = "none";
-                document.getElementById("logout").style.display = "none";
             }
-        }
-    });
+        });
+    }
+    if (DEBUG) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("logout").style.display = "block";
+        document.getElementById("log_name").innerHTML = "Connecté en mode debug";
+    }
+
 </script>
