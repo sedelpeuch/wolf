@@ -4,14 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="fix(login): fix du multi instance">
-      <change afterPath="$PROJECT_DIR$/inventory.py" afterDir="false" />
+    <list default="true" id="e3b05e2c-02a2-4ecb-89e4-e68dc35b8500" name="wolf-4 [FEAT] Génération de commande automatique" comment="feat(login): ajout d'un mode de développement et amélioration du login">
+      <change afterPath="$PROJECT_DIR$/command.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formation.py" beforeDir="false" afterPath="$PROJECT_DIR$/formation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sidebar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/stock.html" afterDir="false" />
     </list>
+    <list id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="fix(login): fix du multi instance" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,7 +50,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="6-feat-liste-des-formations-à-venir" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
   </component>
@@ -77,30 +80,31 @@
     <option name="showExcludedFiles" value="false" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;DefaultPlantUmlFileTemplate&quot;: &quot;UML Activity&quot;,
-    &quot;Project.color&quot;: &quot;154c20&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ToolWindowRun.ShowToolbar&quot;: &quot;false&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/sedelpeuch/.config/JetBrains/PyCharm2022.2/scratches/scratch_3.json&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;two.files.diff.last.used.file&quot;: &quot;/home/sedelpeuch/.config/JetBrains/PyCharm2022.2/scratches/scratch_3.json&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "DefaultPlantUmlFileTemplate": "UML Activity",
+    "Project.color": "154c20",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ToolWindowRun.ShowToolbar": "false",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/sedelpeuch/.config/JetBrains/PyCharm2022.2/scratches/scratch_3.json",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "tasks",
+    "tasks.open.task.update.state.enabled": "false",
+    "two.files.diff.last.used.file": "/home/sedelpeuch/.config/JetBrains/PyCharm2022.2/scratches/scratch_3.json"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JSON&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JSON"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/docs/img" />
@@ -228,12 +232,13 @@
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
+    <task id="Default" summary="Default task">
+      <branch name="main" repository="$PROJECT_DIR$" />
       <changelist id="69d42743-a013-463c-9425-a9bc88be5343" name="Changes" comment="" />
       <created>1657377896133</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1657377896133</updated>
+      <updated>1668359206303</updated>
       <workItem from="1657377902585" duration="78000" />
       <workItem from="1657380766042" duration="4943000" />
       <workItem from="1657386403832" duration="82000" />
@@ -294,35 +299,7 @@
       <workItem from="1668247628150" duration="259000" />
       <workItem from="1668247913456" duration="91000" />
       <workItem from="1668248031200" duration="19800000" />
-      <workItem from="1668342106097" duration="3215000" />
-    </task>
-    <task id="LOCAL-00002" summary="🔥 remove(idea)">
-      <created>1659526379036</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1659526379036</updated>
-    </task>
-    <task id="LOCAL-00003" summary="✨ feat(fournisseur): add conrad">
-      <created>1659526467153</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1659526467153</updated>
-    </task>
-    <task id="LOCAL-00004" summary="✨ feat(fournisseur): add multi warehouse and low level component">
-      <created>1659547785517</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1659547785517</updated>
-    </task>
-    <task id="LOCAL-00005" summary="📝 documentation(adherent): documentation update">
-      <created>1659644544833</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1659644544833</updated>
+      <workItem from="1668342106097" duration="3699000" />
     </task>
     <task id="LOCAL-00006" summary="📝 documentation(adherent): documentation update">
       <created>1659644560543</created>
@@ -639,8 +616,50 @@
       <option name="project" value="LOCAL" />
       <updated>1668275787968</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
-    <servers />
+    <task id="LOCAL-00051" summary="fix(login): fix du multi instance">
+      <created>1668358737062</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1668358737063</updated>
+    </task>
+    <task active="true" id="wolf-4" summary="[FEAT] Génération de commande automatique">
+      <branch name="main" repository="$PROJECT_DIR$" original="true" />
+      <branch name="wolf-4" repository="$PROJECT_DIR$" />
+      <changelist id="e3b05e2c-02a2-4ecb-89e4-e68dc35b8500" name="wolf-4 [FEAT] Génération de commande automatique" comment="" />
+      <created>1667411580000</created>
+      <option name="issue" value="true" />
+      <url>https://github.com/Eirlab/wolf/issues/4</url>
+      <option name="number" value="4" />
+      <option name="presentableId" value="wolf-4" />
+      <option name="project" value="wolf" />
+      <option name="type" value="BUG" />
+      <updated>1668359206303</updated>
+      <workItem from="1668359207010" duration="14807000" />
+      <workItem from="1668698924649" duration="685000" />
+      <workItem from="1668810355667" duration="12058000" />
+    </task>
+    <task id="LOCAL-00052" summary="🐛 fix(fournisseur): correction du problème d'affichage lors de la recherche d'un composant sans stock à EirLab">
+      <created>1668868041810</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1668868041811</updated>
+    </task>
+    <task id="LOCAL-00053" summary="feat(login): ajout d'un mode de développement et amélioration du login">
+      <created>1668868247164</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1668868247164</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
+    <servers>
+      <GitHub url="https://github.com">
+        <option name="repoAuthor" value="eirlab" />
+        <option name="repoName" value="wolf" />
+      </GitHub>
+    </servers>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
@@ -660,8 +679,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/.." />
     </ignored-roots>
-    <MESSAGE value=" documentation(stock): add stock documentation" />
-    <MESSAGE value="✨ feat(fournisseur): ajout du faux fournisseur &quot;eirlab&quot; pour gérer les éléments ajoutés manuellement" />
     <MESSAGE value="✨ feat(fournisseur): ajout de la gestion du conditionnement" />
     <MESSAGE value="✨ feat(fournisseur): ajout rapide à l'inventaire" />
     <MESSAGE value="✨ feat(emprunt): ajout des la fonctionnalité d'emprunt" />
@@ -685,7 +702,9 @@
     <MESSAGE value="fix(login): Fix missing variable" />
     <MESSAGE value="feat(login): Amélioration des html pour gérer la connexion / deconnexion / PC public" />
     <MESSAGE value="fix(login): fix du multi instance" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(login): fix du multi instance" />
+    <MESSAGE value=" fix(fournisseur): correction du problème d'affichage lors de la recherche d'un composant sans stock à EirLab" />
+    <MESSAGE value="feat(login): ajout d'un mode de développement et amélioration du login" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(login): ajout d'un mode de développement et amélioration du login" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -697,17 +716,12 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="traceback" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/wolf$main.coverage" NAME="main Coverage Results" MODIFIED="1657460230445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$rs_parser_test.coverage" NAME="rs_parser_test Coverage Results" MODIFIED="1658170548305" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$barcode.coverage" NAME="barcode Coverage Results" MODIFIED="1662472727688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1668343477911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wolf$run_api.coverage" NAME="run_api Coverage Results" MODIFIED="1668869064801" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$fournisseurs.coverage" NAME="fournisseurs Coverage Results" MODIFIED="1661529415404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wolf$test.coverage" NAME="test Coverage Results" MODIFIED="1662384011859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

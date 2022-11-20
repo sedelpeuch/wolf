@@ -12,7 +12,7 @@ import rfid
 
 PUB = True
 LOGIN_IP = {}
-
+DEBUG = False
 
 def update_member(member, formation, actual_n_serie):
     """
@@ -85,6 +85,14 @@ def unlock(member_type: str, rfid: rfid.Serial, ip_adress: str = None):
     lock = True
     member = None
     user = None
+
+    if DEBUG:
+        # find user with login = 'sedelpeuch'
+        user = [user for user in users if user['login'] == 'sedelpeuch'][0]
+        # find member with login = 'sedelpeuch'
+        member = [member for member in members if member['login'] == 'sedelpeuch'][0]
+        lock = False
+        return lock, member, user, "Connecté en mode debug"
 
     if ip_adress is not None:
         login = None
@@ -159,7 +167,8 @@ class Common:
 
         self.socketio = socketio
         self.socketio.on_event('new_client', self.new_client, namespace='/login')
-        threading.Thread(target=self.thread_websockect).start()
+        if not DEBUG:
+            threading.Thread(target=self.thread_websockect).start()
 
     def new_client(self, msg):
         self.client[request.remote_addr] = msg['data']

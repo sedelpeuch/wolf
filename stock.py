@@ -85,14 +85,18 @@ class Stock:
         description = request.form['rupture_description']
 
         # Add stockmovement
-        identifier = self.search_component[fournisseur]["dolibarr"]["identifier"]
+        identifier = self.search_component[fournisseur]["dolibarr"]["id"]
         warehouse = self.search_component[fournisseur]["warehouse"]
         quantity = self.search_component[fournisseur]["dolibarr"]["stock_reel"]
-        stockmovement = {"product_id": identifier, "warehouse_id": warehouse["identifier"], "qty": -int(quantity)}
+        stockmovement = {"product_id": identifier, "warehouse_id": warehouse["id"], "qty": -int(quantity)}
         requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
 
         # Update notes with identity and description
-        product = {"note_public": description, "note_private": identity}
+        #     'array_options': {
+        #       'options_command': 'Test'
+        #     },
+        content = {"status": "pending", "identity": identity, "description": description}
+        product = {"array_options": {"options_command": json.dumps(content)}}
         requests.put(config.url + "products/" + str(identifier), json=product, headers=config.headers)
 
         return render_template('stock.html', recherche_composant=self.search_component, recherche=True,
@@ -136,10 +140,6 @@ class Stock:
             return self.arrival_confirm()
 
     def arrival(self):
-        status = self.suppliers.rfid.initialize()
-        if status is False:
-            return render_template(template_name_or_list='stock.html',
-                                   arrivage_error='Connectez le lecteur RFID et réessayez')
         self.supplier = None
         self.fabmanager = None
         self.job = ""

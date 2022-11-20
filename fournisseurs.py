@@ -62,7 +62,6 @@ class Fournisseurs:
                         in_stock = requests.get(config.url + "products/" + item["id"] + "/stock",
                                                 headers=config.headers).text
                         in_stock = json.loads(in_stock)
-                        print(in_stock)
                         for stock in in_stock['stock_warehouses']:
                             if int(in_stock['stock_warehouses'][stock]['real']) > 0 and stock != '2':
                                 product[prod]['eirlab'] = True
@@ -76,14 +75,19 @@ class Fournisseurs:
                 except KeyError:
                     product[prod]['eirlab'] = False
             # if all product[prod]['eirlab'] are False, return result, product, item else return result, product, None
-            if all(product[prod]['eirlab'] == False for prod in product) and item is not None and not emp:
-                product['eirlab'] = {
-                    'fournisseur': {'name': 'EirLab', 'image': '/static/img/eirlab.png', 'id': '6', 'ref': 'eirlab'},
-                    'title': item['label'], 'price': item['cost_price'], 'links': item['url'], 'attributes': {},
-                    'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '', 'eirlab': True}
-                product['eirlab']['warehouse'] = warehouse
-                product['eirlab']['dolibarr'] = item
-                return result, product, item
+            with open('fournisseurs.json', 'r') as f:
+                data = json.load(f)
+                fournisseurs = data.keys()
+                fournisseurs = [fournisseur for fournisseur in fournisseurs if fournisseur != "eirlab"]
+                if all(product[prod]['eirlab'] == False for prod in
+                       product) and item is not None and not emp and fournisseur not in fournisseurs:
+                    product['eirlab'] = {'fournisseur': {'name': 'EirLab', 'image': '/static/img/eirlab.png', 'id': '6',
+                                                         'ref': 'eirlab'}, 'title': item['label'],
+                        'price': item['cost_price'], 'links': item['url'], 'attributes': {},
+                        'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '', 'eirlab': True}
+                    product['eirlab']['warehouse'] = warehouse
+                    product['eirlab']['dolibarr'] = item
+                    return result, product, item
             return result, product, item
 
     def find_dolibarr(self, ref):

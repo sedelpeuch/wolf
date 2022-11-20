@@ -9,95 +9,118 @@
     <div class="card shadow mb-4" id="accueil">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#scan" role="button">
-            <h6 class="m-0 font-weight-bold text-secondary">Stocks</h6>
+            <h6 class="m-0 font-weight-bold text-secondary">Rechercher</h6>
         </a>
         <div class="collapse show card-body mb-4" id="scan">
-            <div class="row">
-                <div class="col m-2">
-                    <h4 class="font-weight-bold text-secondary mt-2">Rechercher</h4>
-                    <form action="/stock/recherche" method="POST" onsubmit="document.getElementById('container-svg-loading')
+            <div class="col m-2">
+                <p class="mt-2">Rechercher un produit par sa référence fournisseur ou son nom</p>
+                <form action="/stock/recherche" method="POST" onsubmit="document.getElementById('container-svg-loading')
                     .style.visibility = 'visible';return true;">
-                        <button class="form-control btn btn-secondary" type="submit">Débuter une recherche</button>
-                        <div class="form-group">
-                            <label class="mt-2" for="ref">Référence</label>
-                            <input class="form-control" id="ref" name="ref" placeholder="Référence"
-                                   type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Nom</label>
-                            <input class="form-control" id="name" name="name" placeholder="Nom"
-                                   type="text">
-                        </div>
-                    </form>
-                    <form action="/stock/recherche" method="GET" onsubmit="document.getElementById('container-svg-scanning')
-                    .style.visibility = 'visible';return true;">
-                        <button class="form-control btn btn-secondary scan-button" disabled type="submit">Scanner un
-                            code
-                            barre
-                        </button>
-                    </form>
-                    {% if unknow_composant %}
-                    <div class="alert alert-danger" role="alert">
-                        {% if error %}
-                        {{ error }}
-                        {% endif %}
-                        <p class="text-center">Aucun résultat trouvé</p>
+                    <button class="form-control btn btn-secondary" type="submit">Débuter une recherche</button>
+                    <div class="form-group">
+                        <label class="mt-2" for="ref">Référence</label>
+                        <input class="form-control" id="ref" name="ref" placeholder="Référence fournisseur"
+                               type="text">
                     </div>
+                    <div class="form-group">
+                        <label for="name">Nom</label>
+                        <input class="form-control" id="name" name="name"
+                               placeholder="Nom (la requête peut prendre du temps)"
+                               type="text">
+                    </div>
+                </form>
+                {% if unknow_composant %}
+                <div class="alert alert-danger" role="alert">
+                    {% if error %}
+                    {{ error }}
                     {% endif %}
+                    <p class="text-center">Aucun résultat trouvé</p>
                 </div>
-                <div class="col m-2">
-                    <h4 class="font-weight-bold text-secondary mt-2">Ajouter</h4>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-                    <form action="/stock/arrivage" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
+    <div class="card shadow mb-4" id="accueil">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#scan" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Ajouter</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="scan">
+            <div class="col m-2">
+                <p class="mt-2">Ajouter un ensemble de produits provenant d'un fournisseur lors d'une réception</p>
+                <form action="/stock/arrivage" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                        <button class="form-control btn btn-secondary scan-button" disabled type="submit">Débuter un
-                            arrivage
-                        </button>
-                        <div class="fabmanager">
-                            <p class="mt-2 text-danger">Un <a
-                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                                d'EirLab Community est nécessaire pour débuter
-                                l'opération</p>
+                    <button class="form-control btn btn-secondary" type="submit">Débuter un
+                        arrivage
+                    </button>
+                    <div class="fabmanager">
+                        <p class="mt-2 text-danger">Un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                            d'EirLab Community est nécessaire pour débuter
+                            l'opération</p>
 
-                            <p class="mt-2"> Appuyez sur le bouton débuter un arrivage et posez la carte d'un <a
-                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                                d'EirLab
-                                Community</p>
-                        </div>
-                    </form>
-                    {% if fournisseur %}
-                    <form action="/stock/arrivage/end" method="GET">
-                        <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
-                    </form>
-                    {% endif %}
-                    {% if arrivage_error %}
-                    <h4 class="font-weight-bold mt-2 text-danger">{{ arrivage_error }}</h4>
-                    {% endif %}
-                </div>
+                        <p class="mt-2"> Appuyez sur le bouton débuter un arrivage et posez la carte d'un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                            d'EirLab
+                            Community</p>
+                    </div>
+                </form>
+                {% if fournisseur %}
+                <form action="/stock/arrivage/end" method="GET">
+                    <button class="form-control btn btn-danger mt-2" type="submit">Quitter</button>
+                </form>
+                {% endif %}
+                {% if arrivage_error %}
+                <h4 class="font-weight-bold mt-2 text-danger">{{ arrivage_error }}</h4>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-                <div class="col m-2">
-                    <h4 class="font-weight-bold text-secondary mt-2">Inventorier</h4>
+    <div class="card shadow mb-4" id="accueil">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#scan" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Commander</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="scan">
+            <div class="col m-2">
+                <p class="mt-2">Permet de voir tous les produits en attente de commande et de générer les commandes </p>
+                <form action="/command/" method="GET">
+                    <button class="form-control btn btn-secondary" type="submit">Passer en revue les alertes
+                    </button>
+                    <div class="fabmanager">
+                        <p class="mt-2 text-danger">Un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                            d'EirLab Community est nécessaire pour débuter
+                            l'opération</p>
 
-                    <form action="/inventory/" method="GET">
-                        <button class="form-control btn btn-secondary scan-button" disabled type="submit">Débuter un
-                            inventaire
-                        </button>
-                        <div class="fabmanager">
-                            <p class="mt-2 text-danger">Un <a
-                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                                d'EirLab Community est nécessaire pour débuter
-                                l'opération</p>
+                        <p class="mt-2"> Appuyez sur le bouton débuter une commande et posez la carte d'un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                            d'EirLab
+                            Community</p>
+                    </div>
+                </form>
+            </div>
+            <div class="col m-2">
+                <form action="/command/generate" method="GET">
+                    <button class="form-control btn btn-secondary" type="submit">Générer les commandes
+                    </button>
+                    <div class="fabmanager">
+                        <p class="mt-2 text-danger">Un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                            d'EirLab Community est nécessaire pour débuter
+                            l'opération</p>
 
-                            <p class="mt-2"> Appuyez sur le bouton débuter un inventaire et posez la carte d'un <a
-                                    href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                                d'EirLab
-                                Community</p>
-                        </div>
-                    </form>
-                    {% if inventory_error %}
-                    <h4 class="font-weight-bold mt-2 text-danger"> Vous n'êtes pas autorisé à accéder à cette page </h4>
-                    {% endif %}
-                </div>
+                        <p class="mt-2"> Appuyez sur le bouton débuter une commande et posez la carte d'un <a
+                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
+                            d'EirLab
+                            Community</p>
+                    </div>
+                </form>
+                {% if command_error %}
+                <h4 class="font-weight-bold mt-2 text-danger"> Vous n'êtes pas autorisé à accéder à cette page </h4>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -252,7 +275,7 @@
                         </div>
                         {% else %}
                         <button aria-controls="achat" aria-expanded="false" class="btn btn-outline-danger"
-                                data-target="#achat" data-toggle="collapse" type="button">
+                                data-target="#achat" data-toggle="collapse" disabled type="button">
                             Faire une demande d'achat
                         </button>
                         <div class="collapse" id="achat">
@@ -475,22 +498,53 @@
     </div>
     {% endif %}
 
-    {% if inventory %}
-    <div class="card shadow mb-4" id="paramètres inventaire">
+    {% if command %}
+    {% if not product_command %}
+    <div class="card shadow mb-4" id="paramètres commande">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#inventory" role="button">
+           data-toggle="collapse" href="#command" role="button">
             <h6 class="m-0 font-weight-bold text-secondary">Choix du stockage</h6>
         </a>
-        <div class="collapse show card-body mb-4" id="inventory">
+        <div class="collapse show card-body mb-4" id="command">
             <div class="row">
                 <div class="col m-2">
                     <div class="form-group">
-                        <form action="/inventory/warehouse" method="POST">
-                            <select class="form-control" id="warehouse" name="warehouse">
+                        <form action="/command/warehouse" method="POST">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Lieu</th>
+                                    <th scope="col">Label</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Nombre de produits en attente de commande</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
                                 {% for w in warehouses %}
-                                <option>{{ w.lieu }} - {{ w.label }} - {{ w.id }}</option>
+                                <tr>
+                                    <td></td>
+                                    <td>{{ warehouses[w].warehouse.lieu }}</td>
+                                    <td>{{ warehouses[w].warehouse.label}}</td>
+                                    <td>{{ warehouses[w].warehouse.id }}</td>
+                                    {% if warehouses[w].command == 0 %}
+                                    <td><i class="fas fa-check text-success"></i>
+                                        <span>{{ warehouses[w].command }}</span></td>
+                                    {% elif warehouses[w].command == 1 %}
+                                    <td><i class="fas fa-exclamation-triangle text-warning"></i><span>{{ warehouses[w].command }}</span>
+                                    </td>
+                                    {% else %}
+                                    <td><i class="fas fa-times text-danger"></i><span>{{ warehouses[w].command }}</span>
+                                    </td>
+                                    {% endif %}
+                                    <td><label>
+                                        <input name="warehouse" type="radio" value="{{ warehouses[w].warehouse.id }}">
+                                    </label></td>
+                                </tr>
                                 {% endfor %}
-                            </select>
+                                </tbody>
+                            </table>
                             <button class="form-control btn btn-secondary mt-2" type="submit">Valider</button>
                         </form>
                     </div>
@@ -498,6 +552,78 @@
             </div>
         </div>
     </div>
+    {% endif %}
+    {% endif %}
+
+
+    {% if command %}
+    {% if product_command %}
+    <div class="card shadow mb-4" id="produits commande">
+        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
+           data-toggle="collapse" href="#command" role="button">
+            <h6 class="m-0 font-weight-bold text-secondary">Liste des produits de l'entrepôt</h6>
+        </a>
+        <div class="collapse show card-body mb-4" id="command">
+            <div class="row">
+                <div class="col m-2">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Référence</th>
+                            <th scope="col">Label</th>
+                            <th scope="col">Prix</th>
+                            <th scope="col">Demandé par</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Quantité réel</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for p in product_command %}
+                        <tr>
+                            <td>{{ p.ref }}</td>
+                            <td style="max-width: 5%">{{ p.label }}</td>
+                            <td>{{ p.cost_price }}</td>
+                            {% if p.array_options.options_command.status %}
+                            <td>{{ p.array_options.options_command.identity }}</td>
+                            <td style="max-width: 5%">{{ p.array_options.options_command.description }}</td>
+                            {% else %}
+                            <td></td>
+                            <td></td>
+                            {% endif %}
+                            {% if not p.fk_default_warehouse in p.stock_warehouse %}
+                            <td><i class="fas fa-times text-danger"></i><span>0</span></td>
+                            {% elif p.stock_warehouse[p.fk_default_warehouse].real == '1' %}
+                            <td><i class="fas fa-exclamation-triangle text-warning"></i><span>{{ p.stock_warehouse[p.fk_default_warehouse].real}}</span>
+                            </td>
+                            {% elif p.stock_warehouse[p.fk_default_warehouse].real > '1' %}
+                            <td><i class="fas fa-check text-success"></i> <span>{{ p.stock_warehouse[p.fk_default_warehouse].real}}</span>
+                            </td>
+                            {% endif %}
+                            {% if p.array_options.options_command.status %}
+                            <td>
+                                <form action="/command/add/{{p.id}}" method="POST">
+                                    <button class="form-control btn border-success mt-2" type="submit">Valider</button>
+                                </form>
+                            </td>
+                            {% else %}
+                            <td>
+                                <form action="/command/add/{{p.id}}" method="POST">
+                                    <button class="form-control btn border-secondary mt-2" type="submit">Ajouter
+                                    </button>
+                                </form>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% endif %}
 
 
