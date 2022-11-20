@@ -3,12 +3,15 @@ Formations
 
 .. versionadded:: 1.2
 
-    La module formation permet d'ajouter une formation à un ou plusieurs adhérents
+    Le module formation permet d'ajouter une formation à un ou plusieurs adhérents
 
-Fonctionnalités en cours de développement :
+.. versionadded:: 2.4
 
-- Planifier des formations
-- S'inscrire à des formations
+    Le module formation permet de voir les formations futures
+
+    Le module formation permet aux fabmanagers de s'inscrire à une formation
+
+    Le module formation permet de mettre à jour le temps passé sur une formation par les fabmanagers
 
 Utilisation
 ------------

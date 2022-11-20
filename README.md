@@ -10,9 +10,15 @@ Le projet comporte actuellement les fonctionnalités suivantes :
     - Lier le profil d'un adhérent à partir de sa carte étudiante ou autre, son nom et prénom
 2. Onglet Formations
     - Donner de nouvelles formations aux adhérents
+    - Voir les formations à venir et permettre aux fabmanager de s'y inscrire
 3. Onglet Stock
     - Rechercher un article dans le stock
     - Ajouter une série d'articles dans le stock à partir d'une référence ou en scannant un code barre
+    - Gérer les articles en alerte de stock et générer les commandes fournisseurs dans dolibarr
+4. Onglet Emprunts
+    - Emprunter un article
+    - Rendre un article
+    - Voir les emprunts en cours
 
 ## Installation
 

@@ -25,6 +25,10 @@ Le projet comporte actuellement les fonctionnalités suivantes :
 3. Onglet :doc:`Stock <stock>`
     - Rechercher un article dans le stock
     - Ajouter une série d'articles dans le stock à partir d'une référence ou en scannant un code barre
+4. Onglet :doc:`Emprunts <emprunt>`
+    - Emprunter un article
+    - Rendre un article
+    - Voir les emprunts en cours
 
 
 .. toctree::

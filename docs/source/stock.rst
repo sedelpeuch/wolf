@@ -9,10 +9,7 @@ Gestion du stock
 
 .. versionadded:: 2.3 Gestion automatique du conditionnement
 
-Fonctionnalités en cours de développement :
-
-- Recherche par noms
-- Recherche uniquement dans le stock
+.. versionadded:: 2.4 Ajout de la gestion des alertes de stock et du listing des articles à commander
 
 Recherche d'un produit
 -----------------------
