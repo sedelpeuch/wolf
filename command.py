@@ -17,6 +17,8 @@ class Command:
         self.bp = Blueprint('command', __name__, url_prefix='/command')
         self.bp.route('/', methods=['GET'])(self.command)
         self.bp.route('/warehouse', methods=['POST'])(self.warehouse)
+        self.bp.route('/add/<id_product>', methods=['POST'])(self.add)
+        self.bp.route('/generate')(self.generate)
 
         self.suppliers = fournisseurs.Fournisseurs()
         self.warehouses = None
@@ -41,16 +43,36 @@ class Command:
                 for product in products:
                     if product['array_options']:
                         if product['array_options']['options_command'] is not None:
-                            array_options = json.loads(product['array_options']['options_command'])
-                            if array_options['status'] == "pending" or array_options['status'] == "waiting":
+                            try:
+                                array_options = json.loads(product['array_options']['options_command'])
+                            except json.decoder.JSONDecodeError:
+                                array_options = product['array_options']['options_command'].split(',')
+                                array_options[0] = array_options[0][1:]
+                                array_options[-1] = array_options[-1][:-1]
+                                array_options = [element.split(':') for element in array_options]
+                                for elt in array_options:
+                                    elt[0] = elt[0].replace("'", "")
+                                    elt[0] = elt[0].replace(' ', '')
+                                    elt[1] = elt[1].replace(' ', '')
+                                    elt[1] = elt[1].replace("'", '"')
+                                array_options = {element[0]: element[1] for element in array_options}
+                                array_options = {element[0]: element[1].replace("'", '"') for element in
+                                                 array_options.items()}
+                            if array_options['status'] == "pending":
                                 warehouse_command[product['fk_default_warehouse']]['command'] += 1
                 return render_template('stock.html', command=True, warehouses=warehouse_command)
         else:
             return render_template('stock.html', command_error="Vous n'êtes pas autorisé à accéder à cette page")
 
     def warehouse(self):
-        id_warehouse = request.form['warehouse']
-        id_warehouse = str(id_warehouse.split('-')[-1])
+        try:
+            id_warehouse = request.form['warehouse']
+            id_warehouse = str(id_warehouse.split('-')[-1])
+        except KeyError:
+            if self.id_warehouse is not None:
+                id_warehouse = self.id_warehouse
+            else:
+                return render_template('stock.html', command_error="Vous n'avez pas sélectionné de stock")
         # remove space
         id_warehouse = id_warehouse.replace(' ', '')
         products = requests.get(config.url + config.url_product, headers=config.headers).text
@@ -90,3 +112,56 @@ class Command:
 
         return render_template('stock.html', command=True, warehouses=self.warehouses, product_command=products,
                                id_warehouse=id_warehouse)
+
+    def add(self, id_product):
+        product = requests.get(config.url + "products/" + id_product, headers=config.headers).text
+        product = json.loads(product)
+        try:
+            identity = product['array_options']['options_command']['identity']
+            description = product['array_options']['options_command']['description']
+            quantity = product['array_options']['options_command']['quantity']
+        except TypeError:
+            identity = ""
+            description = ""
+            quantity = request.form['quantity']
+        content = {"status": "waiting", "identity": identity, "description": description, "quantity": quantity}
+        product = {"array_options": {"options_command": json.dumps(content)}}
+        requests.put(config.url + "products/" + str(id_product), json=product, headers=config.headers)
+
+        return self.warehouse()
+
+    def generate(self):
+        products = requests.get(config.url + config.url_product, headers=config.headers).text
+        products = json.loads(products)
+
+        waiting_product = []
+        for product in products:
+            if product['array_options'] != [] and product['array_options']['options_command'] is not None:
+                try:
+                    json_product = json.loads(product['array_options']['options_command'])
+                except json.decoder.JSONDecodeError:
+                    json_product = product['array_options']['options_command'].split(',')
+                    json_product[0] = json_product[0][1:]
+                    json_product[-1] = json_product[-1][:-1]
+                    json_product = [element.split(':') for element in json_product]
+                    for elt in json_product:
+                        elt[0] = elt[0].replace("'", "")
+                        elt[0] = elt[0].replace(' ', '')
+                        elt[1] = elt[1].replace(' ', '')
+                        elt[1] = elt[1].replace("'", '"')
+                    json_product = {element[0]: element[1] for element in json_product}
+                    json_product = {element[0]: element[1].replace("'", '"') for element in json_product.items()}
+                if json_product['status'] == "waiting":
+                    waiting_product.append(product)
+
+        total = 0
+        with open('/opt/wolf/fournisseurs.json', 'r') as f:
+            fournisseurs = json.load(f)
+            for product in waiting_product:
+                product['cost_price'] = str(round(float(product['cost_price']), 2))
+                total += float(product['cost_price'])
+                product['fournisseur'] = fournisseurs[product['accountancy_code_buy_intra']] if product[
+                                                                                                    'accountancy_code_buy_intra'] in fournisseurs else {
+                    'name': product['accountancy_code_buy_intra'], 'image': ""}
+            total = str(round(total, 2))
+        return render_template('stock.html', generate=True, products=waiting_product, total=total)

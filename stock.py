@@ -83,6 +83,7 @@ class Stock:
         fournisseur = request.form['rupture_fournisseur']
         identity = request.form['rupture_identity']
         description = request.form['rupture_description']
+        qte = request.form['rupture_qte']
 
         # Add stockmovement
         identifier = self.search_component[fournisseur]["dolibarr"]["id"]
@@ -95,7 +96,7 @@ class Stock:
         #     'array_options': {
         #       'options_command': 'Test'
         #     },
-        content = {"status": "pending", "identity": identity, "description": description}
+        content = {"status": "pending", "identity": identity, "description": description, "quantity": qte}
         product = {"array_options": {"options_command": json.dumps(content)}}
         requests.put(config.url + "products/" + str(identifier), json=product, headers=config.headers)
 
