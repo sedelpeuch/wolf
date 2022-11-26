@@ -271,8 +271,8 @@ class Stock:
                             products_add[composant] = products[composant]
                     else:
                         # the product doesn't exist in dolibarr, create it and update dolibarr with stockmovement
-                        content = {'label': products[composant]["product"]["title"],
-                                   'description': products[composant]["product"]["attributes"], 'other': None,
+                        content = {'label': str(products[composant]["product"]["title"]),
+                                   'description': str(products[composant]["product"]["attributes"]), 'other': None,
                                    'type': '0', 'cost_price': price, 'status_buy': '1',
                                    'url': str(products[composant]["product"]["links_ref"]),
                                    'accountancy_code_buy': str(products[composant]["product"]["ref"]),
@@ -293,7 +293,7 @@ class Stock:
                                    'height_units': '-3', 'surface': None, 'surface_units': '-6', 'volume': None,
                                    'volume_units': '-9', 'net_measure': None, 'net_measure_units': None,
                                    'accountancy_code_sell': '', 'accountancy_code_sell_intra': '',
-                                   'accountancy_code_sell_export': '', 'accountancy_code_buy_intra': self.supplier,
+                                   'accountancy_code_sell_export': '', 'accountancy_code_buy_intra': str(self.supplier),
                                    'accountancy_code_buy_export': '', 'date_creation': None, 'date_modification': None,
                                    'stock_warehouse': [], 'fk_default_warehouse': str(self.warehouse),
                                    'fk_price_expression': None, 'fk_unit': None, 'price_autogen': '0',
@@ -307,6 +307,8 @@ class Stock:
                                    'duration': ''}
                         if common.PUB:
                             status = requests.post(config.url + "products", json=content, headers=config.headers)
+                            print(status)
+
                             if status.status_code == 200:
                                 identifier = status.json()
                                 stockmovement = {"product_id": identifier, "warehouse_id": str(self.warehouse),

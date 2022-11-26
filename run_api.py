@@ -3,12 +3,15 @@ This file is the entry point of flask api. Launch python3 ronoco_vm/run.py to ru
 """
 import os
 
+import requests_cache
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from werkzeug.debug import DebuggedApplication
+
 os.environ['DISPLAY'] = ':0'
 os.system('xhost +')
+
 
 class RunAPI:
     """
@@ -51,6 +54,18 @@ class RunAPI:
             os.makedirs(self.app.instance_path)
         except OSError:
             pass
+
+        def filter(response):
+            # if response from gestion.eirlab.net return False
+            print('response.url', response.url)
+            if response.url.startswith('https://gestion.eirlab.net'):
+                print('return False')
+                return False
+            print('return True')
+            return True
+
+        requests_cache.install_cache('http_cache', backend='filesystem', filter_fn=filter,
+                                     expire_after=604800*2)  # exclude gestion.eirlab.net from  # cache
 
     def setup_app(self):
         """

@@ -4,7 +4,6 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from sentence_transformers import SentenceTransformer, util
 
 import barcode
 import config
@@ -83,20 +82,23 @@ class Fournisseurs:
                        product) and item is not None and not emp and fournisseur not in fournisseurs:
                     product['eirlab'] = {'fournisseur': {'name': 'EirLab', 'image': '/static/img/eirlab.png', 'id': '6',
                                                          'ref': 'eirlab'}, 'title': item['label'],
-                        'price': item['cost_price'], 'links': item['url'], 'attributes': {},
-                        'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '', 'eirlab': True}
+                                         'price': item['cost_price'], 'links': item['url'], 'attributes': {},
+                                         'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '',
+                                         'eirlab': True}
                     product['eirlab']['warehouse'] = warehouse
                     product['eirlab']['dolibarr'] = item
                     return result, product, item
             return result, product, item
 
-    def find_dolibarr(self, ref):
+    def find_dolibarr(self, ref, products=None, warehouses=None):
         # remove '-' from ref
         ref = ref.replace('-', '')
-        products = requests.get(config.url + config.url_product, headers=config.headers).text
-        products = json.loads(products)
-        warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
-        warehouses = json.loads(warehouses)
+        if products is None:
+            products = requests.get(config.url + config.url_product, headers=config.headers).text
+            products = json.loads(products)
+        if warehouses is None:
+            warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
+            warehouses = json.loads(warehouses)
         for item in products:
             try:
                 if item["accountancy_code_buy"] == ref:
@@ -107,21 +109,25 @@ class Fournisseurs:
                 pass
         return False, None, None
 
-    def find_id(self, id):
+    def find_id(self, id, products, warehouses):
         global name_product
-        products = requests.get(config.url + config.url_product, headers=config.headers).text
-        products = json.loads(products)
         for item in products:
             if item["id"] == id:
                 fournisseur = item["accountancy_code_buy_intra"]
                 ref = item["accountancy_code_buy"]
-                product = getattr(self, fournisseur)(ref)[fournisseur]
-                status, item, warehouse = self.find_dolibarr(ref)
-
-                in_stock = requests.get(config.url + "products/" + item["id"] + "/stock", headers=config.headers).text
-                in_stock = json.loads(in_stock)
-                for stock in in_stock['stock_warehouses']:
-                    if int(in_stock['stock_warehouses'][stock]['real']) > 0 and stock != '2':
+                try:
+                    product = getattr(self, fournisseur)(ref)[fournisseur]
+                except AttributeError:
+                    product = {'title': item['label'], 'price': item['cost_price'], 'links': item['url'],
+                                            'attributes': {}, 'ref': item['accountancy_code_buy'], 'image': '',
+                                            'links_ref': '', 'packaging': '',
+                                            'fournisseur': {'name': fournisseur, 'image': '/static/img/eirlab.png',
+                                                            'id': '6', 'ref': 'eirlab'}}
+                except TypeError:
+                    pass
+                status, item, warehouse = self.find_dolibarr(ref, products, warehouses)
+                for stock in item['stock_warehouse']:
+                    if int(item['stock_warehouse'][stock]['real']) > 0 and stock != '2':
                         product['eirlab'] = True
                     else:
                         product['eirlab'] = False
@@ -134,23 +140,26 @@ class Fournisseurs:
         name_product = {}
         products = requests.get(config.url + config.url_product, headers=config.headers).text
         products = json.loads(products)
-        embedder = SentenceTransformer('all-MiniLM-L6-v2')
-        corpus = []
-        corpus_item_id = []
+
+        warehouses = requests.get(config.url + config.url_warehouse, headers=config.headers).text
+        warehouses = json.loads(warehouses)
         thread_pool = []
+        id_pool = []
+
         for item in products:
-            if item["type"] == '0':
-                corpus.append(item["label"])
-                corpus_item_id.append(item["id"])
-        corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
-        query_embedding = embedder.encode([name], convert_to_tensor=True)
-        cos_scores = util.semantic_search(query_embedding, corpus_embeddings)[0]
-        for elt in cos_scores:
-            thread_pool.append(threading.Thread(target=self.find_id, args=(corpus_item_id[elt['corpus_id']],)))
+            # check if name is in item['label'], item['description'] or item['ref']
+            if name.lower() in item['label'].lower() or name.lower() in item['description'].lower() or name.lower() in \
+                    item['ref'].lower():
+                # thread_pool.append(item['id'])
+                if int(item['id']) not in id_pool:
+                    id_pool.append(int(item['id']))
+                    thread_pool.append(threading.Thread(target=self.find_id, args=(item['id'], products, warehouses)))
         for thread in thread_pool:
             thread.start()
         for thread in thread_pool:
             thread.join()
+        # for id in thread_pool:
+        #     self.find_id(id, products)
         return name_product
 
     def rs(self, ref):
@@ -304,6 +313,8 @@ class Fournisseurs:
         try:
             json_product = requests.get(self.url_conrad + ref).json()['body']
         except KeyError:
+            return
+        except json.decoder.JSONDecodeError:
             return
         try:
             title = json_product['title']

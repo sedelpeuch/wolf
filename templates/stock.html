@@ -41,6 +41,7 @@
         </div>
     </div>
 
+    {% if not recherche_composant %}
     <div class="card shadow mb-4" id="accueil">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
            data-toggle="collapse" href="#scan" role="button">
@@ -124,6 +125,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     {% if recherche_composant %}
     <div class="card shadow mb-4" id="résultat de recherche">
         <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
@@ -245,12 +247,12 @@
                         </div>
                     </div>
 
-                    {% if recherche_composant[composant].eirlab %}
                     <button aria-controls="rupture" aria-expanded="false" class="btn btn-outline-warning mt-2"
                             data-target="#rupture" data-toggle="collapse" type="button">
                         Signaler une rupture de stock et demander l'achat
                     </button>
                     <div class="collapse" id="rupture">
+                        {% if recherche_composant[composant].eirlab %}
                         <div class="card card-body">
                             <form action="/stock/recherche/rupture" method="POST">
                                 <div class="form-group">
@@ -542,11 +544,13 @@
                                     <td><i class="fas fa-exclamation-triangle text-warning"></i><span>{{ warehouses[w].command }}</span>
                                     </td>
                                     {% else %}
-                                    <td><i class="fas fa-times text-danger"></i><span>{{ warehouses[w].command }}</span>
+                                    <td>
+                                        <i class="fas fa-times text-danger"></i><span>{{ warehouses[w].command }}</span>
                                     </td>
                                     {% endif %}
                                     <td><label>
-                                        <input name="warehouse" type="radio" value="{{ warehouses[w].warehouse.id }}">
+                                        <input name="warehouse" type="radio"
+                                               value="{{ warehouses[w].warehouse.id }}">
                                     </label></td>
                                 </tr>
                                 {% endfor %}
