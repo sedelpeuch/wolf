@@ -19,6 +19,7 @@ lock = threading.Lock()
 CLIENT = {}
 DEBUG = False
 
+
 def update_member(member, formation, actual_n_serie):
     """
     Actualise un membre dans la base de données avec son numéro de série et ou les formations qu'il a suivi
@@ -169,7 +170,6 @@ class Common:
         self.bp.route('/login', methods=['POST'])(self.connexion)
         self.bp.route('/logout')(self.deconnexion)
 
-
         self.socketio = socketio
         self.socketio.on_event('new_client', self.new_client, namespace='/login')
         if not DEBUG:
@@ -177,6 +177,7 @@ class Common:
 
     def new_client(self, msg):
         lock.acquire()
+        print("new client")
         CLIENT[request.remote_addr] = msg['data']
         lock.release()
 
@@ -215,19 +216,18 @@ class Common:
             lock.acquire()
             client = CLIENT.copy()
             lock.release()
-            if CLIENT != {}:
-                find = False
-                for c in CLIENT:
+            if client != {}:
+                find = None
+                for c in client:
                     if c == config.IP_PUBLIC_WOLF:
-                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': CLIENT[c]}, namespace='/login')
+                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': client[c]}, namespace='/login')
                     for timestamp in LOGIN_IP:
                         if LOGIN_IP[timestamp]['ip'] == c:
-                            find = True
-                            self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': CLIENT[c]},
+                            find = c
+                            self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': client[c]},
                                                namespace='/login')
-                            break
-                    if not find and c != config.IP_PUBLIC_WOLF:
-                        self.socketio.emit('login', {'login': None, 'sid': CLIENT[c]}, namespace='/login')
+                    if c != find and c != config.IP_PUBLIC_WOLF:
+                        self.socketio.emit('login', {'login': None, 'sid': client[c]}, namespace='/login')
 
     def connexion(self):
         ip_address = request.remote_addr
