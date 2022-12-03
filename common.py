@@ -216,7 +216,6 @@ class Common:
                 find = False
                 for c in CLIENT:
                     if c == config.IP_PUBLIC_WOLF:
-                        find = True
                         self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': CLIENT[c]}, namespace='/login')
                     for timestamp in LOGIN_IP:
                         if LOGIN_IP[timestamp]['ip'] == c:
@@ -224,7 +223,7 @@ class Common:
                             self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': CLIENT[c]},
                                                namespace='/login')
                             break
-                    if not find:
+                    if not find and c != config.IP_PUBLIC_WOLF:
                         self.socketio.emit('login', {'login': None, 'sid': CLIENT[c]}, namespace='/login')
             lock.release()
 
