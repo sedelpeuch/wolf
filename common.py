@@ -176,7 +176,9 @@ class Common:
             threading.Thread(target=self.thread_websockect).start()
 
     def new_client(self, msg):
+        lock.acquire()
         CLIENT[request.remote_addr] = msg['data']
+        lock.release()
 
     def index(self):
         """
@@ -211,6 +213,8 @@ class Common:
         while True:
             time.sleep(1)
             lock.acquire()
+            client = CLIENT.copy()
+            lock.release()
             if CLIENT != {}:
                 find = False
                 for c in CLIENT:
@@ -224,7 +228,6 @@ class Common:
                             break
                     if not find and c != config.IP_PUBLIC_WOLF:
                         self.socketio.emit('login', {'login': None, 'sid': CLIENT[c]}, namespace='/login')
-            lock.release()
 
     def connexion(self):
         ip_address = request.remote_addr
