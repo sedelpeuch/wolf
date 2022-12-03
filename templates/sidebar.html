@@ -122,7 +122,7 @@
         });
 
         socket.on('connect', function () {
-            console.log("Connected");
+            console.log("Connected with client");
             console.log(socket.id)
             socket.emit('new_client', {data: socket.id});
         });

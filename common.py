@@ -12,6 +12,10 @@ import rfid
 
 PUB = True
 LOGIN_IP = {}
+
+# put semaphores on client
+lock = threading.Lock()
+CLIENT = {}
 DEBUG = False
 
 def update_member(member, formation, actual_n_serie):
@@ -163,7 +167,7 @@ class Common:
         self.bp.route('/emprunt')(self.emprunt)
         self.bp.route('/login', methods=['POST'])(self.connexion)
         self.bp.route('/logout')(self.deconnexion)
-        self.client = {}
+
 
         self.socketio = socketio
         self.socketio.on_event('new_client', self.new_client, namespace='/login')
@@ -171,7 +175,9 @@ class Common:
             threading.Thread(target=self.thread_websockect).start()
 
     def new_client(self, msg):
-        self.client[request.remote_addr] = msg['data']
+        lock.acquire()
+        CLIENT[request.remote_addr] = msg['data']
+        lock.release()
 
     def index(self):
         """
@@ -205,20 +211,22 @@ class Common:
     def thread_websockect(self):
         while True:
             time.sleep(1)
-            if self.client != {}:
+            lock.acquire()
+            if CLIENT != {}:
                 find = False
-                for c in self.client:
-                    if c == '192.168.0.117':
+                for c in CLIENT:
+                    if c == config.IP_PUBLIC_WOLF:
                         find = True
-                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': self.client[c]}, namespace='/login')
+                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': CLIENT[c]}, namespace='/login')
                     for timestamp in LOGIN_IP:
                         if LOGIN_IP[timestamp]['ip'] == c:
                             find = True
-                            self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': self.client[c]},
+                            self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': CLIENT[c]},
                                                namespace='/login')
                             break
                     if not find:
-                        self.socketio.emit('login', {'login': None, 'sid': self.client[c]}, namespace='/login')
+                        self.socketio.emit('login', {'login': None, 'sid': CLIENT[c]}, namespace='/login')
+            lock.release()
 
     def connexion(self):
         ip_address = request.remote_addr
