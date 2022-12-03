@@ -133,3 +133,5 @@ config.py
 token.txt
 .idea/
 !/helloasso.csv
+!/http_cache/
+!/run_api.spec

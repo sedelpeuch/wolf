@@ -3,6 +3,7 @@ import json
 import threading
 import time
 import traceback
+import urllib
 
 import requests
 from flask import Blueprint, render_template, request
@@ -12,7 +13,12 @@ import rfid
 
 PUB = True
 LOGIN_IP = {}
+
+# put semaphores on client
+lock = threading.Lock()
+CLIENT = {}
 DEBUG = False
+
 
 def update_member(member, formation, actual_n_serie):
     """
@@ -163,7 +169,6 @@ class Common:
         self.bp.route('/emprunt')(self.emprunt)
         self.bp.route('/login', methods=['POST'])(self.connexion)
         self.bp.route('/logout')(self.deconnexion)
-        self.client = {}
 
         self.socketio = socketio
         self.socketio.on_event('new_client', self.new_client, namespace='/login')
@@ -171,7 +176,10 @@ class Common:
             threading.Thread(target=self.thread_websockect).start()
 
     def new_client(self, msg):
-        self.client[request.remote_addr] = msg['data']
+        lock.acquire()
+        print("new client")
+        CLIENT[request.remote_addr] = msg['data']
+        lock.release()
 
     def index(self):
         """
@@ -205,25 +213,28 @@ class Common:
     def thread_websockect(self):
         while True:
             time.sleep(1)
-            if self.client != {}:
-                find = False
-                for c in self.client:
-                    if c == '192.168.0.117':
-                        find = True
-                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': self.client[c]}, namespace='/login')
+            lock.acquire()
+            client = CLIENT.copy()
+            lock.release()
+            if client != {}:
+                find = None
+                for c in client:
+                    if c == config.IP_PUBLIC_WOLF:
+                        self.socketio.emit('login', {'login': "PCMEGABOT", 'sid': client[c]}, namespace='/login')
                     for timestamp in LOGIN_IP:
                         if LOGIN_IP[timestamp]['ip'] == c:
-                            find = True
-                            self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': self.client[c]},
+                            find = c
+                            self.socketio.emit('login', {'login': LOGIN_IP[timestamp]['login'], 'sid': client[c]},
                                                namespace='/login')
-                            break
-                    if not find:
-                        self.socketio.emit('login', {'login': None, 'sid': self.client[c]}, namespace='/login')
+                    if c != find and c != config.IP_PUBLIC_WOLF:
+                        self.socketio.emit('login', {'login': None, 'sid': client[c]}, namespace='/login')
 
     def connexion(self):
         ip_address = request.remote_addr
         name = request.form['login']
         password = request.form['password']
+        # in password change all special characters to their url encoded version
+        password = urllib.parse.quote(password, safe='')
         result = requests.get(config.url + "login?login=" + name + "&password=" + password)
         if result.status_code == 200:
             LOGIN_IP[time.time()] = {"ip": ip_address, "login": name}
