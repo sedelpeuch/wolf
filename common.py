@@ -3,6 +3,7 @@ import json
 import threading
 import time
 import traceback
+import urllib
 
 import requests
 from flask import Blueprint, render_template, request
@@ -175,9 +176,7 @@ class Common:
             threading.Thread(target=self.thread_websockect).start()
 
     def new_client(self, msg):
-        lock.acquire()
         CLIENT[request.remote_addr] = msg['data']
-        lock.release()
 
     def index(self):
         """
@@ -231,6 +230,8 @@ class Common:
         ip_address = request.remote_addr
         name = request.form['login']
         password = request.form['password']
+        # in password change all special characters to their url encoded version
+        password = urllib.parse.quote(password, safe='')
         result = requests.get(config.url + "login?login=" + name + "&password=" + password)
         if result.status_code == 200:
             LOGIN_IP[time.time()] = {"ip": ip_address, "login": name}
