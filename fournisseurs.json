@@ -34,5 +34,11 @@
     "image": "/static/img/eirlab.png",
     "id": "6",
     "ref": "eirlab"
+  },
+  "dispano": {
+    "name": "Dispano",
+    "image": "/static/img/dispano.png",
+    "id": "7",
+    "ref": "dispano"
   }
 }

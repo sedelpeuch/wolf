@@ -21,6 +21,7 @@ class Fournisseurs:
         self.url_makershop = "https://www.makershop.fr/recherche?search_query="
         self.url_conrad = "https://www.conrad.fr/restservices/FR/products/"
         self.url_farnell = "https://fr.farnell.com/"
+        self.url_dispano = "https://www.dispano.fr/search?q="
         self.rfid = rfid.Serial()
         self.barcode = barcode.BarcodeReader()
 
@@ -119,10 +120,10 @@ class Fournisseurs:
                     product = getattr(self, fournisseur)(ref)[fournisseur]
                 except AttributeError:
                     product = {'title': item['label'], 'price': item['cost_price'], 'links': item['url'],
-                                            'attributes': {}, 'ref': item['accountancy_code_buy'], 'image': '',
-                                            'links_ref': '', 'packaging': '',
-                                            'fournisseur': {'name': fournisseur, 'image': '/static/img/eirlab.png',
-                                                            'id': '6', 'ref': 'eirlab'}}
+                               'attributes': {}, 'ref': item['accountancy_code_buy'], 'image': '', 'links_ref': '',
+                               'packaging': '',
+                               'fournisseur': {'name': fournisseur, 'image': '/static/img/eirlab.png', 'id': '6',
+                                               'ref': 'eirlab'}}
                 except TypeError:
                     pass
                 status, item, warehouse = self.find_dolibarr(ref, products, warehouses)
@@ -432,7 +433,117 @@ class Fournisseurs:
                                   "links_ref": self.url_farnell + ref, "packaging": packaging}
             return product
 
+    def dispano(self, ref):
+        global product
+        # curl 'https://www.dispano.fr/search?q=3193947' \
+        #   -H 'authority: www.dispano.fr' \
+        #   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,
+        #   */*;q=0.8,application/signed-exchange;v=b3;q=0.9' \
+        #   -H 'accept-language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7' \
+        #   -H 'sec-ch-device-memory: 8' \
+        #   -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+        #   -H 'sec-ch-ua-arch: "x86"' \
+        #   -H 'sec-ch-ua-full-version-list: " Not A;Brand";v="99.0.0.0", "Chromium";v="101.0.4951.41",
+        #   "Google Chrome";v="101.0.4951.41"' \
+        #   -H 'sec-ch-ua-mobile: ?0' \
+        #   -H 'sec-ch-ua-model: ""' \
+        #   -H 'sec-ch-ua-platform: "Linux"' \
+        #   -H 'sec-fetch-dest: document' \
+        #   -H 'sec-fetch-mode: navigate' \
+        #   -H 'sec-fetch-site: none' \
+        #   -H 'sec-fetch-user: ?1' \
+        #   -H 'upgrade-insecure-requests: 1' \
+        #   -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0
+        #   Safari/537.36' \
+        #   --compressed
+        headers = {'authority': 'www.dispano.fr',
+                   'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,'
+                             '*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                   'accept-language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7', 'sec-ch-device-memory': '8',
+                   'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
+                   'sec-ch-ua-arch': '"x86"',
+                   'sec-ch-ua-full-version-list': '" Not A;Brand";v="99.0.0.0", "Chromium";v="101.0.4951.41", '
+                                                  '"Google Chrome";v="101.0.4951.41"', 'sec-ch-ua-mobile': '?0',
+                   'sec-ch-ua-model': '""', 'sec-ch-ua-platform': '"Linux"', 'sec-fetch-dest': 'document',
+                   'sec-fetch-mode': 'navigate', 'sec-fetch-site': 'none', 'sec-fetch-user': '?1',
+                   'upgrade-insecure-requests': '1',
+                   'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                 'Chrome/101.0.0.0 '
+                                 'Safari/537.36', }
+
+        params = {'q': ref, }
+
+        html = requests.get(self.url_dispano + ref, headers=headers, params=params).text
+        html = html.replace('\n', '')
+        html = html.replace('\t', '')
+        html = html.replace('\r', '')
+        print(html)
+        try:
+            parsed_html = BeautifulSoup(html, "html.parser")
+        except AttributeError:
+            return
+
+        try:
+            title = parsed_html.body.find('h1', attrs={'class': 'product-title'}).text
+        except AttributeError:
+            title = ""
+
+        try:
+            price = parsed_html.body.find('span', attrs={'class': 'price-processed'}).text
+            print(price)
+        except AttributeError:
+            price = ""
+
+        try:
+            links = parsed_html.body.find('a', attrs={'rel': 'nofollow noopener'}).get('href')
+        except AttributeError:
+            links = ""
+
+        try:
+            image = parsed_html.body.find('img', attrs={'id': 'productMainImage'}).get('src')
+        except AttributeError:
+            image = ""
+
+        try:
+            table_label = []
+            table_value = []
+            dict_attributes = {}
+            all_dl = parsed_html.find_all('dl')
+            for dl in all_dl:
+                dt = dl.find_all('dt')
+                for element in dt:
+                    label = element.find('label')
+                    if label is not None:
+                        table_label.append(label.text)
+            all_dd = parsed_html.find_all('dd')
+            for dd in all_dd:
+                # check if id begin with descAttributeValue
+                if dd.get('id') is not None and dd.get('id').startswith('descAttributeValue'):
+                    table_value.append(dd.text)
+
+            if len(table_label) != len(table_value):
+                dict_attributes = {}
+            else:
+                for i in range(len(table_label)):
+                    dict_attributes[table_label[i]] = table_value[i]
+        except TypeError:
+            dict_attributes = {}
+
+        try:
+            packaging = parsed_html.body.find('div', attrs={'class': 'multqty'}).find('strong').text
+        except AttributeError:
+            packaging = ""
+
+        if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
+            return
+        with open('/opt/wolf/fournisseurs.json', 'r') as f:
+            data = json.load(f)
+            product['dispano'] = {"fournisseur": data['dispano'], "title": title, "price": price, "links": links,
+                                  "attributes": dict_attributes, "ref": ref, "image": image,
+                                  "links_ref": self.url_dispano + ref, "packaging": packaging}
+            return product
+
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    print(four.find_dolibarr_name("Résistance"))
+    print(four.dispano("3193947"))

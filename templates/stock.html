@@ -52,8 +52,7 @@
                 <p class="mt-2">Ajouter un ensemble de produits provenant d'un fournisseur lors d'une réception</p>
                 <form action="/stock/arrivage" method="GET" onsubmit="document.getElementById('container-svg-card-reader')
             .style.visibility = 'visible';return true;">
-                    <button class="form-control btn btn-secondary" type="submit">Débuter un
-                        arrivage
+                    <button class="form-control btn btn-secondary" type="submit">Débuter une prise de référence
                     </button>
                     <div class="fabmanager">
                         <p class="mt-2 text-danger">Un <a
@@ -74,53 +73,6 @@
                 {% endif %}
                 {% if arrivage_error %}
                 <h4 class="font-weight-bold mt-2 text-danger">{{ arrivage_error }}</h4>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4" id="accueil">
-        <a aria-controls="select" aria-expanded="true" class="d-block card-header py-3"
-           data-toggle="collapse" href="#scan" role="button">
-            <h6 class="m-0 font-weight-bold text-secondary">Commander</h6>
-        </a>
-        <div class="collapse show card-body mb-4" id="scan">
-            <div class="col m-2">
-                <p class="mt-2">Permet de voir tous les produits en attente de commande et de générer les commandes </p>
-                <form action="/command/" method="GET">
-                    <button class="form-control btn btn-secondary" type="submit">Passer en revue les alertes
-                    </button>
-                    <div class="fabmanager">
-                        <p class="mt-2 text-danger">Un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab Community est nécessaire pour débuter
-                            l'opération</p>
-
-                        <p class="mt-2"> Appuyez sur le bouton débuter une commande et posez la carte d'un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab
-                            Community</p>
-                    </div>
-                </form>
-            </div>
-            <div class="col m-2">
-                <form action="/command/generate" method="GET">
-                    <button class="form-control btn btn-secondary" type="submit">Générer les commandes
-                    </button>
-                    <div class="fabmanager">
-                        <p class="mt-2 text-danger">Un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab Community est nécessaire pour débuter
-                            l'opération</p>
-
-                        <p class="mt-2"> Appuyez sur le bouton débuter une commande et posez la carte d'un <a
-                                href="https://www.eirlab.net/wp-content/uploads/2022/06/Organigramme-2.png">fabmanager</a>
-                            d'EirLab
-                            Community</p>
-                    </div>
-                </form>
-                {% if command_error %}
-                <h4 class="font-weight-bold mt-2 text-danger"> Vous n'êtes pas autorisé à accéder à cette page </h4>
                 {% endif %}
             </div>
         </div>
@@ -666,6 +618,7 @@
         <div class="collapse show card-body mb-4" id="generate">
             <div class="row">
                 <div class="col m-2">
+                    <h3 class="border-bottom-info">{{error}}</h3>
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -674,34 +627,52 @@
                             <th scope="col">Prix</th>
                             <th scope="col">Quantité</th>
                             <th scope="col">Fournisseur</th>
+                            <th scope="col">Valider</th>
+                            <th scope="col">Enlever</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% for p in products %}
-                        <tr>
-                            <td>{{ p.ref }}</td>
-                            <td style="max-width: 5%">{{ p.label }}</td>
-                            <td>{{ p.cost_price }}</td>
-                            <td>{{ p.array_options.options_command.quantity }}</td>
-                            {% if p.fournisseur != {} %}
-                            {% if p.fournisseur.image != "" %}
-                            <td><img alt="logo" src="{{ p.fournisseur.image }}" width="25%"></td>
-                            {% else %}
-                            <td>{{ p.fournisseur.name }}</td>
-                            {% endif %}
-                            {% else %}
-                            <td></td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                        <tr class="font-weight-bold">
-                            <td></td>
-                            <td></td>
-                            <td>{{total}}</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-
+                        <form action="/command/confirm" method="POST">
+                            {% for p in products %}
+                            <tr>
+                                <td>{{ p.ref }}</td>
+                                <td style="max-width: 5%">{{ p.label }}</td>
+                                <td>{{ p.cost_price }}</td>
+                                <td>{{ p.array_options.options_command.quantity }}</td>
+                                {% if p.fournisseur != {} %}
+                                {% if p.fournisseur.image != "" %}
+                                <td><img alt="logo" src="{{ p.fournisseur.image }}" width="25%"></td>
+                                {% else %}
+                                <td>{{ p.fournisseur.name }}</td>
+                                {% endif %}
+                                {% else %}
+                                <td></td>
+                                {% endif %}
+                                <td>
+                                    {% if p.array_options.options_command.status == "shipping" %}
+                                    <i class="fas fa-truck text-secondary"></i>
+                                    {% else %}
+                                    <input name="{{p.id}}" type="checkbox" value="{{ p.id }}">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger" href="/command/remove/{{p.id}}"><i
+                                            class="fas fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="font-weight-bold">
+                                <td></td>
+                                <td></td>
+                                <td>{{total}}</td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-success" type="submit">Valider</button>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </form>
                         </tbody>
                     </table>
                 </div>

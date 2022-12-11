@@ -57,11 +57,8 @@ class RunAPI:
 
         def filter(response):
             # if response from gestion.eirlab.net return False
-            print('response.url', response.url)
             if response.url.startswith('https://gestion.eirlab.net'):
-                print('return False')
                 return False
-            print('return True')
             return True
 
         requests_cache.install_cache('http_cache', backend='filesystem', filter_fn=filter,

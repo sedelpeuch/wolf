@@ -178,11 +178,11 @@ class Stock:
                 pass
             ref = request.form['arrivage_ref']  # get current ref with form
         if quantite == "":
-            quantite = "1"
+            quantite = "0"
         try:
             if self.list_add[ref] != {}:
                 quantite = int(self.list_add[ref]['quantite']) + int(quantite)
-                if quantite <= 0:
+                if quantite < 0:
                     try:
                         del self.list_add[ref]
                     except KeyError:
@@ -190,7 +190,7 @@ class Stock:
                 else:
                     self.list_add[ref]['quantite'] = quantite
         except KeyError:
-            if int(quantite) <= 0:
+            if int(quantite) < 0:
                 with open('/opt/wolf/fournisseurs.json', 'r') as f:
                     data = json.load(f)
                     return render_template('stock.html', fournisseur=data[self.supplier],
