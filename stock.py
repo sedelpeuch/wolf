@@ -307,7 +307,6 @@ class Stock:
                                    'duration': ''}
                         if common.PUB:
                             status = requests.post(config.url + "products", json=content, headers=config.headers)
-                            print(status)
 
                             if status.status_code == 200:
                                 identifier = status.json()

@@ -19,7 +19,7 @@ class Fournisseurs:
         self.url_otelo = "https://www.otelo.fr/is-bin/INTERSHOP.enfinity/WFS/Otelo-France-Site/fr_FR/-/EUR/Navigation" \
                          "-Dispatch?Ntk=Default_OTFR&Ntt="
         self.url_makershop = "https://www.makershop.fr/recherche?search_query="
-        self.url_conrad = "https://www.conrad.fr/restservices/FR/products/"
+        self.url_conrad = "https://api.conrad.fr/product/1/service/HP_FR_B2B/product/"
         self.url_farnell = "https://fr.farnell.com/"
         self.url_dispano = "https://www.dispano.fr/search?q="
         self.rfid = rfid.Serial()
@@ -311,45 +311,53 @@ class Fournisseurs:
         global product
         # remove all 0 at the beginning of the ref
         ref = ref.lstrip('0')
+        if ref.endswith('-62'):
+            ref = ref[:-3]
         try:
-            json_product = requests.get(self.url_conrad + ref).json()['body']
+
+            json_product = requests.get(self.url_conrad + ref +
+                                        "?language=fr&apikey=n2AZInAwVYnkiFAbVykOfKrYChAefCYe").json()
+            print(json_product)
+            if json_product['status'] == "404":
+                print("404")
+                return
         except KeyError:
-            return
+            pass
         except json.decoder.JSONDecodeError:
             return
         try:
-            title = json_product['title']
-        except AttributeError:
+            title = json_product['productShortInformation']['title']
+        except KeyError:
             title = ""
         try:
-            price = json_product['price']['unit']['gross']
-        except AttributeError:
+            price = ""
+        except KeyError:
             price = ""
         except KeyError:
             price = ""
         try:
-            links = json_product['productMedia'][0]['url']
-        except AttributeError:
+            links = "https://www.conrad.fr/fr/search.html?search=" + ref
+        except KeyError:
             links = ""
         except IndexError:
             links = ""
         try:
-            image = json_product['image']['url']
-        except AttributeError:
+            image = json_product['productShortInformation']['mainImage']['imageUrl']
+        except KeyError:
             image = ""
         dict_attributes = {}
         try:
-            for tr in json_product['technicalAttributes']:
-                dict_attributes[tr['name']] = tr['values'][0]['value']
-            if 'Contenu' in dict_attributes:
-                packaging = dict_attributes["Contenu"].replace("pc(s)", "")
-            else:
-                packaging = "1"
-        except AttributeError:
+            for tr in json_product['productFullInformation']['technicalAttributes']:
+                dict_attributes[tr['attributeName']] = tr['values'][0]['value']
+        except KeyError:
             dict_attributes = {}
         try:
+            packaging = json_product['businessInformation']['packaging']['amount']
+        except KeyError:
+            packaging = "1"
+        try:
             links_ref = "www.conrad.fr" + json_product['urlPath']
-        except AttributeError:
+        except KeyError:
             links_ref = ""
 
         if title == "" and price == "" and links == "" and image == "" and dict_attributes == {}:
@@ -546,4 +554,4 @@ class Fournisseurs:
 
 if __name__ == '__main__':
     four = Fournisseurs()
-    print(four.dispano("3193947"))
+    print(four.conrad("468503-62"))

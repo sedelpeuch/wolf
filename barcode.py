@@ -16,7 +16,6 @@ def read_virtual_barcode():
     :return: None
     """
     barcode_reader = BarcodeReader()
-    print("Barcode reader started", running_virtual_keyboard)
     while running_virtual_keyboard:
         try:
             barcode = barcode_reader.ser.readline().decode("utf-8").strip("\r\n")
@@ -62,7 +61,6 @@ class BarcodeReader:
             if not self.ser.is_open:
                 self.ser.open()
         except serial.SerialException as error:
-            logging.error("Error opening serial port: {}".format(error))
             return False
         return self.ser.is_open
 
@@ -87,7 +85,6 @@ class BarcodeReader:
             if barcode_len > 0:
                 return barcode
         except serial.SerialException as error:
-            logging.error("Barcode reader error: {}".format(error))
             self.close()
             self.open()
 
@@ -112,5 +109,4 @@ if __name__ == "__main__":
     read_virtual_barcode()
     br.close()
     del br
-    print("Done")
     exit(0)
