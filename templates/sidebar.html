@@ -24,29 +24,12 @@
 
     <!-- Nav Item - Photos -->
     <li class="nav-item active">
-        <a class="nav-link" href="/formations">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <span>Formations</span></a>
-    </li>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider my-0">
-
-    <!-- Nav Item - Photos -->
-    <li class="nav-item active">
         <a class="nav-link" href="/stock">
             <i class="fas fa-box"></i>
             <span>Stocks</span></a>
     </li>
 
     <hr class="sidebar-divider my-0">
-
-    <!-- Nav Item - Photos -->
-    <li class="nav-item active">
-        <a class="nav-link" href="/emprunt">
-            <i class="fas fa-box-open"></i>
-            <span>Emprunts</span></a>
-    </li>
 
     <!--    &lt;!&ndash; Divider &ndash;&gt;-->
     <!--    <hr class="sidebar-divider my-0">-->
@@ -113,7 +96,7 @@
 
 <script src="/static/socket.io/socket.io.js"></script>
 <script>
-    var DEBUG = false;
+    var DEBUG = true;
     if (!DEBUG) {
         var connect = io.connect('http://' + document.domain + ':' + location.port)
         var socket = io.connect('http://' + document.domain + ':' + location.port + '/login');
@@ -159,4 +142,7 @@
         document.getElementById("log_name").innerHTML = "Connecté en mode debug";
     }
 
+    sidebar = document.getElementById("accordionSidebar");
+
 </script>
+
