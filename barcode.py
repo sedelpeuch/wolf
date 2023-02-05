@@ -26,7 +26,6 @@ def read_virtual_barcode():
                         pyautogui.press(char, interval=0.01)
                 pyautogui.press("enter")
         except serial.SerialException as error:
-            logging.error("Barcode reader error: {}".format(error))
             barcode_reader.close()
             barcode_reader.open()
     barcode_reader.close()

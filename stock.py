@@ -1,4 +1,5 @@
 import json
+import multiprocessing
 import threading
 import time
 
@@ -26,9 +27,6 @@ class Stock:
     def __init__(self):
         self.bp = Blueprint('fournisseur', __name__, url_prefix='/stock')
         self.bp.route('/recherche', methods=['POST', 'GET'])(self.search)
-        self.bp.route('/recherche/rupture', methods=['POST'])(self.search_breakage)
-        self.bp.route('/recherche/achat', methods=['POST'])(self.search_buy)
-        self.bp.route('/recherche/add', methods=['POST'])(self.search_add)
 
         self.bp.route('/arrivage', methods=['GET'])(self.arrival)
         self.bp.route('/arrivage/fournisseur', methods=['POST'])(self.arrival_supplier)
@@ -79,67 +77,6 @@ class Stock:
             return render_template('stock.html', recherche_composant=search_component, recherche=True,
                                    composant_eirlab=component_eirlab, warehouses=warehouses)
 
-    def search_breakage(self):
-        fournisseur = request.form['rupture_fournisseur']
-        identity = request.form['rupture_identity']
-        description = request.form['rupture_description']
-        qte = request.form['rupture_qte']
-
-        # Add stockmovement
-        identifier = self.search_component[fournisseur]["dolibarr"]["id"]
-        warehouse = self.search_component[fournisseur]["warehouse"]
-        quantity = self.search_component[fournisseur]["dolibarr"]["stock_reel"]
-        stockmovement = {"product_id": identifier, "warehouse_id": warehouse["id"], "qty": -int(quantity)}
-        requests.post(config.url + "stockmovements", json=stockmovement, headers=config.headers)
-
-        # Update notes with identity and description
-        #     'array_options': {
-        #       'options_command': 'Test'
-        #     },
-        content = {"status": "pending", "identity": identity, "description": description, "quantity": qte}
-        product = {"array_options": {"options_command": json.dumps(content)}}
-        requests.put(config.url + "products/" + str(identifier), json=product, headers=config.headers)
-
-        return render_template('stock.html', recherche_composant=self.search_component, recherche=True,
-                               composant_eirlab=self.component_eirlab)
-
-    def search_buy(self):
-        return render_template('stock.html', recherche_composant=self.search_component, recherche=True,
-                               composant_eirlab=self.component_eirlab)
-
-    def search_add(self):
-        self.list_add = {}
-
-        self.supplier = request.form['add_fournisseur']
-        self.warehouse = request.form['warehouse']
-        self.warehouse = self.warehouse.split('-')[2]
-        lock, member, user, status = common.unlock("ConseilAdministration", self.suppliers.rfid, request.remote_addr)
-
-        if not lock:
-            ref = ""
-            quantite = ""
-            if request.method == 'POST':
-                try:
-                    quantite = request.form['add_qte']  # get current quantity of this reference
-                except KeyError:
-                    pass
-                ref = self.search_reference  # get current ref with form
-            if quantite == "":
-                quantite = "1"
-            try:
-                if self.list_add[ref] != {}:
-                    quantite = int(self.list_add[ref]['quantite']) + int(quantite)
-                    if quantite <= 0:
-                        try:
-                            del self.list_add[ref]
-                        except KeyError:
-                            pass
-                    else:
-                        self.list_add[ref]['quantite'] = quantite
-            except KeyError:
-                self.list_add[ref] = {"ref": ref, "quantite": quantite}
-            return self.arrival_confirm()
-
     def arrival(self):
         self.supplier = None
         self.fabmanager = None
@@ -159,8 +96,7 @@ class Stock:
 
     def arrival_supplier(self):
         self.supplier = request.form['fournisseur']
-        self.warehouse = request.form['warehouse']
-        self.warehouse = self.warehouse.split('-')[2]
+        self.warehouse = 0
         barcode.running_virtual_keyboard = True
         time.sleep(0.5)
         threading.Thread(target=barcode.read_virtual_barcode).start()
@@ -330,3 +266,21 @@ class Stock:
 
         return render_template('stock.html', arrivage_confirm=True, products_add=products_add,
                                products_error=products_error)
+
+    def warm_up_thread(self, ref, supplier):
+        """Warm up the cache"""
+        method = getattr(self.suppliers, supplier)
+        method(ref)
+
+    def warm_up(self):
+        """Warm up the cache"""
+        products = requests.get(config.url + config.url_product, headers=config.headers).text
+        products = json.loads(products)
+        thread_pool = []
+        for product in products:
+            thread_pool.append(multiprocessing.Process(target=self.warm_up_thread,
+                                                       args=(product["ref"], product["accountancy_code_buy_intra"],)))
+        for thread in thread_pool:
+            thread.start()
+        for thread in thread_pool:
+            thread.join()
