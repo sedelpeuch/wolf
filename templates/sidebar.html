@@ -96,7 +96,7 @@
 
 <script src="/static/socket.io/socket.io.js"></script>
 <script>
-    var DEBUG = true;
+    var DEBUG = false;
     if (!DEBUG) {
         var connect = io.connect('http://' + document.domain + ':' + location.port)
         var socket = io.connect('http://' + document.domain + ':' + location.port + '/login');
