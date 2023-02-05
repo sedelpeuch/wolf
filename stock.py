@@ -1,4 +1,5 @@
 import json
+import multiprocessing
 import threading
 import time
 
@@ -265,3 +266,21 @@ class Stock:
 
         return render_template('stock.html', arrivage_confirm=True, products_add=products_add,
                                products_error=products_error)
+
+    def warm_up_thread(self, ref, supplier):
+        """Warm up the cache"""
+        method = getattr(self.suppliers, supplier)
+        method(ref)
+
+    def warm_up(self):
+        """Warm up the cache"""
+        products = requests.get(config.url + config.url_product, headers=config.headers).text
+        products = json.loads(products)
+        thread_pool = []
+        for product in products:
+            thread_pool.append(multiprocessing.Process(target=self.warm_up_thread,
+                                                       args=(product["ref"], product["accountancy_code_buy_intra"],)))
+        for thread in thread_pool:
+            thread.start()
+        for thread in thread_pool:
+            thread.join()

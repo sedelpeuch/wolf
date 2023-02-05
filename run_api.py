@@ -2,6 +2,7 @@
 This file is the entry point of flask api. Launch python3 ronoco_vm/run.py to run flask server
 """
 import os
+import threading
 
 import requests_cache
 from flask import Flask
@@ -59,6 +60,7 @@ class RunAPI:
             # if response from gestion.eirlab.net return False
             if response.url.startswith('https://gestion.eirlab.net'):
                 return False
+            print(response.url)
             return True
 
         requests_cache.install_cache('http_cache', backend='filesystem', filter_fn=filter,
@@ -81,7 +83,9 @@ class RunAPI:
         self.app.register_blueprint(formation.Formations().bp)
 
         import stock
-        self.app.register_blueprint(stock.Stock().bp)
+        stock_class = stock.Stock()
+        self.app.register_blueprint(stock_class.bp)
+        threading.Thread(target=stock_class.warm_up).start()
 
         CORS(self.app)
 
