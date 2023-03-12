@@ -249,8 +249,8 @@ class Member:
                                                                                                            'tarif ('
                                                                                                            'sur '
                                                                                                            'facture)'
-                                              if adherent.fk_adherent_type == 4 else "Etudiants en dehors de Bordeaux"
-                                                                                                                                                             " INP et demandeurs d'emploi" if adherent.fk_adherent_type == 2 else "Etudiant ou personnel de Bordeaux "
+                                              if adherent.fk_adherent_type == 4 else "Etudiant hors INP / Personne en situation de handicap / Demandeur d'emploi" if adherent.fk_adherent_type == 2
+                                              else "Etudiant ou personnel de Bordeaux "
                                                                                                                                                                                                                                   "INP",
                                               'need_subscription': '1', 'datefin': time.mktime(
                                                 datetime.datetime.strptime(adherent.datefin, "%Y-%m-%d").timetuple()),
@@ -297,7 +297,7 @@ class Adherent:
     def fill_fk_adherent_type(self, row):
         if row[5] == "Etudiant ou personnel de Bordeaux INP":
             self.fk_adherent_type = 1
-        elif row[5] == "Etudiants en dehors de Bordeaux INP et demandeurs d'emploi":
+        elif row[5] == "Etudiant hors INP / Personne en situation de handicap / Demandeur d'emploi":
             self.fk_adherent_type = 2
         elif row[5] == "Plein tarif":
             self.fk_adherent_type = 3
