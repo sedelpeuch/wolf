@@ -22,7 +22,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [Wolf]
     permissions:
       actions: read
       contents: read
