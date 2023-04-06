@@ -22,7 +22,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: [Wolf , ubuntu-latest]
+    runs-on: [Wolf]
     permissions:
       actions: read
       contents: read
