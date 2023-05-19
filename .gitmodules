@@ -2,6 +2,3 @@
 	path = wolf_core
 	url = git@github.com:Eirlab/wolf-core.git
 	branch = main
-[submodule "wolf-core"]
-	path = wolf-core
-	url = git@github.com:eirlab/wolf-core.git
