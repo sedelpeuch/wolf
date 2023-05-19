@@ -1,4 +1,4 @@
-[submodule "wolf_core"]
-	path = wolf_core
+[submodule "core"]
+	path = core
 	url = git@github.com:Eirlab/wolf-core.git
 	branch = main
