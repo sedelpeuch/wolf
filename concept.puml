@@ -4,9 +4,12 @@ skinparam linetype ortho
 package wolf{
 package wolf-core{
 class Runner{
-- applications
-- loadApplications()
-- getAllStatus()
+~ applications
+- debug
+- status
+- setup_logger()
+- load_applications()
+- get_all_status()
 + run()
 + shutdown()
 }
@@ -20,9 +23,20 @@ interface API{
 
 interface Application{
 ~ apis
+~ status
 + frequency
++ logger
++ status(value)
 + job()
++ run()
 
+}
+
+enum Status{
+RUNNING = 1
+WAITING = 2
+ERROR = 3
+SUCCESS = 4
 }
 }
 
@@ -49,5 +63,6 @@ API <-- Dolibarr
 API <-- Notion
 Application <-- SyncCalendar
 Application <-- Inscrit
+Application *-up- Status
 
 @enduml
