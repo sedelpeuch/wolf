@@ -1,0 +1,19 @@
+version: 2
+
+sphinx:
+  configuration: docs/source/conf.py
+
+submodules:
+  include: all
+  recursive: true
+
+python:
+  version: 3.8
+  install:
+    - requirements: core/requirements.txt
+    - method: pip
+      path: core
+
+build:
+  image: latest
+

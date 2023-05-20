@@ -7,6 +7,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../../core/wolf_core/'))
+sys.path.insert(0, os.path.abspath('../../core/docs/source/'))
 
 
 project = 'Wolf'
@@ -16,7 +17,6 @@ author = 'sedelpeuch'
 version = '1.1'
 
 # -- General configuration
-
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.intersphinx', 'myst_parser', ]
 
 intersphinx_mapping = {'python': ('https://docs.python.org/2/', None), 'sphinx': ('https://www.sphinx-doc.org/en/master/', None), }

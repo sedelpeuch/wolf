@@ -1,6 +1,6 @@
 name: Unittest
 
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   build:
@@ -18,15 +18,15 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          git submodule init
+          git submodule update
           python -m pip install --upgrade pip
-          pip install ruff pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Lint with ruff
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
-          # default set of ruff rules with GitHub Annotations
-          ruff --format=github --target-version=py37 .
+          python -m pip install virtualenv
+          python -m virtualenv venv
+          source venv/bin/activate
+          cd core && pip install -r requirements.txt
+          poetry install
       - name: Test with unittest
         run: |
+          source venv/bin/activate
           cd tests && python -m unittest
