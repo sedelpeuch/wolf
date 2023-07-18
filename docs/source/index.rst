@@ -32,6 +32,7 @@ Wolf est un package applicatif utilisant Wolf Core pour définir des application
     :caption: Wolf
 
     installation.md
+    notion
 
 .. toctree::
     :glob:
