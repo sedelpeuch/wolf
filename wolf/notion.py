@@ -6,6 +6,7 @@ The Notion API is documented here: https://developers.notion.com/reference/intro
 # 286ecfe40ac34190960ca136e54901a8
 
 import json
+import os
 
 import requests
 
@@ -14,7 +15,8 @@ from wolf_core import api
 
 class Notion(api.API):
     def __init__(self):
-        with open("token.json") as f:
+        absolute_path = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(absolute_path, "token.json")) as f:
             token = json.load(f)["notion"]
 
         ressources = {
@@ -34,6 +36,7 @@ class Notion(api.API):
         return {
             "Authorization": f"Bearer {self._token}",
             "Notion-Version": "2022-06-28",
+            "accept": "application/json"
         }
 
     def get_databases(self, params):
