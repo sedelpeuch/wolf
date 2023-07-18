@@ -8,8 +8,10 @@ Wolf-Core Status
 
 [![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml)
 
-Le projet Wolf est une initiative de l'association EirLab Community visant à gérer les ressources internes. Son objectif est de fournir un
-environnement d'interconnexion entre différents outils de gestion tels que HelloAsso et Dolibarr. Cette solution permet une gestion centralisée et
+Le projet Wolf est une initiative de l'association EirLab Community visant à gérer les ressources internes. Son objectif
+est de fournir un
+environnement d'interconnexion entre différents outils de gestion tels que HelloAsso et Dolibarr. Cette solution permet
+une gestion centralisée et
 harmonisée des processus de l'association.
 
 ## Installation
@@ -57,18 +59,34 @@ cd core
 poetry install
 ```
 
+### Configuration
+
+Le projet utilise un fichier de configuration pour définir les paramètres de connexion aux différents outils. Vous devez
+créer un fichier de configuration à placer dans le répertoire wolf nommé `token.json` ayant le format suivant :
+
+```json
+{
+  "notion": "SECRET_HERE",
+  "dolibarr": "SECRET_HERE"
+}
+```
+
+Attention, ce fichier ne doit pas être versionné ! Vous devez donc l'ajouter au fichier `.gitignore` du projet.
+
 Une fois l'installation terminée, vous pouvez commencer à utiliser le projet Wolf.
 
 ## Documentation
 
-La documentation complète du projet est disponible dans le répertoire /docs. Vous pouvez consulter cette documentation pour en savoir plus sur les
+La documentation complète du projet est disponible dans le répertoire /docs. Vous pouvez consulter cette documentation
+pour en savoir plus sur les
 fonctionnalités du projet et son utilisation.
 
 La documentation est disponibe en ligne à l'adresse suivante : https://wolf-eirlab-community.readthedocs.io/
 
 ## Contributions
 
-Nous accueillons avec plaisir les contributions à notre projet ! Si vous souhaitez contribuer, veuillez suivre les étapes suivantes :
+Nous accueillons avec plaisir les contributions à notre projet ! Si vous souhaitez contribuer, veuillez suivre les
+étapes suivantes :
 
 - Forker le dépôt
 - Créer une nouvelle branche
@@ -83,5 +101,6 @@ Nous apprécions les contributions de la communauté pour améliorer et faire é
 
 Ce projet est distribué sous licence GPL3. Pour plus d'informations, veuillez consulter le fichier LICENSE.
 
-Nous espérons que le projet Wolf répondra à vos besoins de gestion des ressources internes. N'hésitez pas à nous contacter si vous avez des questions
+Nous espérons que le projet Wolf répondra à vos besoins de gestion des ressources internes. N'hésitez pas à nous
+contacter si vous avez des questions
 ou des commentaires. Merci de votre intérêt pour notre projet !
