@@ -6,7 +6,8 @@ Wolf Status
 
 Wolf-Core Status
 
-[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml)
+[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core]
+(https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml)
 
 Le projet Wolf est une initiative de l'association EirLab Community visant à gérer les ressources internes. Son objectif
 est de fournir un

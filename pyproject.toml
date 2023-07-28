@@ -1,0 +1,14 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "wolf"
+version = "0.1"
+description = "A library using wolf core to implement applications for services automation"
+authors = ["sedelpeuch <sebastien@delpeuch.net>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+
+[packages]
+wolf_core = { path = "wolf", develop = true }
