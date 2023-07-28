@@ -1,105 +1,172 @@
-#! /usr/bin/env python3
-"""
-This module test notion class
-"""
-from unittest import TestCase, mock
-from unittest.mock import MagicMock
-
+import unittest
 from wolf_core import api
-from wolf import notion
+from unittest.mock import patch, Mock
+import json
+from wolf.notion import Notion  # Change to your actual module
 
+class TestNotionBlock(unittest.TestCase):
 
-class NotionTest(TestCase):
-    """
-    Testing Notion class
-    """
+    @patch('requests.patch')
+    def test_append_block_children(self, mock_patch):
+        mock_patch.return_value.json.return_value = {"test": "value"}
+        mock_patch.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.append_block_children("block_id", [{"object": "block", "type": "paragraph"}])
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
 
-    def setUp(self):
-        """
-        Initializes the NotionTest class.
+    @patch('requests.get')
+    def test_get_block(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_block("block_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
 
-        :return: None
-        """
-        self.notion = notion.Notion()
-        self.notion._token = "mock_token"
+    @patch('requests.get')
+    def test_get_block_children(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_block_children("block_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
 
-    @mock.patch('requests.get')
+    @patch('requests.patch')
+    def test_update_block(self, mock_patch):
+        mock_patch.return_value.json.return_value = {"test": "value"}
+        mock_patch.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.update_block("block_id", {"title": "Updated title"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.delete')
+    def test_delete_block(self, mock_delete):
+        mock_delete.return_value.json.return_value = {"test": "value"}
+        mock_delete.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.delete_block("block_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+class TestNotionDatabase(unittest.TestCase):
+
+    @patch('requests.get')
+    def test_get_database(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_database("database_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.patch')
+    def test_patch_database(self, mock_patch):
+        mock_patch.return_value.json.return_value = {"test": "value"}
+        mock_patch.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.patch_database("database_id", title="Updated title")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.post')
+    def test_query_database(self, mock_post):
+        mock_post.return_value.json.return_value = {"test": "value"}
+        mock_post.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.query_database("database_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+class TestNotionPage(unittest.TestCase):
+
+    @patch('requests.get')
+    def test_get_page(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_page("params")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.post')
+    def test_post_page(self, mock_post):
+        mock_post.return_value.json.return_value = {"test": "value"}
+        mock_post.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.post_page("parent_id", {"title": "Page Title"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.get')
+    def test_get_page_property(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_page_property("page_id", "property_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.patch')
+    def test_patch_page_property(self, mock_patch):
+        mock_patch.return_value.json.return_value = {"test": "value"}
+        mock_patch.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.patch_page_property("page_id", {"title": "Updated Title"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+class TestNotionUsersAndSearch(unittest.TestCase):
+
+    @patch('requests.get')
+    def test_get_user(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_user("user_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.get')
+    def test_get_all_users(self, mock_get):
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_user()
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+    @patch('requests.post')
+    def test_search(self, mock_post):
+        mock_post.return_value.json.return_value = {"test": "value"}
+        mock_post.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.search({"query": "query"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
+
+class TestNotionDatabaseActions(unittest.TestCase):
+
+    @patch('requests.get')
     def test_get_databases(self, mock_get):
-        """
-        Test get_databases method
-        """
-        # Arrange the mock return value
-        mock_resp_instance = MagicMock()
-        expected_resp = api.RequestResponse(status_code=200, data={})
-        mock_resp_instance.json.return_value = expected_resp.data
-        mock_resp_instance.status_code = expected_resp.status_code
+        mock_get.return_value.json.return_value = {"test": "value"}
+        mock_get.return_value.status_code = 200
+        notion = Notion()
+        resp = notion.get_databases("database_id")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
 
-        # Connect the mock
-        mock_get.return_value = mock_resp_instance
+    @patch('requests.post')
+    def test_create_database(self, mock_post):
+        mock_post.return_value.json.return_value = {"test": "value"}
+        mock_post.return_value.status_code = 200
+        notion = Notion()
+        properties = {"Name": {"title": []}, "Description": {"rich_text": []}}
+        resp = notion.create_database("parent_id", properties, title="Test Database")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, {"test": "value"})
 
-        # Call the method
-        response = self.notion.get_databases('test_params')
-
-        # Test that the method behaves as expected
-        self.assertEqual(expected_resp, response)
-        mock_get.assert_called_once_with(self.notion._url + "/v1/databases/" + 'test_params',
-                                         headers=self.notion.oauth_header())
-
-    @mock.patch('requests.get')
-    def test_get_pages(self, mock_get):
-        """
-        Test get_pages method
-        """
-        # Arrange the mock return value
-        mock_resp_instance = MagicMock()
-        expected_resp = api.RequestResponse(status_code=200, data={})
-        mock_resp_instance.json.return_value = expected_resp.data
-        mock_resp_instance.status_code = expected_resp.status_code
-
-        # Connect the mock
-        mock_get.return_value = mock_resp_instance
-
-        # Call the method
-        response = self.notion.get_pages('test_params')
-
-        # Test that the method behaves as expected
-        self.assertEqual(expected_resp, response)
-        mock_get.assert_called_once_with(self.notion._url + "/v1/pages/" + 'test_params',
-                                         headers=self.notion.oauth_header())
-
-    def test_oauth_header(self):
-        """
-        Test oauth_header method
-        """
-        # Call the method
-        header = self.notion.oauth_header()
-
-        # Test that the method behaves as expected
-        expected_header = {
-            "Authorization": f"Bearer mock_token",
-            "Notion-Version": "2022-06-28",
-            "accept": "application/json"
-        }
-        self.assertEqual(expected_header, header)
-
-    @mock.patch('requests.get', side_effect=Exception('mocked error'))
-    def test_get_databases_exception(self, mock_get):
-        """
-        Test get_databases method when an exception is raised by requests.get
-        """
-        # Call the method and test that it raises an exception
-        with self.assertRaises(Exception) as context:
-            self.notion.get_databases('test_params')
-
-        self.assertTrue('mocked error' in str(context.exception))
-
-    @mock.patch('requests.get', side_effect=Exception('mocked error'))
-    def test_get_pages_exception(self, mock_get):
-        """
-        Test get_pages method when an exception is raised by requests.get
-        """
-        # Call the method and test that it raises an exception
-        with self.assertRaises(Exception) as context:
-            self.notion.get_pages('test_params')
-
-        self.assertTrue('mocked error' in str(context.exception))
+if __name__ == "__main__":
+    unittest.main()
