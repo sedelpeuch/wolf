@@ -24,6 +24,7 @@ jobs:
           python -m pip install virtualenv
           python -m virtualenv venv
           source venv/bin/activate
+          pip install poetry
           cd core && poetry install
           cd .. && poetry install
       - name: Test with unittest
