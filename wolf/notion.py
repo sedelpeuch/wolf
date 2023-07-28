@@ -22,11 +22,15 @@ class Notion(api.API):
     https://developers.notion.com/reference/intro
     """
 
-    def __init__(self):
+    def __init__(self, test=False):
         absolute_path = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(absolute_path, "token.json")) as f:
-            token = json.load(f)["notion"]
-            os.environ["NOTION_TOKEN"] = token
+        if test:
+            token = "test"
+        else:
+            with open(os.path.join(absolute_path, "token.json")) as f:
+                token = json.load(f)["notion"]
+                os.environ["NOTION_TOKEN"] = token
+
 
         ressources = {
             "pages": {
