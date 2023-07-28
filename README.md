@@ -2,7 +2,7 @@
 
 Wolf Status
 
-[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Unittest](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml)
+[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Unittest](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml) [![Deploy EirLab Cloud](https://github.com/Eirlab/wolf/actions/workflows/deploy_eirlab_cloud.yml/badge.svg)](https://github.com/Eirlab/wolf/actions/workflows/deploy.yml)
 
 Wolf-Core Status
 
