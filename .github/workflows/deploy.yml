@@ -69,6 +69,13 @@ jobs:
           script: |
             python3 -m venv ~/wolf/venv
             source ~/wolf/venv/bin/activate
-            pip3 install pip install poetry==1.5.0
-            poetry install ~/wolf/wolf_package.whl
+            pip3 install poetry==1.5.0
+            mkdir -p ~/wolf/wolf
+            mkdir -p ~/wolf/temp
+            tar xf ~/wolf/dist/*.tar.gz -C ~/wolf/temp
+            find ~/wolf/temp/ -mindepth 2 -type f -exec mv {} ~/wolf/wolf \;
+            rm -rf ~/wolf/temp
+            cd ~/wolf/wolf
+            poetry install
+            deactivate
             echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python install.py
