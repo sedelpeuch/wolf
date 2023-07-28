@@ -65,7 +65,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-
+          passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             python3 -m venv ~/wolf/venv
             source ~/wolf/venv/bin/activate
