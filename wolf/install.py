@@ -16,6 +16,7 @@ sensitive token information into a standalone JSON file. As a security measure, 
 dynamically and securely, not hardcoded. Also, the script should be run with sufficient permissions, usually as root
 or via sudo, to allow the creation/modification of system services.
 """
+import argparse
 import getpass
 import json
 import os
@@ -83,9 +84,33 @@ def create_token_file(token_dict, file_path='token.json'):
     print(f"token.json created at {file_path}.")
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+
+    # You can specify some known arguments, e.g., service_name in this case
+    unknown_args = parser.parse_known_args()
+    print(unknown_args)
+
+    # Convert unknown args to token dictionary
+    token_dict = {}
+    for arg in unknown_args[1]:
+        if arg.startswith('--'):
+            key = arg[2:]
+            value = unknown_args[1][unknown_args[1].index(arg) + 1]
+            token_dict[key] = value
+
+    return unknown_args[0], token_dict
+
+
 if __name__ == "__main__":
+    args = parse_arguments()
+    # check if args is not empty
+    if args[1]:
+        token_dict = args[1]
+    else:
+        # Needs to be replaced with the actual token. KEEP SECRET AND NEVER COMMIT TO GIT!
+        token_dict = {"app": "token"}
     service_name = 'wolf.service'
-    token_dict = {"app": "token"}  # Needs to be replaced with the actual token. KEEP SECRET AND NEVER COMMIT TO GIT!
 
     create_service(service_name=service_name)
     create_token_file(token_dict)
