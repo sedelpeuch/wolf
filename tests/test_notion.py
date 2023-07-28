@@ -1,8 +1,8 @@
 import unittest
-from wolf_core import api
-from unittest.mock import patch, Mock
-import json
-from wolf.notion import Notion  # Change to your actual module
+from unittest.mock import patch
+
+from wolf.notion import Notion
+
 
 class TestNotionBlock(unittest.TestCase):
 
@@ -51,6 +51,7 @@ class TestNotionBlock(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
+
 class TestNotionDatabase(unittest.TestCase):
 
     @patch('requests.get')
@@ -79,6 +80,7 @@ class TestNotionDatabase(unittest.TestCase):
         resp = notion.query_database("database_id")
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
+
 
 class TestNotionPage(unittest.TestCase):
 
@@ -118,6 +120,7 @@ class TestNotionPage(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
+
 class TestNotionUsersAndSearch(unittest.TestCase):
 
     @patch('requests.get')
@@ -147,6 +150,7 @@ class TestNotionUsersAndSearch(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
+
 class TestNotionDatabaseActions(unittest.TestCase):
 
     @patch('requests.get')
@@ -167,6 +171,7 @@ class TestNotionDatabaseActions(unittest.TestCase):
         resp = notion.create_database("parent_id", properties, title="Test Database")
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
+
 
 if __name__ == "__main__":
     unittest.main()
