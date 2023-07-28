@@ -78,4 +78,4 @@ jobs:
             cd ~/wolf/wolf
             poetry install
             deactivate
-            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python install.py
+            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python3 install.py
