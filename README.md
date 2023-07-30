@@ -8,12 +8,8 @@ Wolf-Core Status
 
 [![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml)
 
-Le projet Wolf est une initiative de l'association EirLab Community visant à gérer les ressources internes. Son objectif
-est de fournir un
-environnement d'interconnexion entre différents outils de gestion tels que HelloAsso et Dolibarr. Cette solution permet
-une gestion centralisée et
-harmonisée des processus de l'association.
-
+Le projet Wolf est un projet ayant pour but de créer un environnement d'interconnexion entre les différents outils pouvant être utilisés dans la gestion d'associatins, de projets
+etc
 ## Installation
 
 Pour installer le projet, suivez les instructions ci-dessous :
@@ -22,7 +18,7 @@ Clonez le projet sur votre machine en utilisant la commande suivante :
 bash
 
 ```bash
-git clone git@github.com:eirlab/wolf.git
+git clone git@github.com:sedelpeuch/wolf.git
 ```
 
 ### Installation pour les utilisateurs
@@ -33,7 +29,7 @@ Créez un environnement virtuel et installez le package `wolf_core` :
 python3 -m pip install virtualenv
 python3 -m virtualenv venv
 source venv/bin/activate
-pip install 'wolf_core @ git+https://github.com/Eirlab/wolf-core.git'
+pip install 'wolf_core @ git+https://github.com/sedelpeuch/wolf-core.git'
 
 ```
 

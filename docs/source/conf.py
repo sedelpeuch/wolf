@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath('../../wolf_core/'))
 sys.path.insert(0, os.path.abspath('../..'))
 
 project = 'Wolf Core'
-copyright = '2023, EirLab Community'
+copyright = '2023, Sébastien Delpeuch'
 author = 'sedelpeuch'
 
 version = '0.1'
