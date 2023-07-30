@@ -12,8 +12,7 @@ Documentation Wolf
    <p>
    </p>
 
-Le projet Wolf est un projet ayant pour but la gestion des ressources internes de l'association EirLab Community. L'objectif du projet est de
-fournir un environnement d'interconnexion entre les différents outils de gestions de l'association (HelloAsso, Dolibarr, etc...).
+Le projet Wolf est un projet ayant pour but de créer un environnement d'interconnexion entre les différents outils pouvant être utilisés dans la gestion d'associatins, de projets etc
 
 Le projet est composé de deux packages. Wolf et Wolf Core.
 Wolf Core est un package permettant de mettre en place un runner de tâches asynchrones. Il défini plusieurs interfaces permettant de définir une
@@ -32,7 +31,9 @@ Wolf est un package applicatif utilisant Wolf Core pour définir des application
     :caption: Wolf
 
     installation.md
+    notion_main.md
     notion
+    notion2latex
 
 .. toctree::
     :glob:

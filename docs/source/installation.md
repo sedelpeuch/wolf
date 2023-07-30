@@ -7,7 +7,7 @@ Clonez le projet sur votre machine en utilisant la commande suivante :
 bash
 
 ```bash
-git clone git@github.com:eirlab/wolf.git
+git clone git@github.com:sedelpeuch/wolf.git
 ```
 
 Installation pour les utilisateurs

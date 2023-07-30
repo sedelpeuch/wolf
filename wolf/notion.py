@@ -31,7 +31,6 @@ class Notion(api.API):
                 token = json.load(f)["notion"]
                 os.environ["NOTION_TOKEN"] = token
 
-
         ressources = {
             "pages": {
                 "page_get": {"verb": "GET", "method": self.get_page, "params": str},
