@@ -2,12 +2,11 @@
 
 Wolf Status
 
-[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Unittest](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml)
+[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Unittest](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf/actions/workflows/unittest.yml) [![Deploy EirLab Cloud](https://github.com/Eirlab/wolf/actions/workflows/deploy_eirlab_cloud.yml/badge.svg)](https://github.com/Eirlab/wolf/actions/workflows/deploy.yml)
 
 Wolf-Core Status
 
-[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core]
-(https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml)
+[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/Eirlab/wolf-core/actions/workflows/publish.yaml)
 
 Le projet Wolf est une initiative de l'association EirLab Community visant à gérer les ressources internes. Son objectif
 est de fournir un
@@ -28,13 +27,14 @@ git clone git@github.com:eirlab/wolf.git
 
 ### Installation pour les utilisateurs
 
-Créez un environnement virtuel et installez le package `wolf_core` :
+Créez un environnement virtuel et installez le package :
 
 ```bash
 python3 -m pip install virtualenv
 python3 -m virtualenv venv
 source venv/bin/activate
-pip install 'wolf_core @ git+https://github.com/Eirlab/wolf-core.git'
+pip install poetry
+poetry install
 
 ```
 
@@ -62,19 +62,22 @@ poetry install
 
 ### Configuration
 
-Le projet utilise un fichier de configuration pour définir les paramètres de connexion aux différents outils. Vous devez
-créer un fichier de configuration à placer dans le répertoire wolf nommé `token.json` ayant le format suivant :
+Le projet utilise les arguments de la ligne de commande pour définir les paramètres de connexion à divers outils. Vous pouvez placer vos tokens directement via les arguments de la
+ligne de commande.
 
-```json
-{
-  "notion": "SECRET_HERE",
-  "dolibarr": "SECRET_HERE"
-}
+```bash
+python install.py --token1 VOTRE_TOKEN1 --token2 VOTRE_TOKEN2 ...
 ```
 
-Attention, ce fichier ne doit pas être versionné ! Vous devez donc l'ajouter au fichier `.gitignore` du projet.
+N'oubliez pas de remplacer VOTRE_NOTION_TOKEN et VOTRE_DOLIBARR_TOKEN par vos véritables tokens.
+Vous pouvez également placer vos tokens dans le fichier `install.py`.
 
-Une fois l'installation terminée, vous pouvez commencer à utiliser le projet Wolf.
+Pour enregistrer la configuration et lancer le projet en tant que service systemd, exécutez la commande suivante :
+
+```bash
+deactivate
+sudo python3 install.py
+```
 
 ## Documentation
 
@@ -82,7 +85,7 @@ La documentation complète du projet est disponible dans le répertoire /docs. V
 pour en savoir plus sur les
 fonctionnalités du projet et son utilisation.
 
-La documentation est disponibe en ligne à l'adresse suivante : https://wolf-eirlab-community.readthedocs.io/
+La documentation est disponible en ligne à l'adresse suivante : https://wolf-eirlab-community.readthedocs.io/
 
 ## Contributions
 

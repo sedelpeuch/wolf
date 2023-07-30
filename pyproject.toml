@@ -10,5 +10,11 @@ authors = ["sedelpeuch <sebastien@delpeuch.net>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
-[packages]
-wolf_core = { path = "wolf", develop = true }
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+wolf-core = { version = "1.0", source = "testpypi" }
+

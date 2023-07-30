@@ -1,24 +1,24 @@
 name: Pylint
 
-on: [pull_request]
+on: [ pull_request ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8"]
+        python-version: [ "3.8" ]
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pylint
-    - name: Analysing the code with pylint
-      run: |
-        wget -O .pylintrc  https://gist.github.com/sedelpeuch/14bfafb97d9ea56b88d295898ab9d7e9/raw
-        python -m pylint wolf
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint
+      - name: Analysing the code with pylint
+        run: |
+          wget -O .pylintrc  https://gist.github.com/sedelpeuch/14bfafb97d9ea56b88d295898ab9d7e9/raw
+          python -m pylint wolf
