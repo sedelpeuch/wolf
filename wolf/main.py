@@ -11,5 +11,5 @@ if __name__ == "__main__":
         if file.endswith(".py") and file not in ["main.py", "install.py", "__init__.py"]:
             __import__(f"wolf.{file[:-3]}")
 
-    main_runner = runner.Runner(debug=False)
+    main_runner = runner.Runner(debug=True)
     main_runner.run()

@@ -49,9 +49,9 @@ class Notion2Latex(application.Application):
             },
             "required": ["client", "titre", "phase_id", "phase_nom"]
         }
-        self.master_file = "567a24028dcc4fb68d4533b285ef75ca"
         with open('token.json') as file:
             token = json.load(file)['github_doc_publish']
+            self.master_file = json.load(file)['notion_master_file']
         self.github = Github(token)
         self.repo = self.github.get_user().get_repo('compiled_result_latex')
 
