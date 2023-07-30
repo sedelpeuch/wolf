@@ -1,10 +1,10 @@
 name: Pylint
 
-on: [ push ]
+on: [ pull_request ]
 
 jobs:
   build:
-    runs-on: Robotics
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [ "3.8" ]
@@ -21,4 +21,4 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           wget -O .pylintrc  https://gist.github.com/sedelpeuch/14bfafb97d9ea56b88d295898ab9d7e9/raw
-          python -m pylint wolf_core
+          python -m pylint wolf

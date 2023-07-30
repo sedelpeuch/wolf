@@ -5,14 +5,17 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../../wolf_core/'))
 sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../wolf/'))
+sys.path.insert(0, os.path.abspath('../../core/wolf_core/'))
+sys.path.insert(0, os.path.abspath('../../core/docs/source/'))
 
-project = 'Wolf Core'
-copyright = '2023, Sébastien Delpeuch'
+
+project = 'Wolf'
+copyright = '2023, EirLab Community'
 author = 'sedelpeuch'
 
-version = '0.1'
+version = '1.1'
 
 # -- General configuration
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.intersphinx', 'myst_parser', ]
@@ -31,3 +34,4 @@ html_logo = '../img/logo.png'
 epub_show_urls = 'footnote'
 master_doc = 'index'
 os.environ['DISPLAY'] = ':0'
+

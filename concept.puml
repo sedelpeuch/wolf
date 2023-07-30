@@ -1,0 +1,68 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam linetype ortho
+package wolf{
+package wolf-core{
+class Runner{
+~ applications
+- debug
+- status
+- setup_logger()
+- load_applications()
+- get_all_status()
++ run()
++ shutdown()
+}
+
+interface API{
+~ url
+~ token
++ get(resource)
++ post(resource, data)
+}
+
+interface Application{
+~ apis
+~ status
++ frequency
++ logger
++ status(value)
++ job()
++ run()
+
+}
+
+enum Status{
+RUNNING = 1
+WAITING = 2
+ERROR = 3
+SUCCESS = 4
+}
+}
+
+class Dolibarr{
+
+}
+
+class Notion{
+
+}
+
+class SyncCalendar{
+
+}
+
+class Inscrit{
+
+}
+}
+
+Runner "1" *-- "n" Application
+Application "1" *-left- "n" API
+API <-- Dolibarr
+API <-- Notion
+Application <-- SyncCalendar
+Application <-- Inscrit
+Application *-up- Status
+
+@enduml
