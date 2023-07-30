@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('../../core/docs/source/'))
 
 
 project = 'Wolf'
-copyright = '2023, EirLab Community'
+copyright = '2023, Sébastien Delpeuch'
 author = 'sedelpeuch'
 
 version = '1.1'
