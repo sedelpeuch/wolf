@@ -49,7 +49,7 @@ class Notion2Latex(application.Application):
             },
             "required": ["client", "titre", "phase_id", "phase_nom"]
         }
-        self.master_file = "011f57a503864878b9e777d80932706d"
+        self.master_file = "567a24028dcc4fb68d4533b285ef75ca"
         with open('token.json') as file:
             token = json.load(file)['github_doc_publish']
         self.github = Github(token)
@@ -77,7 +77,7 @@ class Notion2Latex(application.Application):
         req = self.api("Notion").get.block_children(self.master_file)
         if req.status_code != 200:
             self.logger.error("Failed to get files from Notion.")
-            return None
+            return None, None
         files = []
         block_saved = []
         blocks = req.data["results"]
