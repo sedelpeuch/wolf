@@ -7,10 +7,12 @@ import base64
 import json
 import os
 import subprocess
+import time
 
 import jsonschema
 import pygit2
 import schedule
+import unidecode
 from github import Github, InputGitTreeElement
 from notion2md.exporter.block import MarkdownExporter
 
@@ -36,7 +38,7 @@ class Notion2Latex(application.Application):
 
     def __init__(self):
         super().__init__()
-        self.frequency = schedule.every(5).seconds
+        self.frequency = schedule.every(1).minutes
         self.validate_schema = {
             "type": "object",
             "properties": {
@@ -63,7 +65,7 @@ class Notion2Latex(application.Application):
         """
         status = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if status.returncode != 0:
-            raise RuntimeError("Failed to run command: " + cmd + "\n" + status.stderr)
+            return False
         return True
 
     def get_files(self):
@@ -77,6 +79,7 @@ class Notion2Latex(application.Application):
             self.logger.error("Failed to get files from Notion.")
             return None
         files = []
+        block_saved = []
         blocks = req.data["results"]
         for block in blocks:
             if block["type"] == "paragraph":
@@ -84,7 +87,9 @@ class Notion2Latex(application.Application):
                     if rich_text["type"] == "mention":
                         if rich_text["mention"]["type"] == "page":
                             files.append(rich_text["mention"]["page"]["id"])
-        return files
+                            block_saved.append(block)
+        self.logger.info("Get {} files from Notion.".format(len(files)))
+        return files, block_saved
 
     def get_markdown(self, file):
         """
@@ -121,16 +126,11 @@ class Notion2Latex(application.Application):
             with open(file + ".md", "w") as f:
                 f.write(header_data_line_process[:index + 12].lstrip())
                 f.write(body_data)
-            try:
-                jsonschema.validate(param_dict, self.validate_schema)
-            except jsonschema.exceptions.ValidationError as e:
-                self.logger.error("JSON Schema validation failed for file: " + file + ".md" + "\n" + str(e))
-                self.set_status(application.Status.ERROR)
-                return application.Status.ERROR
-            finally:
-                self.logger.warning(
-                    "JSON Schema validation passed for file: " + file + ".md." + " Beginning compilation "
-                                                                                 "...")
+        try:
+            jsonschema.validate(param_dict, self.validate_schema)
+        except jsonschema.exceptions.ValidationError:
+            self.logger.error("JSON Schema validation failed for file: " + file + ".md")
+            self.run_command("rm " + file + ".md")
         return param_dict
 
     def compile(self, file, param_dict):
@@ -143,58 +143,126 @@ class Notion2Latex(application.Application):
         """
         self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
         os.chdir("doc_latex-template-complex-version/src")
-        self.run_command(
+        success_first = self.run_command(
             "pandoc " + file + ".md --template=template.tex -o " + file + ".tex && xelatex "
             + file + ".tex interaction=nonstopmode >/dev/null"
         )
+        success_second = self.run_command(
+            "xelatex " + file + ".tex interaction=nonstopmode >/dev/null"
+        )
+        success = success_first and success_second
+        if not success:
+            self.logger.error("Failed to compile file: " + file + ".md")
+            return None
         self.run_command("rm *.aux *.log *.out")
         self.run_command("rm " + file + ".md " + file + ".tex")
-        title = (param_dict["client"] + "_" + param_dict["titre"]).lower()
+
+        client = unidecode.unidecode(param_dict["client"]).lower().replace("'", "")
+        titre = unidecode.unidecode(param_dict["titre"]).lower().replace("'", "")
+        phase_id = unidecode.unidecode(param_dict["phase_id"]).lower().replace("'", "")
+        phase_nom = unidecode.unidecode(param_dict["phase_nom"]).lower().replace("'", "")
+        title = client + "_" + titre + "_" + phase_id + "_" + phase_nom
         title = title.replace(" ", "-")
         self.run_command("mv " + file + ".pdf ../out/" + title + ".pdf")
         os.chdir("../..")
         self.run_command("rm " + file + ".md")
         return title
 
-    def publish_compiled(self, file, title):
+    def publish_compiled(self, param_dict, title):
         """
-        Publishes the compiled PDF file to the Notion page.
+        Publishes the compiled PDF file to a GitHub repository.
 
-        :param file: The path to the compiled PDF file.
-        :type file: str
-        :param title: The title of the Notion page.
-        :type title: str
+        :param param_dict: A dictionary containing parameters for publishing the compiled PDF.
+        :param title: The title of the PDF file.
         :return: None
         """
-        pdf_file_location = "doc_latex-template-complex-version/out/" + title + ".pdf"
-        # with open(pdf_file_location, "rb") as f:
-        #     data = f.read()
-        # base64content = base64.b64encode(data)
-        # tree = self.repo.get_git_tree("master")
-        # element = InputGitTreeElement(path=pdf_file_location, mode='100644', type='blob',
-        #                               content=base64content.decode())
-        # tree_data = self.repo.create_git_tree(tree=[element], base_tree=tree)
-        # parents = [self.repo.get_git_commit(sha="master")]
-        #
-        # commit = self.repo.create_git_commit(message='Add PDF', tree=tree_data, parents=parents)
-        # self.repo.head_ref.edit(sha=commit.sha)
+        file_path = "doc_latex-template-complex-version/out/" + title + ".pdf"
+        file_name = param_dict["client"] + "/" + title + ".pdf"
 
-        block_object = {
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": [
+        # noinspection PyBroadException
+        try:
+            commit_message = 'Add ' + file_name + ' on GitHub'
+            master_ref = self.repo.get_git_ref('heads/master')
+            master_sha = master_ref.object.sha
+            base_tree = self.repo.get_git_tree(master_sha)
+            with open(file_path, 'rb') as input_file:
+                data = input_file.read()
+            data = base64.b64encode(data).decode("utf-8")
+            blob = self.repo.create_git_blob(data, "base64")
+            element = InputGitTreeElement(file_name, '100644', 'blob', sha=blob.sha)
+            tree = self.repo.create_git_tree([element], base_tree=base_tree)
+            parent = self.repo.get_git_commit(master_sha)
+            commit = self.repo.create_git_commit(commit_message, tree, [parent])
+            master_ref.edit(commit.sha)
+        except Exception:
+            self.logger.error(f"Le fichier PDF {file_name} n'a pas pu être poussé sur le repo.")
+            return None
+        self.logger.info(f"Le fichier PDF {file_name} a été poussé sur le repo avec succès.")
+        return "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name, master_ref.ref,
+                                                            file_name)
+
+    def update_notion(self, success, file_id, block, msg=None, link=None):
+        """
+        Updates the Notion page with the result of the compilation.
+
+        :param success: Boolean value indicating whether the update was successful.
+        :param file_id: String representing the ID of the Notion page.
+        :param block: Dictionary representing the block on the Notion page.
+        :param msg: Optional string representing an additional message to display.
+        :param link: Optional string representing the GitHub link.
+        :return: None
+        """
+        string_display = " ✅ " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()) \
+            if success else " ❌ " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
+        if msg:
+            string_display += " - " + msg
+        new_paragraph_block = {
+            'paragraph': {
+                'rich_text': [
                     {
-                        "type": "text",
-                        "text": {
-                            "content": pdf_file_location,
-                            "link": None
-                        }
+                        'type': 'mention',
+                        'mention': {
+                            'type': 'page',
+                            'page': {
+                                'id': file_id
+                            }
+                        },
+                        'annotations': {
+                            'bold': False,
+                            'italic': False,
+                            'strikethrough': False,
+                            'underline': False,
+                            'code': False,
+                            'color': 'default'
+                        },
+                        'plain_text': 'Test',
+                        'href': 'https://www.notion.so/' + file_id
+                    },
+                    {
+                        'type': 'text',
+                        'text': {
+                            'content': string_display,
+                            'link': None
+                        },
                     }
                 ]
             }
         }
-        req = self.api("Notion").patch.block_children(self.master_file, [block_object])
+        if link:
+            # noinspection PyTypeChecker
+            new_paragraph_block['paragraph']['rich_text'].append({
+                'type': 'text',
+                'text': {
+                    'content': " - Github link",
+                    'link': {
+                        'url': link
+                    }
+                }
+            })
+        req = self.api("Notion").patch.block(block["id"], new_paragraph_block)
+        if not req:
+            self.logger.error("Error while updating Notion page.")
+            raise Exception("Error while updating Notion page.")
 
     def get_template(self):
         """
@@ -227,9 +295,9 @@ class Notion2Latex(application.Application):
 
         :return: application.Status The status of the job indicating whether it was successful or not.
         """
-        self.logger.debug("SyncNotion job started.")
+        self.logger.debug("Notion to LaTeX conversion started.")
         self.get_template()
-        files = self.get_files()
+        files, blocks = self.get_files()
         if files is None:
             self.set_status(application.Status.ERROR)
             self.health_check = {"message": "Failed to get files from Notion."}
@@ -237,11 +305,18 @@ class Notion2Latex(application.Application):
         for file in files:
             param_dict = self.get_markdown(file)
             if param_dict is None:
-                self.set_status(application.Status.ERROR)
-                self.health_check = {"message": "JSON Schema validation failed for file: " + file + ".md"}
-                return application.Status.ERROR
+                self.update_notion(False, file, blocks[files.index(file)], "The markdown header is badly formatted.")
+                continue
             title = self.compile(file, param_dict)
-            self.publish_compiled(file, title)
+            if title is None:
+                self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
+                continue
+            link = self.publish_compiled(param_dict, title)
+            if link is None:
+                self.update_notion(False, file, blocks[files.index(file)], "The PDF could not be published.")
+                continue
+            self.update_notion(True, file, blocks[files.index(file)], link=link)
+
         self.set_status(application.Status.SUCCESS)
         str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.run_command("rm -rf doc_latex-template-complex-version")
