@@ -38,7 +38,7 @@ class Notion2Latex(application.Application):
 
     def __init__(self):
         super().__init__()
-        self.frequency = schedule.every(1).minutes
+        self.frequency = schedule.every(5).minutes
         self.validate_schema = {
             "type": "object",
             "properties": {
@@ -134,6 +134,8 @@ class Notion2Latex(application.Application):
         except jsonschema.exceptions.ValidationError:
             self.logger.error("JSON Schema validation failed for file: " + file + ".md")
             self.run_command("rm " + file + ".md")
+        if "email" in param_dict or "name" in param_dict:
+            return None
         return param_dict
 
     def compile(self, file, param_dict):
@@ -149,7 +151,7 @@ class Notion2Latex(application.Application):
         os.chdir("doc_latex-template-complex-version/src")
         success_first = self.run_command(
             "pandoc " + file + ".md --template=template.tex -o " + file + ".tex && xelatex "
-            + file + ".tex interaction=nonstopmode >/home/sedelpeuch/log.txt"
+            + file + ".tex interaction=nonstopmode >/dev/null"
         )
         success_second = self.run_command(
             "xelatex " + file + ".tex interaction=nonstopmode >/dev/null"
