@@ -24,7 +24,7 @@ import subprocess
 import time
 
 
-def create_service(dir_path=os.path.dirname(os.path.realpath(__file__)), service_name='wolf.service'):
+def create_service(dir_path=os.path.dirname(os.path.realpath(__file__)), service_name='wolf.service', user=None):
     """
     Creates a service file in the specified directory path. If the service file already exists, it is overwritten.
 
@@ -41,7 +41,7 @@ def create_service(dir_path=os.path.dirname(os.path.realpath(__file__)), service
     [Service]
     WorkingDirectory={dir_path}
     ExecStart={dir_path}/../{'venv'}/bin/python3 {dir_path}/main.py
-    User={getpass.getuser()}
+    User={user}
     Restart=on-failure
 
     [Install]
@@ -86,10 +86,10 @@ def create_token_file(token_dict, file_path='token.json'):
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-
+    # parse argument user
+    parser.add_argument('--user', type=str, default=getpass.getuser(), help='user name')
     # You can specify some known arguments, e.g., service_name in this case
     unknown_args = parser.parse_known_args()
-    print(unknown_args)
 
     # Convert unknown args to token dictionary
     token_dict = {}
@@ -112,5 +112,5 @@ if __name__ == "__main__":
         token_dict = {"app": "token"}
     service_name = 'wolf.service'
 
-    create_service(service_name=service_name)
+    create_service(service_name=service_name, user=args[0].user)
     create_token_file(token_dict)

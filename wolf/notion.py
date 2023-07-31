@@ -28,7 +28,10 @@ class Notion(api.API):
             token = "test"
         else:
             with open(os.path.join(absolute_path, "token.json")) as f:
-                token = json.load(f)["notion"]
+                try:
+                    token = json.load(f)["notion"]
+                except KeyError:
+                    raise KeyError("The token.json file does not contain a notion key see documentation.")
                 os.environ["NOTION_TOKEN"] = token
 
         ressources = {

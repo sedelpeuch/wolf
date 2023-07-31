@@ -49,6 +49,8 @@ class Notion2Latex(application.Application):
             },
             "required": ["client", "titre", "phase_id", "phase_nom"]
         }
+        self.logger.error(os.getcwd())
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         with open('token.json') as file:
             token = json.load(file)['github_doc_publish']
         with open('token.json') as file:
@@ -142,11 +144,12 @@ class Notion2Latex(application.Application):
         :param param_dict: A dictionary containing the parameters for compilation.
         :return: None
         """
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
         os.chdir("doc_latex-template-complex-version/src")
         success_first = self.run_command(
             "pandoc " + file + ".md --template=template.tex -o " + file + ".tex && xelatex "
-            + file + ".tex interaction=nonstopmode >/dev/null"
+            + file + ".tex interaction=nonstopmode >/home/sedelpeuch/log.txt"
         )
         success_second = self.run_command(
             "xelatex " + file + ".tex interaction=nonstopmode >/dev/null"
@@ -303,27 +306,38 @@ class Notion2Latex(application.Application):
             self.set_status(application.Status.ERROR)
             self.health_check = {"message": "Failed to get files from Notion."}
             return application.Status.ERROR
+        failure = 0
         for file in files:
             param_dict = self.get_markdown(file)
             if param_dict is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The markdown header is badly formatted.")
+                failure += 1
                 continue
             title = self.compile(file, param_dict)
             if title is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
+                failure += 1
                 continue
             link = self.publish_compiled(param_dict, title)
             if link is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The PDF could not be published.")
+                failure += 1
                 continue
             self.update_notion(True, file, blocks[files.index(file)], link=link)
 
-        self.set_status(application.Status.SUCCESS)
-        str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.run_command("rm -rf doc_latex-template-complex-version")
+
+        str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.logger.debug(str_msg)
-        self.health_check = {"message": str_msg}
-        return application.Status.SUCCESS
+
+        if failure == len(files):
+            self.set_status(application.Status.ERROR)
+            self.health_check = {"message": "All files failed to compile."}
+            return application.Status.ERROR
+        else:
+            self.set_status(application.Status.SUCCESS)
+            self.health_check = {"message": str_msg}
+            return application.Status.SUCCESS
 
     def __del__(self):
         try:
