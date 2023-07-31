@@ -51,6 +51,7 @@ class Notion2Latex(application.Application):
         }
         with open('token.json') as file:
             token = json.load(file)['github_doc_publish']
+        with open('token.json') as file:
             self.master_file = json.load(file)['notion_master_file']
         self.github = Github(token)
         self.repo = self.github.get_user().get_repo('compiled_result_latex')
