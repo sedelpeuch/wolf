@@ -127,7 +127,7 @@ class Notion2Latex(application.Application):
                         pass
                 header_data_line_process += line + "\n"
             with open(file + ".md", "w") as f:
-                f.write(header_data_line_process[:index + 12].lstrip())
+                f.write(header_data_line_process.lstrip())
                 f.write(body_data)
         try:
             jsonschema.validate(param_dict, self.validate_schema)
@@ -161,7 +161,7 @@ class Notion2Latex(application.Application):
             self.logger.error("Failed to compile file: " + file + ".md")
             return None
         self.run_command("rm *.aux *.log *.out")
-        self.run_command("rm " + file + ".md " + file + ".tex")
+        self.run_command("rm " + file + ".md ")
 
         client = unidecode.unidecode(param_dict["client"]).lower().replace("'", "")
         titre = unidecode.unidecode(param_dict["titre"]).lower().replace("'", "")
@@ -170,6 +170,7 @@ class Notion2Latex(application.Application):
         title = client + "_" + titre + "_" + phase_id + "_" + phase_nom
         title = title.replace(" ", "-")
         self.run_command("mv " + file + ".pdf ../out/" + title + ".pdf")
+        self.run_command("mv " + file + ".tex ../out/" + title + ".tex")
         os.chdir("../..")
         self.run_command("rm " + file + ".md")
         return title
@@ -183,7 +184,9 @@ class Notion2Latex(application.Application):
         :return: None
         """
         file_path = "doc_latex-template-complex-version/out/" + title + ".pdf"
+        file_path_tex = "doc_latex-template-complex-version/out/" + title + ".tex"
         file_name = param_dict["client"] + "/" + title + ".pdf"
+        file_name_tex = param_dict["client"] + "/" + title + ".tex"
 
         # noinspection PyBroadException
         try:
@@ -194,13 +197,22 @@ class Notion2Latex(application.Application):
             with open(file_path, 'rb') as input_file:
                 data = input_file.read()
             data = base64.b64encode(data).decode("utf-8")
+
+            with open(file_path_tex, 'rb') as input_file:
+                data_tex = input_file.read()
+            data_tex = base64.b64encode(data_tex).decode("utf-8")
+
             blob = self.repo.create_git_blob(data, "base64")
+            blob_tex = self.repo.create_git_blob(data_tex, "base64")
             element = InputGitTreeElement(file_name, '100644', 'blob', sha=blob.sha)
-            tree = self.repo.create_git_tree([element], base_tree=base_tree)
+            element_tex = InputGitTreeElement(file_name_tex, '100644', 'blob', sha=blob_tex.sha)
+            element_list = [element, element_tex]
+            tree = self.repo.create_git_tree(element_list, base_tree=base_tree)
             parent = self.repo.get_git_commit(master_sha)
             commit = self.repo.create_git_commit(commit_message, tree, [parent])
             master_ref.edit(commit.sha)
-        except Exception:
+        except Exception as e:
+            print(e)
             self.logger.error(f"Le fichier PDF {file_name} n'a pas pu être poussé sur le repo.")
             return None
         self.logger.info(f"Le fichier PDF {file_name} a été poussé sur le repo avec succès.")
