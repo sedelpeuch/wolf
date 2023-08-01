@@ -2,11 +2,11 @@
 
 Wolf Status
 
-[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Unittest](https://github.com/sedelpeuch/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/sedelpeuch/wolf/actions/workflows/unittest.yml)
+[![Documentation Status](https://readthedocs.org/projects/wolf-project/badge/?version=latest)](https://wolf-project.readthedocs.io/?badge=latest) [![Unittest](https://github.com/sedelpeuch/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/sedelpeuch/wolf/actions/workflows/unittest.yml)
 
 Wolf-Core Status
 
-[![Documentation Status](https://readthedocs.org/projects/wolf-eirlab-community/badge/?version=latest)](https://wolf-eirlab-community.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/sedelpeuch/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/sedelpeuch/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/sedelpeuch/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/sedelpeuch/wolf-core/actions/workflows/publish.yaml)
+[![Documentation Status](https://readthedocs.org/projects/wolf-project/badge/?version=latest)](https://wolf-project.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/sedelpeuch/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/sedelpeuch/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/sedelpeuch/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/sedelpeuch/wolf-core/actions/workflows/publish.yaml)
 
 Le projet Wolf est un projet ayant pour but de créer un environnement d'interconnexion entre les différents outils pouvant être utilisés dans la gestion d'associatins, de projets
 etc
