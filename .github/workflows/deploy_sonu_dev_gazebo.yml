@@ -1,0 +1,83 @@
+name: Deploy SONU Dev Gazebo
+
+on: [ pull_request ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.10" ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          git submodule init
+          git submodule update
+          python -m pip install --upgrade pip
+          python -m pip install virtualenv
+          python -m virtualenv venv
+          source venv/bin/activate
+          pip install poetry
+          cd core && poetry install
+          cd .. && poetry install
+      - name: Test with unittest
+        run: |
+          source venv/bin/activate
+          cd tests && python -m unittest
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.10" ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies and compile wolf package with Poetry
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install virtualenv
+          python -m virtualenv venv
+          source venv/bin/activate
+          pip install poetry==1.5.0
+          poetry install
+          poetry build
+
+      - name: Copy files via SSH
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          source: "dist/."
+          target: "~/wolf/"
+
+      - name: SSH and install package
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            python3.8 -m venv ~/wolf/venv
+            source ~/wolf/venv/bin/activate
+            pip3 install poetry==1.5.0
+            mkdir -p ~/wolf/wolf
+            mkdir -p ~/wolf/temp
+            tar xf ~/wolf/dist/*.tar.gz -C ~/wolf/temp
+            find ~/wolf/temp/ -mindepth 2 -type f -exec mv {} ~/wolf/wolf \;
+            rm -rf ~/wolf/temp
+            cd ~/wolf/wolf
+            poetry install
+            deactivate
+            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
+
+
