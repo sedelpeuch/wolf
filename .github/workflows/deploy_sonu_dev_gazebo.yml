@@ -26,7 +26,7 @@ jobs:
           cd core && poetry install
           cd .. && poetry install
           deactivate
-          echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
+          cd wolf && echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
 
       - name: Test with unittest
         run: |
