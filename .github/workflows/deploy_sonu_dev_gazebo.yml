@@ -34,7 +34,7 @@ jobs:
           cd tests && python -m unittest
 
   deploy:
-    needs: [ test, tailscale ]
+    needs: test
     runs-on: ubuntu-latest
     strategy:
       matrix:
