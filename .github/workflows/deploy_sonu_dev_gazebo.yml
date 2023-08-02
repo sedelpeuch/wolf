@@ -69,9 +69,6 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           source: "dist/."
           target: "~/wolf/"
-          script: |
-            echo ${{ secrets.HOST }} 
-            echo ${{ secrets.USERNAME }}
 
       - name: SSH and install package
         uses: appleboy/ssh-action@master
