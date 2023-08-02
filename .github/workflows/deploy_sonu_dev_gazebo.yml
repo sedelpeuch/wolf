@@ -32,6 +32,21 @@ jobs:
         run: |
           source venv/bin/activate
           cd tests && python -m unittest
+
+  tailscale:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.10" ]
+
+    steps:
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
   deploy:
     needs: test
     runs-on: ubuntu-latest
