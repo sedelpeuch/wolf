@@ -15,9 +15,12 @@ name = "testpypi"
 url = "https://test.pypi.org/simple/"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 wolf-core = { version = "1.0", source = "testpypi" }
 unidecode = "^1.2.0"
 pygit2 = "^1.6.1"
 pygithub = "^1.59.0"
 notion2md = "^2.8.3"
+
+[packages]
+wolf = { path = "wolf", develop = false }

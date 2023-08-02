@@ -80,11 +80,12 @@ jobs:
           script: |
             python3.8 -m venv ~/wolf/venv
             source ~/wolf/venv/bin/activate
+            pip3 install pip==22.0.0
             pip3 install poetry==1.5.0
             mkdir -p ~/wolf/wolf
             mkdir -p ~/wolf/temp
             tar xf ~/wolf/dist/*.tar.gz -C ~/wolf/temp
-            find ~/wolf/temp/ -mindepth 2 -type f -exec mv {} ~/wolf/wolf \;
+            cd ~/wolf/temp/*/ && mv * ~/wolf/wolf
             rm -rf ~/wolf/temp
             cd ~/wolf/wolf
             poetry install
