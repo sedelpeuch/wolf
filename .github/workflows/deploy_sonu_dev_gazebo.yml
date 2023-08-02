@@ -33,20 +33,6 @@ jobs:
           source venv/bin/activate
           cd tests && python -m unittest
 
-  tailscale:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ "3.10" ]
-
-    steps:
-      - name: Tailscale
-        uses: tailscale/github-action@v2
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:wolf
-
   deploy:
     needs: [ test, tailscale ]
     runs-on: ubuntu-latest
@@ -66,6 +52,13 @@ jobs:
           pip install poetry==1.5.0
           poetry install
           poetry build
+
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:wolf
 
       - name: Copy files via SSH
         uses: appleboy/scp-action@master
