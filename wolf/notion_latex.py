@@ -4,6 +4,7 @@ The Notion2Latex class is a utility designed for interacting with the Notion API
 Processing specific operations and subsequently converting the retrieved data from Notion to LaTeX format.
 """
 import base64
+import difflib
 import json
 import os
 import subprocess
@@ -71,6 +72,36 @@ class Notion2Latex(application.Application):
             return False
         return True
 
+    def get_template(self):
+        """
+        Retrieves the template for Notion to LaTeX conversion.
+
+        :return: None
+        """
+        url = ""
+        try:
+            with open('token.json') as file:
+                token = json.load(file)['github_doc_latex']
+            url = "https://github.com/catie-aq/doc_latex-template.git"
+            url_with_token = f"https://{token}@{url[8:]}"
+            self.run_command("rm -rf doc_latex-template-complex-version")
+            pygit2.clone_repository(url_with_token, "doc_latex-template-complex-version",
+                                    checkout_branch="complex-version")
+
+            with open('token.json') as file:
+                token = json.load(file)['github_doc_publish']
+            url = "https://github.com/catie-aq/doc_latex-compiled-result-wolf.git"
+            url_with_token = f"https://{token}@{url[8:]}"
+            self.run_command("rm -rf doc_latex-compiled-result-wolf")
+            pygit2.clone_repository(url_with_token, "doc_latex-compiled-result-wolf")
+
+        except pygit2.GitError as e:  # Catch the pygit2.GitError exception
+            self.logger.error(f"Error while cloning repository from {url}: {e}")
+        except FileNotFoundError as e:  # Catch the FileNotFoundError exception for 'token.json'
+            self.logger.error(f"Unable to open the 'token.json' file: {e}")
+        except json.JSONDecodeError as e:  # Catch the JSONDecodeError for malformed JSON in 'token.json'
+            self.logger.error(f"Unable to parse the JSON from 'token.json': {e}")
+
     def get_files(self):
         """
         Retrieves files from Notion and returns a list of file IDs.
@@ -81,17 +112,29 @@ class Notion2Latex(application.Application):
         if req.status_code != 200:
             self.logger.error("Failed to get files from Notion.")
             return None, None
+
+        files, block_saved = self.get_files_from_results(req)
+        self.logger.info(f"Get {len(files)} files from Notion.")
+
+        return files, block_saved
+
+    @staticmethod
+    def get_files_from_results(req):
+        """
+        :param req: The request object containing the results from Notion API.
+        :return: A tuple containing two lists - files and block_saved.
+                 - files: List of page IDs extracted from the results.
+                 - block_saved: List of blocks that contain the extracted page IDs.
+        """
         files = []
         block_saved = []
         blocks = req.data["results"]
         for block in blocks:
             if block["type"] == "paragraph":
                 for rich_text in block["paragraph"]["rich_text"]:
-                    if rich_text["type"] == "mention":
-                        if rich_text["mention"]["type"] == "page":
-                            files.append(rich_text["mention"]["page"]["id"])
-                            block_saved.append(block)
-        self.logger.info("Get {} files from Notion.".format(len(files)))
+                    if rich_text["type"] == "mention" and rich_text["mention"]["type"] == "page":
+                        files.append(rich_text["mention"]["page"]["id"])
+                        block_saved.append(block)
         return files, block_saved
 
     def get_markdown(self, file):
@@ -138,6 +181,27 @@ class Notion2Latex(application.Application):
             return None
         return param_dict
 
+    @staticmethod
+    def check_diff(current, last):
+        """
+        Compares the contents of two files and returns True if there is a difference,
+        otherwise returns False.
+
+        :param current: Path to the current file
+        :param last: Path to the previous file
+        :type current: str
+        :type last: str
+        :return: True if there is a difference, otherwise False
+        :rtype: bool
+        """
+        if os.path.isfile(current) and os.path.isfile(last):
+            with open(current) as cur, open(last) as las:
+                diff = difflib.ndiff(cur.readlines(), las.readlines())
+                count = sum(1 for line in diff if line.startswith('+') or line.startswith('-'))
+            if count == 0:
+                return False
+        return True
+
     def compile(self, file, param_dict):
         """
         This method compiles a Markdown file into a PDF using the pandoc and xelatex tools.
@@ -146,22 +210,17 @@ class Notion2Latex(application.Application):
         :param param_dict: A dictionary containing the parameters for compilation.
         :return: None
         """
+
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
         os.chdir("doc_latex-template-complex-version/src")
-        success_first = self.run_command(
-            "pandoc " + file + ".md --template=template.tex -o " + file + ".tex && xelatex "
-            + file + ".tex interaction=nonstopmode >/dev/null"
-        )
-        success_second = self.run_command(
-            "xelatex " + file + ".tex interaction=nonstopmode >/dev/null"
-        )
+        self.run_command("pandoc " + file + ".md --template=template.tex -o " + file + ".tex")
+        success_first = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
+        success_second = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
         success = success_first and success_second
         if not success:
             self.logger.error("Failed to compile file: " + file + ".md")
             return None
-        self.run_command("rm *.aux *.log *.out")
-        self.run_command("rm " + file + ".md ")
 
         client = unidecode.unidecode(param_dict["client"]).lower().replace("'", "")
         titre = unidecode.unidecode(param_dict["titre"]).lower().replace("'", "")
@@ -169,10 +228,10 @@ class Notion2Latex(application.Application):
         phase_nom = unidecode.unidecode(param_dict["phase_nom"]).lower().replace("'", "")
         title = client + "_" + titre + "_" + phase_id + "_" + phase_nom
         title = title.replace(" ", "-")
+
         self.run_command("mv " + file + ".pdf ../out/" + title + ".pdf")
         self.run_command("mv " + file + ".tex ../out/" + title + ".tex")
         os.chdir("../..")
-        self.run_command("rm " + file + ".md")
         return title
 
     def publish_compiled(self, param_dict, title):
@@ -188,6 +247,8 @@ class Notion2Latex(application.Application):
         file_name = param_dict["client"] + "/" + title + ".pdf"
         file_name_tex = param_dict["client"] + "/" + title + ".tex"
 
+        last_compiled_path_tex = "doc_latex-compiled-result-wolf/" + file_name_tex
+
         # noinspection PyBroadException
         try:
             commit_message = 'Add ' + file_name + ' on GitHub'
@@ -202,6 +263,13 @@ class Notion2Latex(application.Application):
                 data_tex = input_file.read()
             data_tex = base64.b64encode(data_tex).decode("utf-8")
 
+            diff = self.check_diff(file_path_tex, last_compiled_path_tex)
+            if not diff:
+                self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
+                return False, "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name,
+                                                                           master_ref.ref,
+                                                                           file_name)
+
             blob = self.repo.create_git_blob(data, "base64")
             blob_tex = self.repo.create_git_blob(data_tex, "base64")
             element = InputGitTreeElement(file_name, '100644', 'blob', sha=blob.sha)
@@ -214,10 +282,10 @@ class Notion2Latex(application.Application):
         except Exception as e:
             print(e)
             self.logger.error(f"Le fichier PDF {file_name} n'a pas pu être poussé sur le repo.")
-            return None
+            return False, None
         self.logger.info(f"Le fichier PDF {file_name} a été poussé sur le repo avec succès.")
-        return "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name, master_ref.ref,
-                                                            file_name)
+        return True, "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name, master_ref.ref,
+                                                                  file_name)
 
     def update_notion(self, success, file_id, block, msg=None, link=None):
         """
@@ -282,28 +350,6 @@ class Notion2Latex(application.Application):
             self.logger.error("Error while updating Notion page.")
             raise Exception("Error while updating Notion page.")
 
-    def get_template(self):
-        """
-        Retrieves the template for Notion to LaTeX conversion.
-
-        :return: None
-        """
-        url = ""
-        try:
-            with open('token.json') as file:
-                token = json.load(file)['github_doc_latex']
-            url = "https://github.com/catie-aq/doc_latex-template.git"
-            url_with_token = f"https://{token}@{url[8:]}"
-            self.run_command("rm -rf doc_latex-template-complex-version")
-            pygit2.clone_repository(url_with_token, "doc_latex-template-complex-version",
-                                    checkout_branch="complex-version")
-        except pygit2.GitError as e:  # Catch the pygit2.GitError exception
-            self.logger.error(f"Error while cloning repository from {url}: {e}")
-        except FileNotFoundError as e:  # Catch the FileNotFoundError exception for 'token.json'
-            self.logger.error(f"Unable to open the 'token.json' file: {e}")
-        except json.JSONDecodeError as e:  # Catch the JSONDecodeError for malformed JSON in 'token.json'
-            self.logger.error(f"Unable to parse the JSON from 'token.json': {e}")
-
     def job(self) -> application.Status:
         """
         Perform the SyncNotion job.
@@ -332,14 +378,18 @@ class Notion2Latex(application.Application):
                 self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
                 failure += 1
                 continue
-            link = self.publish_compiled(param_dict, title)
-            if link is None:
+            process, link = self.publish_compiled(param_dict, title)
+            if not process and link is not None:
+                continue
+            if not process and link is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The PDF could not be published.")
                 failure += 1
                 continue
             self.update_notion(True, file, blocks[files.index(file)], link=link)
 
         self.run_command("rm -rf doc_latex-template-complex-version")
+        self.run_command("rm -rf doc_latex-compiled-result-wolf")
+        self.run_command("rm -r *.md")
 
         str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.logger.debug(str_msg)
@@ -356,5 +406,6 @@ class Notion2Latex(application.Application):
     def __del__(self):
         try:
             self.run_command("rm -rf doc_latex-template-complex-version")
+            self.run_command("rm -r *.md")
         except FileNotFoundError:
             pass
