@@ -210,18 +210,6 @@ class Notion2Latex(application.Application):
         :param param_dict: A dictionary containing the parameters for compilation.
         :return: None
         """
-
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
-        os.chdir("doc_latex-template-complex-version/src")
-        self.run_command("pandoc " + file + ".md --template=template.tex -o " + file + ".tex")
-        success_first = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
-        success_second = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
-        success = success_first and success_second
-        if not success:
-            self.logger.error("Failed to compile file: " + file + ".md")
-            return None
-
         client = unidecode.unidecode(param_dict["client"]).lower().replace("'", "")
         titre = unidecode.unidecode(param_dict["titre"]).lower().replace("'", "")
         phase_id = unidecode.unidecode(param_dict["phase_id"]).lower().replace("'", "")
@@ -229,10 +217,32 @@ class Notion2Latex(application.Application):
         title = client + "_" + titre + "_" + phase_id + "_" + phase_nom
         title = title.replace(" ", "-")
 
+        file_path_tex = file + ".tex"
+        file_name_tex = param_dict["client"] + "/" + title + ".tex"
+
+        last_compiled_path_tex = "../../doc_latex-compiled-result-wolf/" + file_name_tex
+
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
+        os.chdir("doc_latex-template-complex-version/src")
+        self.run_command("pandoc " + file + ".md --template=template.tex -o " + file + ".tex")
+
+        diff = self.check_diff(file_path_tex, last_compiled_path_tex)
+        if not diff:
+            self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
+            return False, title
+
+        success_first = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
+        success_second = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
+        success = success_first and success_second
+        if not success:
+            self.logger.error("Failed to compile file: " + file + ".md")
+            return False, None
+
         self.run_command("mv " + file + ".pdf ../out/" + title + ".pdf")
         self.run_command("mv " + file + ".tex ../out/" + title + ".tex")
         os.chdir("../..")
-        return title
+        return True, title
 
     def publish_compiled(self, param_dict, title):
         """
@@ -246,8 +256,6 @@ class Notion2Latex(application.Application):
         file_path_tex = "doc_latex-template-complex-version/out/" + title + ".tex"
         file_name = param_dict["client"] + "/" + title + ".pdf"
         file_name_tex = param_dict["client"] + "/" + title + ".tex"
-
-        last_compiled_path_tex = "doc_latex-compiled-result-wolf/" + file_name_tex
 
         # noinspection PyBroadException
         try:
@@ -263,13 +271,6 @@ class Notion2Latex(application.Application):
                 data_tex = input_file.read()
             data_tex = base64.b64encode(data_tex).decode("utf-8")
 
-            diff = self.check_diff(file_path_tex, last_compiled_path_tex)
-            if not diff:
-                self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
-                return False, "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name,
-                                                                           master_ref.ref,
-                                                                           file_name)
-
             blob = self.repo.create_git_blob(data, "base64")
             blob_tex = self.repo.create_git_blob(data_tex, "base64")
             element = InputGitTreeElement(file_name, '100644', 'blob', sha=blob.sha)
@@ -280,12 +281,11 @@ class Notion2Latex(application.Application):
             commit = self.repo.create_git_commit(commit_message, tree, [parent])
             master_ref.edit(commit.sha)
         except Exception as e:
-            print(e)
             self.logger.error(f"Le fichier PDF {file_name} n'a pas pu être poussé sur le repo.")
-            return False, None
+            return None
         self.logger.info(f"Le fichier PDF {file_name} a été poussé sur le repo avec succès.")
-        return True, "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name, master_ref.ref,
-                                                                  file_name)
+        return "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name, master_ref.ref,
+                                                            file_name)
 
     def update_notion(self, success, file_id, block, msg=None, link=None):
         """
@@ -373,15 +373,16 @@ class Notion2Latex(application.Application):
                 self.update_notion(False, file, blocks[files.index(file)], "The markdown header is badly formatted.")
                 failure += 1
                 continue
-            title = self.compile(file, param_dict)
-            if title is None:
+            process, title = self.compile(file, param_dict)
+            print(process, title)
+            if not process and title is not None:
+                continue
+            if not process and title is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
                 failure += 1
                 continue
-            process, link = self.publish_compiled(param_dict, title)
-            if not process and link is not None:
-                continue
-            if not process and link is None:
+            link = self.publish_compiled(param_dict, title)
+            if link is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The PDF could not be published.")
                 failure += 1
                 continue
