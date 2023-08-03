@@ -68,7 +68,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S rm -r ~/wolf/wolf
+            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S rm -rf ~/wolf/wolf
 
       - name: Copy files via SSH
         uses: appleboy/scp-action@master
