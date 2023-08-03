@@ -68,7 +68,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S rm -rf ~/wolf/wolf
+            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S rm -rf ~/wolf
 
       - name: Copy files via SSH
         uses: appleboy/scp-action@master
@@ -92,15 +92,15 @@ jobs:
             source ~/wolf/venv/bin/activate
             pip3 install pip==22.0.0
             pip3 install poetry==1.5.0
-            mkdir -p ~/wolf/wolf
+            mkdir -p ~/wolf
             mkdir -p ~/wolf/temp
             tar xf ~/wolf/dist/*.tar.gz -C ~/wolf/temp
-            cd ~/wolf/temp/*/ && mv * ~/wolf/wolf
+            cd ~/wolf/temp/*/ && mv * ~/wolf/
             rm -rf ~/wolf/temp
-            cd ~/wolf/wolf
+            cd ~/wolf
             poetry install
             deactivate
-            cd ~/wolf/wolf/wolf
+            cd ~/wolf/wolf
             echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
 
 
