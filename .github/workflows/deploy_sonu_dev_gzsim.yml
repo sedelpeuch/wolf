@@ -1,4 +1,4 @@
-name: Deploy SONU Dev Gazebo
+name: Deploy SONU Dev Gzsim
 
 on: [ push ]
 jobs:
