@@ -146,6 +146,11 @@ class Notion2Latex(application.Application):
         """
         MarkdownExporter(block_id=file, output_path='.', download=True).export()
         self.run_command("unzip -o -d . " + file + ".zip > /dev/null")
+        self.run_command("mv *.png doc_latex-template-complex-version/src")
+        self.run_command("mv *.jpg doc_latex-template-complex-version/src")
+        self.run_command("mv *.jpeg doc_latex-template-complex-version/src")
+        self.run_command("mv *.svg doc_latex-template-complex-version/src")
+        self.run_command("mv *.gif doc_latex-template-complex-version/src")
         self.run_command("rm " + file + ".zip")
         param_dict = None
         with open(file + ".md") as f:
@@ -232,8 +237,8 @@ class Notion2Latex(application.Application):
             self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
             return False, title
 
-        success_first = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
-        success_second = self.run_command("xelatex " + file + ".tex interaction=nonstopmode >/dev/null")
+        success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
+        success_second = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
         success = success_first and success_second
         if not success:
             self.logger.error("Failed to compile file: " + file + ".md")
