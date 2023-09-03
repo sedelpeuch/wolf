@@ -54,8 +54,7 @@ class Notion2Latex(application.Application):
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         with open('token.json') as file:
             token = json.load(file)['github_doc_publish']
-        with open('token.json') as file:
-            self.master_file = json.load(file)['notion_master_file']
+        self.master_file = "39b8866e6090425c8d1fe799b74956c3"
         self.github = Github(token)
         self.repo = self.github.get_user().get_repo('doc_latex-compiled-result-wolf')
 
@@ -129,6 +128,7 @@ class Notion2Latex(application.Application):
         files = []
         block_saved = []
         blocks = req.data["results"]
+
         for block in blocks:
             if block["type"] == "paragraph":
                 for rich_text in block["paragraph"]["rich_text"]:
