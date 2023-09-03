@@ -51,8 +51,8 @@ class Notion2Latex(application.Application):
             "required": ["client", "titre", "phase_id", "phase_nom"]
         }
         self.logger.error(os.getcwd())
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        with open('token.json') as file:
+        token_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'token.json')
+        with open(token_path) as file:
             token = json.load(file)['github_doc_publish']
         self.master_file = "39b8866e6090425c8d1fe799b74956c3"
         self.github = Github(token)
@@ -79,15 +79,16 @@ class Notion2Latex(application.Application):
         """
         url = ""
         try:
-            with open('token.json') as file:
+            token_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'token.json')
+            with open(token_path) as file:
                 token = json.load(file)['github_doc_latex']
             url = "https://github.com/catie-aq/doc_latex-template.git"
             url_with_token = f"https://{token}@{url[8:]}"
             self.run_command("rm -rf doc_latex-template-complex-version")
             pygit2.clone_repository(url_with_token, "doc_latex-template-complex-version",
                                     checkout_branch="complex-version")
-
-            with open('token.json') as file:
+            token_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'token.json')
+            with open(token_path) as file:
                 token = json.load(file)['github_doc_publish']
             url = "https://github.com/catie-aq/doc_latex-compiled-result-wolf.git"
             url_with_token = f"https://{token}@{url[8:]}"
