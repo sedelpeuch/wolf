@@ -1,0 +1,37 @@
+name: Notion Latex
+
+on: [ push ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.10" ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          git submodule init
+          git submodule update
+          python -m pip install --upgrade pip
+          python -m pip install virtualenv
+          python -m virtualenv venv
+          source venv/bin/activate
+          pip install poetry
+          cd core && poetry install
+          cd .. && poetry install
+          
+          deactivate
+          cd wolf && echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
+
+      - name: Test with unittest
+        run: |
+          source venv/bin/activate
+          cd wolf && python main.py debug notion_latex
