@@ -12,12 +12,12 @@ import time
 
 import jsonschema
 import pygit2
-import schedule
 import unidecode
 from github import Github, InputGitTreeElement
 from notion2md.exporter.block import MarkdownExporter
 
-from wolf_core import application
+from wolf_core import application, api
+import notion
 
 
 class Notion2Latex(application.Application):
@@ -39,7 +39,6 @@ class Notion2Latex(application.Application):
 
     def __init__(self):
         super().__init__()
-        self.frequency = schedule.every(5).minutes
         self.validate_schema = {
             "type": "object",
             "properties": {
@@ -204,7 +203,7 @@ class Notion2Latex(application.Application):
                 diff = difflib.ndiff(cur.readlines(), las.readlines())
                 count = sum(1 for line in diff if line.startswith('+') or line.startswith('-'))
             if count == 0:
-                return False
+                return True
         return True
 
     def compile(self, file, param_dict):
@@ -415,3 +414,8 @@ class Notion2Latex(application.Application):
             self.run_command("rm -r *.md")
         except FileNotFoundError:
             pass
+
+
+if __name__ == "__main__":
+    app = Notion2Latex()
+    app.job()
