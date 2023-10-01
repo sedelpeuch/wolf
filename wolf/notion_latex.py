@@ -49,8 +49,7 @@ class Notion2Latex(application.Application):
         with open('token.json') as file:
             self.master_file = json.load(file)['notion_master_file']
 
-    @staticmethod
-    def run_command(cmd):
+    def run_command(self, cmd):
         """
         Run a command in the shell.
 
@@ -109,15 +108,15 @@ class Notion2Latex(application.Application):
                  - files: List of page IDs extracted from the results.
                  - block_saved: List of blocks that contain the extracted page IDs.
         """
-        files = []
-        block_saved = []
         blocks = req.data["results"]
-        for block in blocks:
-            if block["type"] == "paragraph":
-                for rich_text in block["paragraph"]["rich_text"]:
-                    if rich_text["type"] == "mention" and rich_text["mention"]["type"] == "page":
-                        files.append(rich_text["mention"]["page"]["id"])
-                        block_saved.append(block)
+        files_and_blocks = [
+            (rich_text["mention"]["page"]["id"], block)
+            for block in blocks
+            if block["type"] == "paragraph"
+            for rich_text in block["paragraph"]["rich_text"]
+            if rich_text["type"] == "mention" and rich_text["mention"]["type"] == "page"
+        ]
+        files, block_saved = zip(*files_and_blocks) if files_and_blocks else ([], [])
         return files, block_saved
 
     def get_markdown(self, file):
@@ -128,13 +127,13 @@ class Notion2Latex(application.Application):
         :return: Returns a dictionary containing parameter information if the markdown file has valid header data
         """
         MarkdownExporter(block_id=file, output_path='.', download=True).export()
-        self.run_command("unzip -o -d . " + file + ".zip > /dev/null")
-        self.run_command("mv *.png doc_latex-template-complex-version/src")
-        self.run_command("mv *.jpg doc_latex-template-complex-version/src")
-        self.run_command("mv *.jpeg doc_latex-template-complex-version/src")
-        self.run_command("mv *.svg doc_latex-template-complex-version/src")
-        self.run_command("mv *.gif doc_latex-template-complex-version/src")
-        self.run_command("rm " + file + ".zip")
+
+        self.run_command(f"unzip -o -d . {file}.zip > /dev/null")
+        image_file_types = ['png', 'jpg', 'jpeg', 'svg', 'gif', "pdf"]
+        for file_type in image_file_types:
+            self.run_command(f"mv *.{file_type} doc_latex-template-complex-version/src")
+        self.run_command(f"rm {file}.zip")
+
         param_dict = None
         with open(file + ".md") as f:
             data = f.read()
@@ -253,35 +252,44 @@ class Notion2Latex(application.Application):
             self.logger.error("Error while updating Notion page.")
             raise Exception("Error while updating Notion page.")
 
-    def job(self) -> application.Status:
+    def _update_and_log_failure(self, file, blocks, index, failure, errmsg):
+        self.update_notion(False, file, blocks[index], errmsg)
+        failure += 1
+        return failure
+
+    def _process_file(self, file, blocks, index, failure):
+        param_dict = self.get_markdown(file)
+        if param_dict is None:
+            return self._update_and_log_failure(file, blocks, index, failure, "The markdown header is badly formatted.")
+
+        process, title = self.compile(file, param_dict)
+        if not process and title is None:
+            return self._update_and_log_failure(file, blocks, index, failure, "The compilation failed.")
+
+        self.update_notion(True, file, blocks[index])
+        return failure
+
+    def job(self) -> 'application.Status':
         """
         Perform the SyncNotion job.
 
         This method starts the job by setting the status to "RUNNING."
         It then sets the status to "SUCCESS" and logs the job finished with the current status.
 
-        :return: application.Status The status of the job indicating whether it was successful or not.
+        :return: 'application.Status': The status of the job indicating whether it was successful or not.
         """
         self.logger.debug("Notion to LaTeX conversion started.")
         self.get_template()
         files, blocks = self.get_files()
+
         if files is None:
             return application.Status.ERROR
-        failure = 0
-        for file in files:
-            param_dict = self.get_markdown(file)
-            if param_dict is None:
-                self.update_notion(False, file, blocks[files.index(file)], "The markdown header is badly formatted.")
-                failure += 1
-                continue
-            process, title = self.compile(file, param_dict)
-            if not process and title is None:
-                self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
-                failure += 1
-                continue
-            self.update_notion(True, file, blocks[files.index(file)])
 
-        str_msg = "Notion LaTeX compiled {} files.".format(len(files) - failure)
+        failure = 0
+        for index, file in enumerate(files):
+            failure = self._process_file(file, blocks, index, failure)
+
+        str_msg = f"Notion LaTeX compiled {len(files) - failure} files."
         self.logger.debug(str_msg)
 
         if failure == len(files):
