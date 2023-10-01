@@ -394,11 +394,13 @@ class Notion2Latex(application.Application):
             self.update_notion(True, file, blocks[files.index(file)], link=link)
 
         self.run_command("rm -rf doc_latex-template-complex-version")
-        self.run_command("rm -r wolf/doc_latex-template-complex-version")
+        self.run_command("rm -rf wolf/doc_latex-template-complex-version")
         self.run_command("rm -rf doc_latex-compiled-result-wolf")
-        self.run_command("rm -r wolf/doc_latex-compiled-result-wolf")
-        self.run_command("rm -r *.md")
-        self.run_command("rm -r wolf/*.md")
+        self.run_command("rm -rf wolf/doc_latex-compiled-result-wolf")
+        self.run_command("rm -rf *.md")
+        self.run_command("rm -rf *.pdf")
+        self.run_command("rm -rf wolf/*.md")
+        self.run_command("rm -rf wolf/*.pdf")
 
         str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.logger.debug(str_msg)
@@ -406,6 +408,7 @@ class Notion2Latex(application.Application):
         if failure == len(files):
             self.set_status(application.Status.ERROR)
             self.health_check = {"message": "All files failed to compile."}
+            self.logger.error("All files failed to compile.")
             return application.Status.ERROR
         else:
             self.set_status(application.Status.SUCCESS)
@@ -415,7 +418,16 @@ class Notion2Latex(application.Application):
     def __del__(self):
         try:
             self.run_command("rm -rf doc_latex-template-complex-version")
-            self.run_command("rm -r *.md")
+            self.run_command("rm -rf doc_latex-compiled-result-wolf")
+            self.run_command("rm -rf *.md")
+            self.run_command("rm -rf *.pdf")
+        except FileNotFoundError:
+            pass
+        try:
+            self.run_command("rm -rf wolf/doc_latex-template-complex-version")
+            self.run_command("rm -rf wolf/doc_latex-compiled-result-wolf")
+            self.run_command("rm -rf wolf/*.md")
+            self.run_command("rm -rf wolf/*.pdf")
         except FileNotFoundError:
             pass
 
