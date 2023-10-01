@@ -3,7 +3,6 @@ The Notion2Latex class is a utility designed for interacting with the Notion API
 
 Processing specific operations and subsequently converting the retrieved data from Notion to LaTeX format.
 """
-import difflib
 import json
 import os
 import subprocess
@@ -12,7 +11,6 @@ import time
 import jsonschema
 import pygit2
 import unidecode
-from github import Github
 from notion2md.exporter.block import MarkdownExporter
 
 from wolf_core import application
@@ -51,7 +49,8 @@ class Notion2Latex(application.Application):
         with open('token.json') as file:
             self.master_file = json.load(file)['notion_master_file']
 
-    def run_command(self, cmd):
+    @staticmethod
+    def run_command(cmd):
         """
         Run a command in the shell.
 
@@ -170,27 +169,6 @@ class Notion2Latex(application.Application):
             return None
         return param_dict
 
-    @staticmethod
-    def check_diff(current, last):
-        """
-        Compares the contents of two files and returns True if there is a difference,
-        otherwise returns False.
-
-        :param current: Path to the current file
-        :param last: Path to the previous file
-        :type current: str
-        :type last: str
-        :return: True if there is a difference, otherwise False
-        :rtype: bool
-        """
-        if os.path.isfile(current) and os.path.isfile(last):
-            with open(current) as cur, open(last) as las:
-                diff = difflib.ndiff(cur.readlines(), las.readlines())
-                count = sum(1 for line in diff if line.startswith('+') or line.startswith('-'))
-            if count == 0:
-                return True
-        return True
-
     def compile(self, file, param_dict):
         """
         This method compiles a Markdown file into a PDF using the pandoc and xelatex tools.
@@ -216,11 +194,6 @@ class Notion2Latex(application.Application):
         os.chdir("doc_latex-template-complex-version/src")
         self.run_command("pandoc " + file + ".md --template=template.tex -o " + file + ".tex")
 
-        diff = self.check_diff(file_path_tex, last_compiled_path_tex)
-        if not diff:
-            self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
-            return False, title
-
         success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex")
         success_second = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
         success = success_first and success_second
@@ -233,7 +206,7 @@ class Notion2Latex(application.Application):
         os.chdir("../..")
         return True, title
 
-    def update_notion(self, success, file_id, block, msg=None, link=None):
+    def update_notion(self, success, file_id, block, msg=None):
         """
         Updates the Notion page with the result of the compilation.
 
@@ -241,7 +214,6 @@ class Notion2Latex(application.Application):
         :param file_id: String representing the ID of the Notion page.
         :param block: Dictionary representing the block on the Notion page.
         :param msg: Optional string representing an additional message to display.
-        :param link: Optional string representing the GitHub link.
         :return: None
         """
         string_display = " ✅ " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()) \
@@ -333,6 +305,12 @@ class Notion2Latex(application.Application):
 
 
 def main():
+    """
+
+    This is the documentation for the method main().
+
+    :returns: None
+    """
     __import__("wolf_core.api")
     __import__("wolf.notion")
     app = Notion2Latex()
