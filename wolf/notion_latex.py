@@ -337,25 +337,18 @@ class Notion2Latex(application.Application):
         return None
 
     def artifact_link_notion(self, link):
-        req = self.api("Notion").patch.block(self.master_file, {
+        req = self.api("Notion").patch.block("bdff6e80184641609564996d70c8d3fc", {
             "paragraph": {
-                "text": [
+                "rich_text": [
                     {
                         "type": "text",
                         "text": {
-                            "content": "Artifacts: " + link,
+                            "content": "Artifacts at " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()),
                             "link": {
                                 "url": link
                             }
                         }
                     },
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": "Time: " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()),
-                            "link": None
-                        }
-                    }
                 ]
             }
         })
@@ -390,4 +383,4 @@ def post_run():
 
 
 if __name__ == "__main__":
-    main()
+    post_run()
