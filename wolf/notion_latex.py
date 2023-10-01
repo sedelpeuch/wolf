@@ -343,7 +343,7 @@ class Notion2Latex(application.Application):
                     {
                         "type": "text",
                         "text": {
-                            "content": "Artifacts at " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()),
+                            "content": "Penultimate artifacts at " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()),
                             "link": {
                                 "url": link
                             }
