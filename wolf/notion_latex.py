@@ -184,11 +184,6 @@ class Notion2Latex(application.Application):
         title = client + "_" + titre + "_" + phase_id + "_" + phase_nom
         title = title.replace(" ", "-")
 
-        file_path_tex = file + ".tex"
-        file_name_tex = param_dict["client"] + "/" + title + ".tex"
-
-        last_compiled_path_tex = "../../doc_latex-compiled-result-wolf/" + file_name_tex
-
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
         os.chdir("doc_latex-template-complex-version/src")
@@ -204,6 +199,7 @@ class Notion2Latex(application.Application):
         self.run_command("mv " + file + ".pdf ../out/" + title + ".pdf")
         self.run_command("mv " + file + ".tex ../out/" + title + ".tex")
         os.chdir("../..")
+        self.logger.info("File " + file + ".md compiled successfully.")
         return True, title
 
     def update_notion(self, success, file_id, block, msg=None):
@@ -270,8 +266,6 @@ class Notion2Latex(application.Application):
         self.get_template()
         files, blocks = self.get_files()
         if files is None:
-            self.set_status(application.Status.ERROR)
-            self.health_check = {"message": "Failed to get files from Notion."}
             return application.Status.ERROR
         failure = 0
         for file in files:
@@ -281,26 +275,18 @@ class Notion2Latex(application.Application):
                 failure += 1
                 continue
             process, title = self.compile(file, param_dict)
-            print(process, title)
-            if not process and title is not None:
-                continue
             if not process and title is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
                 failure += 1
                 continue
             self.update_notion(True, file, blocks[files.index(file)])
 
-        str_msg = "SyncNotion compiled {} files.".format(len(files))
+        str_msg = "Notion LaTeX compiled {} files.".format(len(files) - failure)
         self.logger.debug(str_msg)
 
         if failure == len(files):
-            self.set_status(application.Status.ERROR)
-            self.health_check = {"message": "All files failed to compile."}
-            self.logger.error("All files failed to compile.")
             return application.Status.ERROR
         else:
-            self.set_status(application.Status.SUCCESS)
-            self.health_check = {"message": str_msg}
             return application.Status.SUCCESS
 
 
@@ -314,7 +300,8 @@ def main():
     __import__("wolf_core.api")
     __import__("wolf.notion")
     app = Notion2Latex()
-    app.job()
+    result = app.job()
+    app.logger.debug("Notion LaTeX finished with status: " + result.name)
 
 
 if __name__ == "__main__":
