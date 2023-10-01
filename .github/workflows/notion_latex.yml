@@ -1,6 +1,11 @@
 name: Notion Latex
 
-on: [ push ]
+on:
+  schedule:
+    - cron: '30 * * * *'
+  workflow_dispatch:
+
+
 
 jobs:
   notion_latex:

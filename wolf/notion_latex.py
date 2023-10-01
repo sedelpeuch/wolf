@@ -265,7 +265,7 @@ class Notion2Latex(application.Application):
         # noinspection PyBroadException
         try:
             commit_message = 'Add ' + file_name + ' on GitHub'
-            master_ref = self.repo.get_git_ref('heads/master')
+            master_ref = self.repo.get_git_ref('heads/result')
             master_sha = master_ref.object.sha
             base_tree = self.repo.get_git_tree(master_sha)
             with open(file_path, 'rb') as input_file:
