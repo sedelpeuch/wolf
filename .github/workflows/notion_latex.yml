@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '30 * * * *'
   workflow_dispatch:
+  push:
 
 
 
@@ -30,17 +31,24 @@ jobs:
           installer-parallel: true
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
-      - name: Install LaTeX
-        run: |
-          sudo apt-get update
-          sudo apt-get install texlive-full -y
+      - name: Setup TeX Live
+        uses: teatimeguest/setup-texlive-action@v2
+        with:
+          packages: >-
+            texlive-full
       - name: Install Pandoc
         run: |
           sudo apt-get update
           sudo apt-get install pandoc -y
       - name: Install token
         run: |
-          cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
+          cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
       - name: Run Notion LaTeX
         run: |
           poetry run notion_latex
+      - name: Archive LaTeX output
+        uses: actions/upload-artifact@v3
+        with:
+          name: latex-artifact
+          path: wolf/doc_latex-template-complex-version/out
+          if-no-files-found: error
