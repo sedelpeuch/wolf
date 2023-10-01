@@ -236,7 +236,7 @@ class Notion2Latex(application.Application):
             self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
             return False, title
 
-        success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
+        success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex")
         success_second = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
         success = success_first and success_second
         if not success:
