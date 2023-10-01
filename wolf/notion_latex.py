@@ -17,7 +17,7 @@ from github import Github, InputGitTreeElement
 from notion2md.exporter.block import MarkdownExporter
 
 from wolf_core import application, api
-import notion
+from wolf import notion
 
 
 class Notion2Latex(application.Application):
@@ -416,6 +416,10 @@ class Notion2Latex(application.Application):
             pass
 
 
-if __name__ == "__main__":
+def main():
     app = Notion2Latex()
     app.job()
+
+
+if __name__ == "__main__":
+    main()

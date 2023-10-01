@@ -14,6 +14,9 @@ readme = "README.md"
 name = "testpypi"
 url = "https://test.pypi.org/simple/"
 
+[tool.poetry.scripts]
+notion_latex = "wolf.notion_latex:main"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 wolf-core = { version = "1.0", source = "testpypi" }
