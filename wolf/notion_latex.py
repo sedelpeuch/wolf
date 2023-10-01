@@ -67,8 +67,6 @@ class Notion2Latex(application.Application):
         """
         status = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if status.returncode != 0:
-            self.logger.error(f"Error while running command: {cmd}")
-            self.logger.error(f"Error message: {status.stderr}")
             return False
         return True
 
