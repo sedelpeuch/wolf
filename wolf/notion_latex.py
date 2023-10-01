@@ -3,8 +3,6 @@ The Notion2Latex class is a utility designed for interacting with the Notion API
 
 Processing specific operations and subsequently converting the retrieved data from Notion to LaTeX format.
 """
-import base64
-import difflib
 import json
 import os
 import subprocess
@@ -13,11 +11,9 @@ import time
 import jsonschema
 import pygit2
 import unidecode
-from github import Github, InputGitTreeElement
 from notion2md.exporter.block import MarkdownExporter
 
-from wolf_core import application, api
-from wolf import notion
+from wolf_core import application
 
 
 class Notion2Latex(application.Application):
@@ -49,16 +45,12 @@ class Notion2Latex(application.Application):
             },
             "required": ["client", "titre", "phase_id", "phase_nom"]
         }
-        self.logger.error(os.getcwd())
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         with open('token.json') as file:
-            token = json.load(file)['github_doc_publish']
-        with open('token.json') as file:
             self.master_file = json.load(file)['notion_master_file']
-        self.github = Github(token)
-        self.repo = self.github.get_user().get_repo('doc_latex-compiled-result-wolf')
 
-    def run_command(self, cmd):
+    @staticmethod
+    def run_command(cmd):
         """
         Run a command in the shell.
 
@@ -85,13 +77,6 @@ class Notion2Latex(application.Application):
             self.run_command("rm -rf doc_latex-template-complex-version")
             pygit2.clone_repository(url_with_token, "doc_latex-template-complex-version",
                                     checkout_branch="complex-version")
-
-            with open('token.json') as file:
-                token = json.load(file)['github_doc_publish']
-            url = "https://github.com/catie-aq/doc_latex-compiled-result-wolf.git"
-            url_with_token = f"https://{token}@{url[8:]}"
-            self.run_command("rm -rf doc_latex-compiled-result-wolf")
-            pygit2.clone_repository(url_with_token, "doc_latex-compiled-result-wolf")
 
         except pygit2.GitError as e:  # Catch the pygit2.GitError exception
             self.logger.error(f"Error while cloning repository from {url}: {e}")
@@ -184,27 +169,6 @@ class Notion2Latex(application.Application):
             return None
         return param_dict
 
-    @staticmethod
-    def check_diff(current, last):
-        """
-        Compares the contents of two files and returns True if there is a difference,
-        otherwise returns False.
-
-        :param current: Path to the current file
-        :param last: Path to the previous file
-        :type current: str
-        :type last: str
-        :return: True if there is a difference, otherwise False
-        :rtype: bool
-        """
-        if os.path.isfile(current) and os.path.isfile(last):
-            with open(current) as cur, open(last) as las:
-                diff = difflib.ndiff(cur.readlines(), las.readlines())
-                count = sum(1 for line in diff if line.startswith('+') or line.startswith('-'))
-            if count == 0:
-                return True
-        return True
-
     def compile(self, file, param_dict):
         """
         This method compiles a Markdown file into a PDF using the pandoc and xelatex tools.
@@ -220,20 +184,10 @@ class Notion2Latex(application.Application):
         title = client + "_" + titre + "_" + phase_id + "_" + phase_nom
         title = title.replace(" ", "-")
 
-        file_path_tex = file + ".tex"
-        file_name_tex = param_dict["client"] + "/" + title + ".tex"
-
-        last_compiled_path_tex = "../../doc_latex-compiled-result-wolf/" + file_name_tex
-
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         self.run_command("cp " + file + ".md doc_latex-template-complex-version/src")
         os.chdir("doc_latex-template-complex-version/src")
         self.run_command("pandoc " + file + ".md --template=template.tex -o " + file + ".tex")
-
-        diff = self.check_diff(file_path_tex, last_compiled_path_tex)
-        if not diff:
-            self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
-            return False, title
 
         success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex")
         success_second = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
@@ -245,52 +199,10 @@ class Notion2Latex(application.Application):
         self.run_command("mv " + file + ".pdf ../out/" + title + ".pdf")
         self.run_command("mv " + file + ".tex ../out/" + title + ".tex")
         os.chdir("../..")
+        self.logger.info("File " + file + ".md compiled successfully.")
         return True, title
 
-    def publish_compiled(self, param_dict, title):
-        """
-        Publishes the compiled PDF file to a GitHub repository.
-
-        :param param_dict: A dictionary containing parameters for publishing the compiled PDF.
-        :param title: The title of the PDF file.
-        :return: None
-        """
-        file_path = "doc_latex-template-complex-version/out/" + title + ".pdf"
-        file_path_tex = "doc_latex-template-complex-version/out/" + title + ".tex"
-        file_name = param_dict["client"] + "/" + title + ".pdf"
-        file_name_tex = param_dict["client"] + "/" + title + ".tex"
-
-        # noinspection PyBroadException
-        try:
-            commit_message = 'Add ' + file_name + ' on GitHub'
-            master_ref = self.repo.get_git_ref('heads/result')
-            master_sha = master_ref.object.sha
-            base_tree = self.repo.get_git_tree(master_sha)
-            with open(file_path, 'rb') as input_file:
-                data = input_file.read()
-            data = base64.b64encode(data).decode("utf-8")
-
-            with open(file_path_tex, 'rb') as input_file:
-                data_tex = input_file.read()
-            data_tex = base64.b64encode(data_tex).decode("utf-8")
-
-            blob = self.repo.create_git_blob(data, "base64")
-            blob_tex = self.repo.create_git_blob(data_tex, "base64")
-            element = InputGitTreeElement(file_name, '100644', 'blob', sha=blob.sha)
-            element_tex = InputGitTreeElement(file_name_tex, '100644', 'blob', sha=blob_tex.sha)
-            element_list = [element, element_tex]
-            tree = self.repo.create_git_tree(element_list, base_tree=base_tree)
-            parent = self.repo.get_git_commit(master_sha)
-            commit = self.repo.create_git_commit(commit_message, tree, [parent])
-            master_ref.edit(commit.sha)
-        except Exception as e:
-            self.logger.error(f"Le fichier PDF {file_name} n'a pas pu être poussé sur le repo.")
-            return None
-        self.logger.info(f"Le fichier PDF {file_name} a été poussé sur le repo avec succès.")
-        return "https://github.com/{}/{}/blob/{}/{}".format(self.repo.owner.login, self.repo.name, master_ref.ref,
-                                                            file_name)
-
-    def update_notion(self, success, file_id, block, msg=None, link=None):
+    def update_notion(self, success, file_id, block, msg=None):
         """
         Updates the Notion page with the result of the compilation.
 
@@ -298,7 +210,6 @@ class Notion2Latex(application.Application):
         :param file_id: String representing the ID of the Notion page.
         :param block: Dictionary representing the block on the Notion page.
         :param msg: Optional string representing an additional message to display.
-        :param link: Optional string representing the GitHub link.
         :return: None
         """
         string_display = " ✅ " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()) \
@@ -337,17 +248,6 @@ class Notion2Latex(application.Application):
                 ]
             }
         }
-        if link:
-            # noinspection PyTypeChecker
-            new_paragraph_block['paragraph']['rich_text'].append({
-                'type': 'text',
-                'text': {
-                    'content': " - Github link",
-                    'link': {
-                        'url': link
-                    }
-                }
-            })
         req = self.api("Notion").patch.block(block["id"], new_paragraph_block)
         if not req:
             self.logger.error("Error while updating Notion page.")
@@ -366,8 +266,6 @@ class Notion2Latex(application.Application):
         self.get_template()
         files, blocks = self.get_files()
         if files is None:
-            self.set_status(application.Status.ERROR)
-            self.health_check = {"message": "Failed to get files from Notion."}
             return application.Status.ERROR
         failure = 0
         for file in files:
@@ -377,62 +275,33 @@ class Notion2Latex(application.Application):
                 failure += 1
                 continue
             process, title = self.compile(file, param_dict)
-            print(process, title)
-            if not process and title is not None:
-                continue
             if not process and title is None:
                 self.update_notion(False, file, blocks[files.index(file)], "The compilation failed.")
                 failure += 1
                 continue
-            link = self.publish_compiled(param_dict, title)
-            if link is None:
-                self.update_notion(False, file, blocks[files.index(file)], "The PDF could not be published.")
-                failure += 1
-                continue
-            self.update_notion(True, file, blocks[files.index(file)], link=link)
+            self.update_notion(True, file, blocks[files.index(file)])
 
-        self.run_command("rm -rf doc_latex-template-complex-version")
-        self.run_command("rm -rf wolf/doc_latex-template-complex-version")
-        self.run_command("rm -rf doc_latex-compiled-result-wolf")
-        self.run_command("rm -rf wolf/doc_latex-compiled-result-wolf")
-        self.run_command("rm -rf *.md")
-        self.run_command("rm -rf *.pdf")
-        self.run_command("rm -rf wolf/*.md")
-        self.run_command("rm -rf wolf/*.pdf")
-
-        str_msg = "SyncNotion compiled {} files.".format(len(files))
+        str_msg = "Notion LaTeX compiled {} files.".format(len(files) - failure)
         self.logger.debug(str_msg)
 
         if failure == len(files):
-            self.set_status(application.Status.ERROR)
-            self.health_check = {"message": "All files failed to compile."}
-            self.logger.error("All files failed to compile.")
             return application.Status.ERROR
         else:
-            self.set_status(application.Status.SUCCESS)
-            self.health_check = {"message": str_msg}
             return application.Status.SUCCESS
-
-    def __del__(self):
-        try:
-            self.run_command("rm -rf doc_latex-template-complex-version")
-            self.run_command("rm -rf doc_latex-compiled-result-wolf")
-            self.run_command("rm -rf *.md")
-            self.run_command("rm -rf *.pdf")
-        except FileNotFoundError:
-            pass
-        try:
-            self.run_command("rm -rf wolf/doc_latex-template-complex-version")
-            self.run_command("rm -rf wolf/doc_latex-compiled-result-wolf")
-            self.run_command("rm -rf wolf/*.md")
-            self.run_command("rm -rf wolf/*.pdf")
-        except FileNotFoundError:
-            pass
 
 
 def main():
+    """
+
+    This is the documentation for the method main().
+
+    :returns: None
+    """
+    __import__("wolf_core.api")
+    __import__("wolf.notion")
     app = Notion2Latex()
-    app.job()
+    result = app.job()
+    app.logger.debug("Notion LaTeX finished with status: " + result.name)
 
 
 if __name__ == "__main__":

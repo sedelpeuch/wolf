@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '30 * * * *'
   workflow_dispatch:
+  push:
 
 
 
@@ -40,7 +41,13 @@ jobs:
           sudo apt-get install pandoc -y
       - name: Install token
         run: |
-          cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
+          cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
       - name: Run Notion LaTeX
         run: |
           poetry run notion_latex
+      - name: Archive LaTeX output
+        uses: actions/upload-artifact@v3
+        with:
+          name: latex-artifact
+          path: wolf/doc_latex-template-complex-version/out
+          if-no-files-found: error
