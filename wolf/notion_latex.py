@@ -334,7 +334,7 @@ class Notion2Latex(application.Application):
 
 def main():
     __import__("wolf_core.api")
-    __import__("notion")
+    __import__("wolf.notion")
     app = Notion2Latex()
     app.job()
 
