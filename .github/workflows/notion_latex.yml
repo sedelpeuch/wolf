@@ -25,6 +25,10 @@ jobs:
           installer-parallel: true
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install texlive-full -y
       - name: Install token
         run: |
           cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --github_doc_publish ${{ secrets.NOTION2LATEX_DOC_PUBLISH_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
