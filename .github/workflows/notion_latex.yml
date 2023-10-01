@@ -31,11 +31,6 @@ jobs:
           installer-parallel: true
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
-      - name: Setup TeX Live
-        uses: teatimeguest/setup-texlive-action@v2
-        with:
-          packages: >-
-            texlive-full
       - name: Install Pandoc
         run: |
           sudo apt-get update
@@ -43,9 +38,10 @@ jobs:
       - name: Install token
         run: |
           cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
-      - name: Run Notion LaTeX
-        run: |
-          poetry run notion_latex
+      - uses: xu-cheng/texlive-action/full@v1
+        with:
+          run: |
+            poetry run notion_latex
       - name: Archive LaTeX output
         uses: actions/upload-artifact@v3
         with:
