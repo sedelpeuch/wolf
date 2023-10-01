@@ -12,12 +12,12 @@ import time
 
 import jsonschema
 import pygit2
-import schedule
 import unidecode
 from github import Github, InputGitTreeElement
 from notion2md.exporter.block import MarkdownExporter
 
-from wolf_core import application
+from wolf_core import application, api
+from wolf import notion
 
 
 class Notion2Latex(application.Application):
@@ -39,7 +39,6 @@ class Notion2Latex(application.Application):
 
     def __init__(self):
         super().__init__()
-        self.frequency = schedule.every(5).minutes
         self.validate_schema = {
             "type": "object",
             "properties": {
@@ -59,8 +58,7 @@ class Notion2Latex(application.Application):
         self.github = Github(token)
         self.repo = self.github.get_user().get_repo('doc_latex-compiled-result-wolf')
 
-    @staticmethod
-    def run_command(cmd):
+    def run_command(self, cmd):
         """
         Run a command in the shell.
 
@@ -204,7 +202,7 @@ class Notion2Latex(application.Application):
                 diff = difflib.ndiff(cur.readlines(), las.readlines())
                 count = sum(1 for line in diff if line.startswith('+') or line.startswith('-'))
             if count == 0:
-                return False
+                return True
         return True
 
     def compile(self, file, param_dict):
@@ -237,7 +235,7 @@ class Notion2Latex(application.Application):
             self.logger.info("No diff between {} and {}".format(file_path_tex, last_compiled_path_tex))
             return False, title
 
-        success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
+        success_first = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex")
         success_second = self.run_command("xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null")
         success = success_first and success_second
         if not success:
@@ -265,7 +263,7 @@ class Notion2Latex(application.Application):
         # noinspection PyBroadException
         try:
             commit_message = 'Add ' + file_name + ' on GitHub'
-            master_ref = self.repo.get_git_ref('heads/master')
+            master_ref = self.repo.get_git_ref('heads/result')
             master_sha = master_ref.object.sha
             base_tree = self.repo.get_git_tree(master_sha)
             with open(file_path, 'rb') as input_file:
@@ -394,8 +392,13 @@ class Notion2Latex(application.Application):
             self.update_notion(True, file, blocks[files.index(file)], link=link)
 
         self.run_command("rm -rf doc_latex-template-complex-version")
+        self.run_command("rm -rf wolf/doc_latex-template-complex-version")
         self.run_command("rm -rf doc_latex-compiled-result-wolf")
-        self.run_command("rm -r *.md")
+        self.run_command("rm -rf wolf/doc_latex-compiled-result-wolf")
+        self.run_command("rm -rf *.md")
+        self.run_command("rm -rf *.pdf")
+        self.run_command("rm -rf wolf/*.md")
+        self.run_command("rm -rf wolf/*.pdf")
 
         str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.logger.debug(str_msg)
@@ -403,6 +406,7 @@ class Notion2Latex(application.Application):
         if failure == len(files):
             self.set_status(application.Status.ERROR)
             self.health_check = {"message": "All files failed to compile."}
+            self.logger.error("All files failed to compile.")
             return application.Status.ERROR
         else:
             self.set_status(application.Status.SUCCESS)
@@ -412,6 +416,24 @@ class Notion2Latex(application.Application):
     def __del__(self):
         try:
             self.run_command("rm -rf doc_latex-template-complex-version")
-            self.run_command("rm -r *.md")
+            self.run_command("rm -rf doc_latex-compiled-result-wolf")
+            self.run_command("rm -rf *.md")
+            self.run_command("rm -rf *.pdf")
         except FileNotFoundError:
             pass
+        try:
+            self.run_command("rm -rf wolf/doc_latex-template-complex-version")
+            self.run_command("rm -rf wolf/doc_latex-compiled-result-wolf")
+            self.run_command("rm -rf wolf/*.md")
+            self.run_command("rm -rf wolf/*.pdf")
+        except FileNotFoundError:
+            pass
+
+
+def main():
+    app = Notion2Latex()
+    app.job()
+
+
+if __name__ == "__main__":
+    main()

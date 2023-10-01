@@ -14,9 +14,12 @@ readme = "README.md"
 name = "testpypi"
 url = "https://test.pypi.org/simple/"
 
+[tool.poetry.scripts]
+notion_latex = "wolf.notion_latex:main"
+
 [tool.poetry.dependencies]
 python = "^3.8"
-wolf-core = { version = "1.0", source = "testpypi" }
+wolf-core = { version = "2.0", source = "testpypi" }
 unidecode = "^1.2.0"
 pygit2 = "^1.6.1"
 pygithub = "^1.59.0"

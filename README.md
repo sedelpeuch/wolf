@@ -1,13 +1,5 @@
 # Projet Wolf
 
-Wolf Status
-
-[![Documentation Status](https://readthedocs.org/projects/wolf-project/badge/?version=latest)](https://wolf-project.readthedocs.io/?badge=latest) [![Unittest](https://github.com/sedelpeuch/wolf/actions/workflows/unittest.yml/badge.svg)](https://github.com/sedelpeuch/wolf/actions/workflows/unittest.yml)
-
-Wolf-Core Status
-
-[![Documentation Status](https://readthedocs.org/projects/wolf-project/badge/?version=latest)](https://wolf-project.readthedocs.io/?badge=latest) [![Wolf Core](https://github.com/sedelpeuch/wolf-core/actions/workflows/unittest.yml/badge.svg)](https://github.com/sedelpeuch/wolf-core/actions/workflows/unittest.yml) [![Publish to Test PyPI](https://github.com/sedelpeuch/wolf-core/actions/workflows/publish.yaml/badge.svg)](https://github.com/sedelpeuch/wolf-core/actions/workflows/publish.yaml)
-
 Le projet Wolf est un projet ayant pour but de créer un environnement d'interconnexion entre les différents outils pouvant être utilisés dans la gestion d'associatins, de projets
 etc
 
@@ -22,7 +14,7 @@ bash
 git clone git@github.com:sedelpeuch/wolf.git
 ```
 
-### Installation pour les utilisateurs
+### Installation
 
 Créez un environnement virtuel et installez le package :
 
@@ -35,45 +27,16 @@ poetry install
 
 ```
 
-### Installation pour les développeurs
+Il est nécessaire de créer un fichier `wolf/token.json` en remplissant avec les tokens adaptés (cela dépend de vos api et applications). Dans le cas du projet actuel :
 
-Le projet utilise des submodules Git, vous devez donc les initialiser comme suit :
-
-```bash
-git submodule init
-git submodule update
-cd core
-git checkout main
-```
-
-Ensuite, installez les dépendances du projet et le package wolf_core :
-
-```bash
-python3 -m pip install virtualenv
-python3 -m virtualenv venv
-source venv/bin/activate
-pip install poetry
-cd core
-poetry install
-```
-
-### Configuration
-
-Le projet utilise les arguments de la ligne de commande pour définir les paramètres de connexion à divers outils. Vous pouvez placer vos tokens directement via les arguments de la
-ligne de commande.
-
-```bash
-python install.py --token1 VOTRE_TOKEN1 --token2 VOTRE_TOKEN2 ...
-```
-
-N'oubliez pas de remplacer VOTRE_NOTION_TOKEN et VOTRE_DOLIBARR_TOKEN par vos véritables tokens.
-Vous pouvez également placer vos tokens dans le fichier `install.py`.
-
-Pour enregistrer la configuration et lancer le projet en tant que service systemd, exécutez la commande suivante :
-
-```bash
-deactivate
-sudo python3 install.py
+```json
+{
+  "notion": "",
+  "dolibarr": "",
+  "github_doc_latex": "",
+  "github_doc_publish": "",
+  "notion_master_file": ""
+}
 ```
 
 ## Documentation
@@ -81,8 +44,6 @@ sudo python3 install.py
 La documentation complète du projet est disponible dans le répertoire /docs. Vous pouvez consulter cette documentation
 pour en savoir plus sur les
 fonctionnalités du projet et son utilisation.
-
-La documentation est disponible en ligne à l'adresse suivante : https://wolf-eirlab-community.readthedocs.io/
 
 ## Contributions
 

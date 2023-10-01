@@ -163,3 +163,4 @@ cython_debug/
 
 wolf/token.json
 !/wolf/token_old.json
+.secrets
