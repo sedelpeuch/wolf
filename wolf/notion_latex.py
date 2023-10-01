@@ -10,6 +10,7 @@ import time
 
 import jsonschema
 import pygit2
+import requests
 import unidecode
 from notion2md.exporter.block import MarkdownExporter
 
@@ -297,6 +298,72 @@ class Notion2Latex(application.Application):
         else:
             return application.Status.SUCCESS
 
+    def get_artifact_suites_url(self, user, repo, token):
+        headers = {"Authorization": "token " + token}
+
+        # Get workflows
+        workflows = requests.get(
+            f"https://api.github.com/repos/{user}/{repo}/actions/workflows",
+            headers=headers
+        ).json()
+
+        # Get runs from the first workflow
+        workflow_id = workflows['workflows'][0]['id']
+        runs = requests.get(
+            f"https://api.github.com/repos/{user}/{repo}/actions/workflows/{workflow_id}/runs",
+            headers=headers
+        ).json()
+
+        # Get the details of the latest workflow run to obtain the check_suite_id
+        if runs['workflow_runs']:
+            run_id = runs['workflow_runs'][0]['id']
+            run_details = requests.get(
+                f"https://api.github.com/repos/{user}/{repo}/actions/runs/{run_id}",
+                headers=headers
+            ).json()
+            check_suite_id = run_details['check_suite_id']
+
+            # Get artifacts from the latest run
+            artifacts = requests.get(
+                f"https://api.github.com/repos/{user}/{repo}/actions/runs/{run_id}/artifacts",
+                headers=headers
+            ).json()
+
+            # Get artifact ID of the latest artifact and create the URL
+            if artifacts['artifacts']:
+                artifact_id = artifacts['artifacts'][0]['id']
+                return f"https://github.com/{user}/{repo}/suites/{check_suite_id}/artifacts/{artifact_id}"
+
+        return None
+
+    def artifact_link_notion(self, link):
+        req = self.api("Notion").patch.block(self.master_file, {
+            "paragraph": {
+                "text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Artifacts: " + link,
+                            "link": {
+                                "url": link
+                            }
+                        }
+                    },
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Time: " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()),
+                            "link": None
+                        }
+                    }
+                ]
+            }
+        })
+        if req.status_code != 200:
+            self.logger.error("Failed to update Notion page with artifact link.")
+            return False
+        return True
+
 
 def main():
     """
@@ -310,6 +377,16 @@ def main():
     app = Notion2Latex()
     result = app.job()
     app.logger.debug("Notion LaTeX finished with status: " + result.name)
+
+
+def post_run():
+    __import__("wolf_core.api")
+    __import__("wolf.notion")
+    app = Notion2Latex()
+    with open('token.json') as file:
+        token = json.load(file)['github']
+    link = app.get_artifact_suites_url("sedelpeuch", "wolf", token)
+    app.artifact_link_notion(link)
 
 
 if __name__ == "__main__":

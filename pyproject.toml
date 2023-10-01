@@ -16,6 +16,7 @@ url = "https://test.pypi.org/simple/"
 
 [tool.poetry.scripts]
 notion_latex = "wolf.notion_latex:main"
+notion_latex_post = "wolf.notion_latex:post_run"
 
 [tool.poetry.dependencies]
 python = "^3.8"

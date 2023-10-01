@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install pandoc -y
       - name: Install token
         run: |
-          cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
+          cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github ${{ secrets.GH_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
       - name: Run Notion LaTeX
         run: |
           poetry run notion_latex
@@ -51,3 +51,6 @@ jobs:
           name: latex-artifact
           path: wolf/doc_latex-template-complex-version/out
           if-no-files-found: error
+      - name: Publish artifact to notion
+        run: |
+          poetry run notion_latex_post
