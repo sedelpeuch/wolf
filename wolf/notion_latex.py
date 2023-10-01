@@ -58,8 +58,7 @@ class Notion2Latex(application.Application):
         self.github = Github(token)
         self.repo = self.github.get_user().get_repo('doc_latex-compiled-result-wolf')
 
-    @staticmethod
-    def run_command(cmd):
+    def run_command(self, cmd):
         """
         Run a command in the shell.
 
@@ -68,6 +67,8 @@ class Notion2Latex(application.Application):
         """
         status = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if status.returncode != 0:
+            self.logger.error(f"Error while running command: {cmd}")
+            self.logger.error(f"Error message: {status.stderr}")
             return False
         return True
 
@@ -393,8 +394,11 @@ class Notion2Latex(application.Application):
             self.update_notion(True, file, blocks[files.index(file)], link=link)
 
         self.run_command("rm -rf doc_latex-template-complex-version")
+        self.run_command("rm -r wolf/doc_latex-template-complex-version")
         self.run_command("rm -rf doc_latex-compiled-result-wolf")
+        self.run_command("rm -r wolf/doc_latex-compiled-result-wolf")
         self.run_command("rm -r *.md")
+        self.run_command("rm -r wolf/*.md")
 
         str_msg = "SyncNotion compiled {} files.".format(len(files))
         self.logger.debug(str_msg)
