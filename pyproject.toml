@@ -10,17 +10,13 @@ authors = ["sedelpeuch <sebastien@delpeuch.net>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
-[[tool.poetry.source]]
-name = "testpypi"
-url = "https://test.pypi.org/simple/"
-
 [tool.poetry.scripts]
 notion_latex = "wolf.notion_latex:main"
 notion_latex_post = "wolf.notion_latex:post_run"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-wolf-core = { version = "2.0", source = "testpypi" }
+wolf-core = "^2.0.1"
 unidecode = "^1.2.0"
 pygit2 = "^1.6.1"
 pygithub = "^1.59.0"
