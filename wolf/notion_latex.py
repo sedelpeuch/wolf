@@ -50,7 +50,8 @@ class Notion2Latex(application.Application):
         with open('token.json') as file:
             self.master_file = json.load(file)['notion_master_file']
 
-    def run_command(self, cmd):
+    @staticmethod
+    def run_command(cmd):
         """
         Run a command in the shell.
 
@@ -298,7 +299,15 @@ class Notion2Latex(application.Application):
         else:
             return application.Status.SUCCESS
 
-    def get_artifact_suites_url(self, user, repo, token):
+    @staticmethod
+    def get_artifact_suites_url(user, repo, token):
+        """
+        :param user: A string representing the username or organization name on GitHub.
+        :param repo: A string representing the repository name on GitHub.
+        :param token: A string representing the access token for authentication with GitHub API.
+
+        :return: A string representing the URL of the artifact suites for the given repository.
+        """
         headers = {"Authorization": "token " + token}
 
         workflows = requests.get(f"https://api.github.com/repos/{user}/{repo}/actions/workflows",
@@ -318,6 +327,10 @@ class Notion2Latex(application.Application):
         return None
 
     def artifact_link_notion(self, link):
+        """
+        :param link: The link to the artifact that needs to be added to the Notion page.
+        :return: Returns True if the Notion page is successfully updated with the artifact link.
+        """
         req = self.api("Notion").patch.block("bdff6e80184641609564996d70c8d3fc", {
             "paragraph": {
                 "rich_text": [
@@ -356,6 +369,13 @@ def main():
 
 
 def post_run():
+    """
+    This method, `post_run`, is used to perform certain actions after the main execution of a program.
+    It is responsible for importing necessary modules, initializing an instance of the `Notion2Latex` class,
+    loading a token from a JSON file, and calling specific methods of the `Notion2Latex` class.
+
+    :return: None
+    """
     __import__("wolf_core.api")
     __import__("wolf.notion")
     app = Notion2Latex()
