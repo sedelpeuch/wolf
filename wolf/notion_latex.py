@@ -343,7 +343,8 @@ class Notion2Latex(application.Application):
                     {
                         "type": "text",
                         "text": {
-                            "content": "Penultimate artifacts at " + time.strftime("%d/%m/%Y %H:%M:%S", time.localtime()),
+                            "content": "Penultimate artifacts at " + time.strftime("%d/%m/%Y %H:%M:%S",
+                                                                                   time.localtime()),
                             "link": {
                                 "url": link
                             }
@@ -354,6 +355,7 @@ class Notion2Latex(application.Application):
         })
         if req.status_code != 200:
             self.logger.error("Failed to update Notion page with artifact link.")
+            self.logger.error(req.data)
             return False
         return True
 
