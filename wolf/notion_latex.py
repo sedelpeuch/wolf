@@ -20,20 +20,7 @@ from wolf_core import application
 
 class Notion2Latex(application.Application):
     """
-    Notion2Latex
-
-    This class is used for converting Notion markdown files to LaTeX format.
-
-    Methods:
-        - get_files(): Retrieves files from Notion and returns a list of file IDs.
-        - get_markdown(file): Get the markdown file from Notion.
-        - compile (file, param_dict): Compile a Markdown file into a PDF using the pandoc and
-        xelatex tools.
-        - job(): Perform the SyncNotion job.
-
-    Attributes:
-        - frequency: The frequency of when the job should be executed.
-        - validate_schema: The schema used for validating the markdown files.
+    This class represents the application for converting Notion pages to LaTeX files.
     """
 
     def __init__(self):
@@ -52,6 +39,7 @@ class Notion2Latex(application.Application):
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         with open("token.json") as file:
             self.master_file = json.load(file)["notion_master_file"]
+            self.token = json.load(file)["github"]
 
     @staticmethod
     def run_command(cmd):
@@ -75,27 +63,19 @@ class Notion2Latex(application.Application):
         """
         url = ""
         try:
-            with open("token.json") as file:
-                token = json.load(file)["github_doc_latex"]
             url = "https://github.com/catie-aq/doc_latex-template.git"
-            url_with_token = f"https://{token}@{url[8:]}"
+            url_with_token = f"https://{self.token}@{url[8:]}"
             self.run_command("rm -rf doc_latex-template-complex-version")
             pygit2.clone_repository(
                 url_with_token,
                 "doc_latex-template-complex-version",
                 checkout_branch="complex-version",
             )
-
-        except pygit2.GitError as e:  # Catch the pygit2.GitError exception
+        except pygit2.GitError as e:
             self.logger.error(f"Error while cloning repository from {url}: {e}")
-        except (
-            FileNotFoundError
-        ) as e:  # Catch the FileNotFoundError exception for 'token.json'
+        except FileNotFoundError as e:
             self.logger.error(f"Unable to open the 'token.json' file: {e}")
-        except (
-            json.JSONDecodeError
-        ) as e:  # Catch the JSONDecodeError for malformed JSON in
-            # 'token.json'
+        except json.JSONDecodeError as e:
             self.logger.error(
                 f"Unable to parse the JSON from 'token.json': {e}"
             )
