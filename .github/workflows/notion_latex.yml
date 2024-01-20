@@ -28,12 +28,12 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
-      - name: Install dependencies
-        run: poetry install --no-interaction --no-root
       - name: Install Pandoc
         run: |
-          sudo apt-get update
-          sudo apt-get install pandoc -y
+          apt-get update
+          apt-get install pandoc -y
+      - name: Poetry install
+        run: poetry install --no-interaction --no-root
       - name: Install token
         run: |
           cd wolf && python3 install.py --notion ${{ secrets.NOTION_TOKEN }} --github ${{ secrets.GITHUB_TOKEN }} --github_doc_latex ${{ secrets.NOTION2LATEX_DOC_LATEX_TOKEN }} --notion_master_file ${{ secrets.NOTION2LATEX_NOTION_MASTER_FILE}}
