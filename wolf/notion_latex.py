@@ -38,8 +38,9 @@ class Notion2Latex(application.Application):
 
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         with open("token.json") as file:
-            self.master_file = json.load(file)["notion_master_file"]
-            self.token = json.load(file)["github"]
+            file = json.load(file)
+            self.master_file = file["notion_master_file"]
+            self.token = file["github"]
 
     @staticmethod
     def run_command(cmd):
