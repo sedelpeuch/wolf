@@ -5,17 +5,18 @@ from wolf.notion import Notion
 
 
 class TestNotionBlock(unittest.TestCase):
-
-    @patch('requests.patch')
+    @patch("requests.patch")
     def test_append_block_children(self, mock_patch):
         mock_patch.return_value.json.return_value = {"test": "value"}
         mock_patch.return_value.status_code = 200
         notion = Notion(test=True)
-        resp = notion.append_block_children("block_id", [{"object": "block", "type": "paragraph"}])
+        resp = notion.append_block_children(
+            "block_id", [{"object": "block", "type": "paragraph"}]
+        )
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_block(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -24,7 +25,7 @@ class TestNotionBlock(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_block_children(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -33,7 +34,7 @@ class TestNotionBlock(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.patch')
+    @patch("requests.patch")
     def test_update_block(self, mock_patch):
         mock_patch.return_value.json.return_value = {"test": "value"}
         mock_patch.return_value.status_code = 200
@@ -42,7 +43,7 @@ class TestNotionBlock(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.delete')
+    @patch("requests.delete")
     def test_delete_block(self, mock_delete):
         mock_delete.return_value.json.return_value = {"test": "value"}
         mock_delete.return_value.status_code = 200
@@ -53,8 +54,7 @@ class TestNotionBlock(unittest.TestCase):
 
 
 class TestNotionDatabase(unittest.TestCase):
-
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_database(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -63,7 +63,7 @@ class TestNotionDatabase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.patch')
+    @patch("requests.patch")
     def test_patch_database(self, mock_patch):
         mock_patch.return_value.json.return_value = {"test": "value"}
         mock_patch.return_value.status_code = 200
@@ -72,7 +72,7 @@ class TestNotionDatabase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.post')
+    @patch("requests.post")
     def test_query_database(self, mock_post):
         mock_post.return_value.json.return_value = {"test": "value"}
         mock_post.return_value.status_code = 200
@@ -83,8 +83,7 @@ class TestNotionDatabase(unittest.TestCase):
 
 
 class TestNotionPage(unittest.TestCase):
-
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_page(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -93,7 +92,7 @@ class TestNotionPage(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.post')
+    @patch("requests.post")
     def test_post_page(self, mock_post):
         mock_post.return_value.json.return_value = {"test": "value"}
         mock_post.return_value.status_code = 200
@@ -102,7 +101,7 @@ class TestNotionPage(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_page_property(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -111,7 +110,7 @@ class TestNotionPage(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.patch')
+    @patch("requests.patch")
     def test_patch_page_property(self, mock_patch):
         mock_patch.return_value.json.return_value = {"test": "value"}
         mock_patch.return_value.status_code = 200
@@ -122,8 +121,7 @@ class TestNotionPage(unittest.TestCase):
 
 
 class TestNotionUsersAndSearch(unittest.TestCase):
-
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_user(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -132,7 +130,7 @@ class TestNotionUsersAndSearch(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_all_users(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -141,7 +139,7 @@ class TestNotionUsersAndSearch(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.post')
+    @patch("requests.post")
     def test_search(self, mock_post):
         mock_post.return_value.json.return_value = {"test": "value"}
         mock_post.return_value.status_code = 200
@@ -152,8 +150,7 @@ class TestNotionUsersAndSearch(unittest.TestCase):
 
 
 class TestNotionDatabaseActions(unittest.TestCase):
-
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_databases(self, mock_get):
         mock_get.return_value.json.return_value = {"test": "value"}
         mock_get.return_value.status_code = 200
@@ -162,13 +159,15 @@ class TestNotionDatabaseActions(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
-    @patch('requests.post')
+    @patch("requests.post")
     def test_create_database(self, mock_post):
         mock_post.return_value.json.return_value = {"test": "value"}
         mock_post.return_value.status_code = 200
         notion = Notion(test=True)
         properties = {"Name": {"title": []}, "Description": {"rich_text": []}}
-        resp = notion.create_database("parent_id", properties, title="Test Database")
+        resp = notion.create_database(
+            "parent_id", properties, title="Test Database"
+        )
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data, {"test": "value"})
 
