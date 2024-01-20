@@ -16,23 +16,31 @@ class MyTestCase(unittest.TestCase):
         self.test_application = TestApplication()
 
     def test_initialisation(self):
-        self.assertEqual(self.test_application.status, application.Status.WAITING)
+        self.assertEqual(
+            self.test_application.status, application.Status.WAITING
+        )
 
     def test_status_property(self):
-        self.assertEqual(self.test_application.status, application.Status.WAITING)
+        self.assertEqual(
+            self.test_application.status, application.Status.WAITING
+        )
 
         # Check if the status is set to RUNNING normally not (property)
         self.test_application.__status = application.Status.RUNNING
-        self.assertEqual(self.test_application.status, application.Status.WAITING)
+        self.assertEqual(
+            self.test_application.status, application.Status.WAITING
+        )
 
     def test_status_setter(self):
         self.test_application.set_status(application.Status.WAITING)
-        self.assertEqual(self.test_application.status, application.Status.WAITING)
+        self.assertEqual(
+            self.test_application.status, application.Status.WAITING
+        )
 
         with self.assertRaises(TypeError):
             # noinspection PyTypeChecker
             self.test_application.set_status("Truc")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -12,7 +12,7 @@ import os
 import subprocess
 
 
-def create_token_file(token_dict, file_path='token.json'):
+def create_token_file(token_dict, file_path="token.json"):
     """
     Create a token file.
 
@@ -22,7 +22,7 @@ def create_token_file(token_dict, file_path='token.json'):
     """
     if not os.path.exists(file_path):
         subprocess.run(["touch", file_path])
-    with open(file_path, 'w') as token_file:
+    with open(file_path, "w") as token_file:
         json.dump(token_dict, token_file)
     print(f"token.json created at {file_path}.")
 
@@ -30,14 +30,16 @@ def create_token_file(token_dict, file_path='token.json'):
 def parse_arguments():
     parser = argparse.ArgumentParser()
     # parse argument user
-    parser.add_argument('--user', type=str, default=getpass.getuser(), help='user name')
+    parser.add_argument(
+        "--user", type=str, default=getpass.getuser(), help="user name"
+    )
     # You can specify some known arguments, e.g., service_name in this case
     unknown_args = parser.parse_known_args()
 
     # Convert unknown args to token dictionary
     token_dict = {}
     for arg in unknown_args[1]:
-        if arg.startswith('--'):
+        if arg.startswith("--"):
             key = arg[2:]
             value = unknown_args[1][unknown_args[1].index(arg) + 1]
             token_dict[key] = value

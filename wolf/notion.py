@@ -31,40 +31,108 @@ class Notion(api.API):
                 try:
                     token = json.load(f)["notion"]
                 except KeyError:
-                    raise KeyError("The token.json file does not contain a notion key see documentation.")
+                    raise KeyError(
+                        "The token.json file does not contain a notion key see documentation."
+                    )
                 os.environ["NOTION_TOKEN"] = token
 
         ressources = {
             "pages": {
-                "page_get": {"verb": "GET", "method": self.get_page, "params": str},
-                "page_post": {"verb": "POST", "method": self.post_page, "params": [str, dict],
-                              "optional_params": [list, dict, dict, dict]}},
-            "page_property": {
-                "property_get": {"verb": "GET", "method": self.get_page_property, "params": [str, str]},
-                "property_patch": {"verb": "PATCH", "method": self.patch_page_property,
-                                   "params": str, "optional_params": [dict, bool]}},
-            "block_children": {
-                "block_append": {"verb": "PATCH", "method": self.append_block_children, "params": [str, list],
-                                 "optional_params": str},
-                "block_children": {"verb": "GET", "method": self.get_block_children, "params": str}},
-            "block": {
-                "block_patch": {"verb": "PATCH", "method": self.update_block, "params": [str, dict]},
-                "block_delete": {"verb": "DELETE", "method": self.delete_block, "params": str},
-                "block_get": {"verb": "GET", "method": self.get_block, "params": str}},
-            "create_database": {"verb": "POST", "method": self.create_database, "params": [str, dict],
-                                "optional_params": str},
-            "database": {
-                "database_get": {"verb": "GET", "method": self.get_database, "params": str},
-                "database_patch": {"verb": "PATCH", "method": self.patch_database, "params": str,
-                                   "optional_params": [list, list, dict]},
-                "database_query": {"verb": "POST", "method": self.query_database, "params": str,
-                                   "optional_params": [dict, list, str, int]}
+                "page_get": {
+                    "verb": "GET",
+                    "method": self.get_page,
+                    "params": str,
+                },
+                "page_post": {
+                    "verb": "POST",
+                    "method": self.post_page,
+                    "params": [str, dict],
+                    "optional_params": [list, dict, dict, dict],
+                },
             },
-            "user": {"verb": "GET", "method": self.get_user, "params": "", "optional_params": str},
+            "page_property": {
+                "property_get": {
+                    "verb": "GET",
+                    "method": self.get_page_property,
+                    "params": [str, str],
+                },
+                "property_patch": {
+                    "verb": "PATCH",
+                    "method": self.patch_page_property,
+                    "params": str,
+                    "optional_params": [dict, bool],
+                },
+            },
+            "block_children": {
+                "block_append": {
+                    "verb": "PATCH",
+                    "method": self.append_block_children,
+                    "params": [str, list],
+                    "optional_params": str,
+                },
+                "block_children": {
+                    "verb": "GET",
+                    "method": self.get_block_children,
+                    "params": str,
+                },
+            },
+            "block": {
+                "block_patch": {
+                    "verb": "PATCH",
+                    "method": self.update_block,
+                    "params": [str, dict],
+                },
+                "block_delete": {
+                    "verb": "DELETE",
+                    "method": self.delete_block,
+                    "params": str,
+                },
+                "block_get": {
+                    "verb": "GET",
+                    "method": self.get_block,
+                    "params": str,
+                },
+            },
+            "create_database": {
+                "verb": "POST",
+                "method": self.create_database,
+                "params": [str, dict],
+                "optional_params": str,
+            },
+            "database": {
+                "database_get": {
+                    "verb": "GET",
+                    "method": self.get_database,
+                    "params": str,
+                },
+                "database_patch": {
+                    "verb": "PATCH",
+                    "method": self.patch_database,
+                    "params": str,
+                    "optional_params": [list, list, dict],
+                },
+                "database_query": {
+                    "verb": "POST",
+                    "method": self.query_database,
+                    "params": str,
+                    "optional_params": [dict, list, str, int],
+                },
+            },
+            "user": {
+                "verb": "GET",
+                "method": self.get_user,
+                "params": "",
+                "optional_params": str,
+            },
             "search": {"verb": "POST", "method": self.search, "params": dict},
         }
 
-        super().__init__(url="https://api.notion.com", test_url="", token=token, ressources=ressources)
+        super().__init__(
+            url="https://api.notion.com",
+            test_url="",
+            token=token,
+            ressources=ressources,
+        )
 
     def oauth_header(self):
         """
@@ -76,7 +144,7 @@ class Notion(api.API):
         return {
             "Authorization": f"Bearer {self._token}",
             "Notion-Version": "2022-06-28",
-            "accept": "application/json"
+            "accept": "application/json",
         }
 
     ##############################
@@ -99,9 +167,15 @@ class Notion(api.API):
         url = self._url + "/v1/blocks/" + block_id + "/children"
         header = self.oauth_header()
         header["Content-Type"] = "application/json"
-        data = {"children": children} if after is None else {"children": children, "after": after}
+        data = (
+            {"children": children}
+            if after is None
+            else {"children": children, "after": after}
+        )
         response = requests.patch(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def get_block(self, block_id):
@@ -115,7 +189,9 @@ class Notion(api.API):
         url = self._url + "/v1/blocks/" + block_id
         header = self.oauth_header()
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def get_block_children(self, block_id):
@@ -129,7 +205,9 @@ class Notion(api.API):
         url = self._url + "/v1/blocks/" + block_id + "/children"
         header = self.oauth_header()
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def update_block(self, block_id, data, archived=False):
@@ -147,7 +225,9 @@ class Notion(api.API):
         header["Content-Type"] = "application/json"
         data["archived"] = archived
         response = requests.patch(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def delete_block(self, block_id):
@@ -161,14 +241,18 @@ class Notion(api.API):
         url = self._url + "/v1/blocks/" + block_id
         header = self.oauth_header()
         response = requests.delete(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     ##############################
     # Page: Notion API requests #
     ##############################
 
-    def post_page(self, parent_id, properties, children=None, icon=None, cover=None):
+    def post_page(
+        self, parent_id, properties, children=None, icon=None, cover=None
+    ):
         """
         Create a page in Notion.
 
@@ -188,10 +272,12 @@ class Notion(api.API):
             "properties": properties,
             "children": children,
             "icon": icon,
-            "cover": cover
+            "cover": cover,
         }
         response = requests.post(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def get_page(self, params):
@@ -206,7 +292,9 @@ class Notion(api.API):
         header = self.oauth_header()
         header["accept"] = "application/json"
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def get_page_property(self, page_id, property_id):
@@ -220,7 +308,9 @@ class Notion(api.API):
         url = self._url + "/v1/pages/" + page_id + "/properties/" + property_id
         header = self.oauth_header()
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def patch_page_property(self, page_id, property=None, archived=False):
@@ -236,9 +326,15 @@ class Notion(api.API):
         url = self._url + "/v1/pages/" + page_id
         header = self.oauth_header()
         header["Content-Type"] = "application/json"
-        data = {"archived": archived} if property is None else {"archived": archived, "properties": property}
+        data = (
+            {"archived": archived}
+            if property is None
+            else {"archived": archived, "properties": property}
+        )
         response = requests.patch(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def get_databases(self, params):
@@ -252,7 +348,9 @@ class Notion(api.API):
         url = self._url + "/v1/databases/" + params
         header = self.oauth_header()
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     ##################################
@@ -276,13 +374,17 @@ class Notion(api.API):
         data = {
             "parent": {"page_id": parent},
             "properties": properties,
-            "title": title
+            "title": title,
         }
         response = requests.post(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
-    def query_database(self, id, filter=None, sorts=None, start_cursor=None, page_size=None):
+    def query_database(
+        self, id, filter=None, sorts=None, start_cursor=None, page_size=None
+    ):
         """
         Gets a list of Pages contained in the database, filtered and ordered according to the filter conditions and
         sort criteria provided in the request.
@@ -313,10 +415,12 @@ class Notion(api.API):
             "filter": filter,
             "sorts": sorts,
             "start_cursor": start_cursor,
-            "page_size": page_size
+            "page_size": page_size,
         }
         response = requests.post(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def get_database(self, id):
@@ -333,7 +437,9 @@ class Notion(api.API):
         url = self._url + "/v1/databases/" + id
         header = self.oauth_header()
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     def patch_database(self, id, title=None, description=None, properties=None):
@@ -364,10 +470,12 @@ class Notion(api.API):
         data = {
             "title": title,
             "description": description,
-            "properties": properties
+            "properties": properties,
         }
         response = requests.patch(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     ##############################
@@ -389,14 +497,18 @@ class Notion(api.API):
             url = self._url + "/v1/users/" + id
         header = self.oauth_header()
         response = requests.get(url, headers=header)
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
     ###############################
     # Search: Notion API requests #
     ###############################
 
-    def search(self, query, sort=None, filter=None, start_cursor=None, page_size=None):
+    def search(
+        self, query, sort=None, filter=None, start_cursor=None, page_size=None
+    ):
         """
         Searches all pages and child pages that are shared with the integration.
         The response may contain fewer than page_size of results.
@@ -419,10 +531,12 @@ class Notion(api.API):
             "sort": sort,
             "filter": filter,
             "start_cursor": start_cursor,
-            "page_size": page_size
+            "page_size": page_size,
         }
         response = requests.post(url, headers=header, data=json.dumps(data))
-        request_response = api.RequestResponse(status_code=response.status_code, data=response.json())
+        request_response = api.RequestResponse(
+            status_code=response.status_code, data=response.json()
+        )
         return request_response
 
 

@@ -50,16 +50,22 @@ class TestRunner(unittest.TestCase):
     def test_get_status(self):
         self.test_runner._Runner__load_applications()
         self.test_runner._Runner__get_status(self.test_runner._applications[0])
-        self.assertNotEqual(self.test_runner._Runner__app_health["TestApplication"]["status"],
-                            {application.Status.WAITING})
+        self.assertNotEqual(
+            self.test_runner._Runner__app_health["TestApplication"]["status"],
+            {application.Status.WAITING},
+        )
 
     def test_run(self):
         self.test_runner.run()
 
     def test_is_method_overridden(self):
-        self.assertFalse(self.test_runner.is_method_overridden(TestApplication, "run"))
-        self.assertTrue(self.test_runner.is_method_overridden(TestApplicationBad, "run"))
+        self.assertFalse(
+            self.test_runner.is_method_overridden(TestApplication, "run")
+        )
+        self.assertTrue(
+            self.test_runner.is_method_overridden(TestApplicationBad, "run")
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
