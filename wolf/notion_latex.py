@@ -1,7 +1,8 @@
 """
 The Notion2Latex class is a utility designed for interacting with the Notion API.
 
-Processing specific operations and subsequently converting the retrieved data from Notion to LaTeX format.
+Processing specific operations and subsequently converting the retrieved data from Notion to
+LaTeX format.
 """
 import json
 import os
@@ -26,7 +27,8 @@ class Notion2Latex(application.Application):
     Methods:
         - get_files(): Retrieves files from Notion and returns a list of file IDs.
         - get_markdown(file): Get the markdown file from Notion.
-        - compile (file, param_dict): Compile a Markdown file into a PDF using the pandoc and xelatex tools.
+        - compile (file, param_dict): Compile a Markdown file into a PDF using the pandoc and
+        xelatex tools.
         - job(): Perform the SyncNotion job.
 
     Attributes:
@@ -46,6 +48,7 @@ class Notion2Latex(application.Application):
             },
             "required": ["client", "titre", "phase_id", "phase_nom"],
         }
+
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         with open("token.json") as file:
             self.master_file = json.load(file)["notion_master_file"]
@@ -60,6 +63,7 @@ class Notion2Latex(application.Application):
         """
         status = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if status.returncode != 0:
+            print(f"Error : {status.stderr}")
             return False
         return True
 
@@ -90,7 +94,8 @@ class Notion2Latex(application.Application):
             self.logger.error(f"Unable to open the 'token.json' file: {e}")
         except (
             json.JSONDecodeError
-        ) as e:  # Catch the JSONDecodeError for malformed JSON in 'token.json'
+        ) as e:  # Catch the JSONDecodeError for malformed JSON in
+            # 'token.json'
             self.logger.error(
                 f"Unable to parse the JSON from 'token.json': {e}"
             )
@@ -138,7 +143,8 @@ class Notion2Latex(application.Application):
         Get the markdown file from Notion.
 
         :param file: The file path of the markdown file to process
-        :return: Returns a dictionary containing parameter information if the markdown file has valid header data
+        :return: Returns a dictionary containing parameter information if the markdown file has
+        valid header data
         """
         MarkdownExporter(block_id=file, output_path=".", download=True).export()
 
@@ -224,7 +230,7 @@ class Notion2Latex(application.Application):
             "xelatex -interaction=nonstopmode " + file + ".tex"
         )
         success_second = self.run_command(
-            "xelatex -interaction=nonstopmode " + file + ".tex  >/dev/null"
+            "xelatex -interaction=nonstopmode " + file + ".tex  " ">/dev/null"
         )
         success = success_first and success_second
         if not success:
@@ -315,7 +321,8 @@ class Notion2Latex(application.Application):
         This method starts the job by setting the status to "RUNNING."
         It then sets the status to "SUCCESS" and logs the job finished with the current status.
 
-        :return: 'application.Status': The status of the job indicating whether it was successful or not.
+        :return: 'application.Status': The status of the job indicating whether it was
+        successful or not.
         """
         self.logger.debug("Notion to LaTeX conversion started.")
         self.get_template()
@@ -353,13 +360,15 @@ class Notion2Latex(application.Application):
         ).json()
         workflow_id = workflows["workflows"][0]["id"]
         runs = requests.get(
-            f"https://api.github.com/repos/{user}/{repo}/actions/workflows/{workflow_id}/runs",
+            f"https://api.github.com/repos/{user}/{repo}/actions/workflows/"
+            f"{workflow_id}/runs",
             headers=headers,
         ).json()
         if runs["workflow_runs"]:
             run_id = runs["workflow_runs"][0]["id"]
             run_details = requests.get(
-                f"https://api.github.com/repos/{user}/{repo}/actions/runs/{run_id}",
+                f"https://api.github.com/repos/{user}/"
+                f"{repo}/actions/runs/{run_id}",
                 headers=headers,
             ).json()
             try:
@@ -418,8 +427,10 @@ def main():
 
 def post_run():
     """
-    This method, `post_run`, is used to perform certain actions after the main execution of a program.
-    It is responsible for importing necessary modules, initializing an instance of the `Notion2Latex` class,
+    This method, `post_run`, is used to perform certain actions after the main execution of a
+    program.
+    It is responsible for importing necessary modules, initializing an instance of the
+    `Notion2Latex` class,
     loading a token from a JSON file, and calling specific methods of the `Notion2Latex` class.
 
     :return: None
