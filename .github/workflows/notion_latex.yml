@@ -6,9 +6,6 @@ on:
   workflow_dispatch:
   push:
 
-permissions:
-  contents: write
-
 jobs:
   notion_latex:
 
@@ -43,11 +40,12 @@ jobs:
       - name: Run Notion LaTeX
         run: |
           poetry run notion_latex
-      - name: Add and commit
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Archive LaTeX output
+        uses: actions/upload-artifact@v3
         with:
-          commit_message: "Update Notion LaTeX"
-          commit_author: Github Actions <actions@github.com>
-          file_pattern: "wolf/doc_latex-template-complex-version/out/*"
-          branch: notion_latex_artifact
-          repository: "sedelpeuch/wolf-artifact"
+          name: latex-artifact
+          path: wolf/doc_latex-template-complex-version/out
+          if-no-files-found: error
+      - name: Publish artifact to notion
+        run: |
+          poetry run notion_latex_post
