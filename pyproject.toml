@@ -9,6 +9,9 @@ description = "A library using wolf core to implement applications for services 
 authors = ["sedelpeuch <sebastien@delpeuch.net>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
+packages = [
+    { include = "wolf" }
+]
 
 [tool.poetry.scripts]
 notion_latex = "wolf.notion_latex:main"
@@ -21,6 +24,4 @@ unidecode = "^1.2.0"
 pygit2 = "^1.6.1"
 pygithub = "^1.59.0"
 notion2md = "^2.8.3"
-
-[packages]
-wolf = { path = "wolf", develop = false }
+pre-commit = "^2.15.0"
