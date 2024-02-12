@@ -4,6 +4,7 @@ The Notion2Latex class is a utility designed for interacting with the Notion API
 Processing specific operations and subsequently converting the retrieved data from Notion to
 LaTeX format.
 """
+
 import json
 import os
 import subprocess
